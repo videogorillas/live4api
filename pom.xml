@@ -163,6 +163,11 @@
             <version>${stjs.version}</version>
         </dependency>
         <dependency>
+			<groupId>org.st-js</groupId>
+			<artifactId>server</artifactId>
+			<version>3.3.0</version>
+		</dependency>
+        <dependency>
             <groupId>com.google.code.geocoder-java</groupId>
             <artifactId>geocoder-java</artifactId>
             <version>0.16</version>

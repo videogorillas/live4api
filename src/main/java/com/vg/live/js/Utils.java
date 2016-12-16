@@ -42,6 +42,10 @@ public class Utils {
         }
         return defaultString;
     }
+    
+    public static boolean isNotBlank(String str) {
+        return str != null && !"".equals(str) && !str.matches("\\s+");
+    }
 
     public static boolean isString(Object anything) {
         return "string".equals(typeof(anything));

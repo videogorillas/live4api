@@ -1,12 +1,15 @@
 package com.vg.live.api3;
 
 import static com.squareup.okhttp.ws.WebSocket.TEXT;
+import static com.vg.live.LiveGson4api3.GSON;
 import static com.vg.live.api.Api2Urls.API_2_UPLOAD_AV;
-import static com.vg.live.model.LiveMessage.subscribeStream;
+import static com.vg.util.HttpUtils.GET;
+import static com.vg.util.HttpUtils.JSON_MIMETYPE;
+import static com.vg.util.HttpUtils.LAST_MODIFIED;
+import static com.vg.util.HttpUtils.OCTET_STREAM;
+import static com.vg.util.HttpUtils.httpDateFormat;
 import static com.vg.util.RxRequests.requestString;
 import static com.vg.util.RxRequests.webSocket;
-import static com.vg.util.Utils.GET;
-import static com.vg.util.Utils.gsonToString;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static rx.schedulers.Schedulers.newThread;
 
@@ -24,7 +27,6 @@ import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ws.WebSocket;
 import com.vg.live.StreamId;
 import com.vg.live.api.Api2Urls;
-import com.vg.live.api.HttpUtils;
 import com.vg.live.model.Hardware;
 import com.vg.live.model.LiveMessage;
 import com.vg.live.model.LoginRequestData;
@@ -35,7 +37,7 @@ import com.vg.live.model.api1.Api1StreamUrls;
 import com.vg.live.model.api3.Api3HwUrls;
 import com.vg.live.model.api3.Api3MissionUrls;
 import com.vg.live.model.api3.Api3Urls;
-import com.vg.util.Utils;
+import com.vg.util.HttpUtils;
 
 import rx.Observable;
 import rx.subjects.ReplaySubject;
@@ -68,31 +70,26 @@ public class RxApiClient {
                         .share();
     }
 
-    //TODO: check urls
     public Request uploadJsonRequest(StreamId sid, String filename, Object o) {
-        return uploadJsonRequest(sid, filename, System.currentTimeMillis(), gsonToString(o));
+        return uploadJsonRequest(sid, filename, System.currentTimeMillis(), GSON.gsonToString(o));
     }
 
-    //TODO: check urls
     public Request uploadJsonRequest(StreamId sid, String filename, long mtime, String json) {
         String buildUrl = String.format(serverUrl + API_2_UPLOAD_AV + "/%s/%s/%s", sid.userId, sid.streamId, filename);
-        Request.Builder builder = new Request.Builder().header(HttpUtils.LAST_MODIFIED, Utils.httpDateFormat(mtime));
+        Request.Builder builder = new Request.Builder().header(LAST_MODIFIED, httpDateFormat(mtime));
         try {
-            builder.url(buildUrl + ".gz").post(RequestBody.create(HttpUtils.OCTET_STREAM, gzip(json)));
+            builder.url(buildUrl + ".gz").post(RequestBody.create(OCTET_STREAM, gzip(json)));
         } catch (IOException e) {
-            builder.url(buildUrl).post(RequestBody.create(HttpUtils.JSON_MIMETYPE, json));
+            builder.url(buildUrl).post(RequestBody.create(JSON_MIMETYPE, json));
         }
 
         return builder.build();
     }
 
-    //TODO: check urls
     public Request uploadFileRequest(StreamId sid, File file) {
-        String buildUrl = String.format(serverUrl + API_2_UPLOAD_AV + "/%s/%s/%s", sid.userId, sid.streamId,
-                file.getName());
-        Request.Builder builder = new Request.Builder().header(HttpUtils.LAST_MODIFIED,
-                Utils.httpDateFormat(file.lastModified()));
-        builder.url(buildUrl).post(RequestBody.create(HttpUtils.OCTET_STREAM, file));
+        String buildUrl = String.format(serverUrl + API_2_UPLOAD_AV + "/%s/%s/%s", sid.userId, sid.streamId, file.getName());
+        Request.Builder builder = new Request.Builder().header(LAST_MODIFIED, httpDateFormat(file.lastModified()));
+        builder.url(buildUrl).post(RequestBody.create(OCTET_STREAM, file));
         return builder.build();
     }
 
@@ -115,14 +112,13 @@ public class RxApiClient {
 
     public Request loginRequest(String email, String password) {
         LoginRequestData lrd = new LoginRequestData(email, password);
-        return HttpUtils.postAsJsonRequest(serverUrl + Api3Urls.API_3_LOGIN, gsonToString(lrd));
+        return HttpUtils.postAsJsonRequest(serverUrl + Api3Urls.API_3_LOGIN, GSON.gsonToString(lrd));
     }
 
     public Request createStreamRequest(StreamResponse sr) {
-        return HttpUtils.postAsJsonRequest(serverUrl + Api2Urls.API_2_STREAM, gsonToString(sr));
+        return HttpUtils.postAsJsonRequest(serverUrl + Api2Urls.API_2_STREAM, GSON.gsonToString(sr));
     }
 
-    //TODO: check urls DONE
     public Observable<User> login(String email, String password) {
         return requestString(getApiClient(), loginRequest(email, password))
                 .concatMap(json -> fromJsonRx(json, User.class));
@@ -141,36 +137,32 @@ public class RxApiClient {
         return GET(serverUrl + Api3MissionUrls.getUrl(id));
     }
 
-    //TODO: check urls DONE
     public Request listHwRequest(String orgId) {
         return GET(serverUrl + Api3HwUrls.listUrl(orgId));
     }
 
     public Request createHwRequest(Hardware hw) {
-        return HttpUtils.postAsJsonRequest(serverUrl + Api3HwUrls.createUrl(), gsonToString(hw));
+        return HttpUtils.postAsJsonRequest(serverUrl + Api3HwUrls.createUrl(), GSON.gsonToString(hw));
     }
 
     public Request createMissionRequest(Mission m) {
-        return HttpUtils.postAsJsonRequest(serverUrl + Api3MissionUrls.createUrl(), gsonToString(m));
+        return HttpUtils.postAsJsonRequest(serverUrl + Api3MissionUrls.createUrl(), GSON.gsonToString(m));
     }
 
     public Request updateMissionRequest(Mission m) {
-        return HttpUtils.putAsJsonRequest(serverUrl + Api3MissionUrls.updateUrl(), gsonToString(m));
+        return HttpUtils.putAsJsonRequest(serverUrl + Api3MissionUrls.updateUrl(), GSON.gsonToString(m));
     }
 
-    //TODO: check urls
     public Observable<Mission> listMissions(String orgId) {
         return requestString(getApiClient(), listMissionsRequest(orgId))
                 .concatMap(json -> fromJsonRx(json, Mission[].class))
                 .concatMap(arr -> Observable.from(arr));
     }
 
-    //TODO: check urls
     public Observable<Mission> getMission(String id) {
         return requestString(getApiClient(), getMissionRequest(id)).concatMap(json -> fromJsonRx(json, Mission.class));
     }
 
-    //TODO: check urls
     public Observable<StreamResponse> getStream(StreamId id) {
         return requestString(getApiClient(), getStreamRequest(id))
                 .concatMap(json -> fromJsonRx(json, StreamResponse.class));
@@ -180,7 +172,6 @@ public class RxApiClient {
         return GET(serverUrl + Api1StreamUrls.getUrl(id.toString()));
     }
 
-    //TODO: check urls
     public Observable<Mission.ShareToken> getShareToken(String missionId) {
         return requestString(getApiClient(), GET(serverUrl + Api3MissionUrls.tokenUrl(missionId)))
                 .concatMap(json -> fromJsonRx(json, Mission.ShareToken.class));
@@ -188,18 +179,16 @@ public class RxApiClient {
 
     public <T> Observable<T> fromJsonRx(String json, Class<T> cls) {
         try {
-            return Observable.just(Utils.fromJson(json, cls));
+            return Observable.just(GSON.fromJson(json, cls));
         } catch (Exception e) {
             return Observable.error(e);
         }
     }
 
-    //TODO: check urls
     public Observable<Hardware> createHw(Hardware hw) {
         return requestString(getApiClient(), createHwRequest(hw)).concatMap(json -> fromJsonRx(json, Hardware.class));
     }
 
-    //TODO: check urls DONE
     public Observable<Hardware> getHwByExternalId(String externalId, String orgId) {
         Observable<Hardware> concatMap = requestString(getApiClient(), listHwRequest(orgId))
                 .concatMap(json -> fromJsonRx(json, Hardware[].class))
@@ -208,25 +197,23 @@ public class RxApiClient {
         return concatMap;
     }
 
-    //TODO: check urls DONE
     public Observable<Mission> createMission(Mission mission) {
         return requestString(getApiClient(), createMissionRequest(mission))
                 .concatMap(json -> fromJsonRx(json, Mission.class));
     }
 
-    //TODO: check urls
     public Observable<Mission> updateMission(Mission mission) {
         return requestString(getApiClient(), updateMissionRequest(mission))
                 .concatMap(json -> fromJsonRx(json, Mission.class));
     }
 
     public Observable<LiveMessage> streamUpdates(StreamId sid) {
-        wsSendText(gsonToString(subscribeStream(sid.sid())));
+        wsSendText(GSON.gsonToString(LiveMessage.subscribeStream(sid.toString())));
         return _liveMessages.filter(lm -> sid.toString().equals(lm.streamId));
     }
 
     public Observable<Mission> missionUpdates() {
-        wsSendText(gsonToString(LiveMessage.subscribe("mission")));
+        wsSendText(GSON.gsonToString(LiveMessage.subscribe("mission")));
         return _liveMessages.filter(lm -> lm.mission != null).map(lm -> lm.mission);
     }
 

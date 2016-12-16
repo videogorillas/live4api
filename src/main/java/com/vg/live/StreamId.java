@@ -5,6 +5,8 @@ import javax.ws.rs.PathParam;
 public class StreamId {
     //NOTE: these fields are intentionally final - this class is supposed to be immutable
     public final String userId;
+    
+    //TODO: rename streamId to ololo
     public final String streamId;
 
     public StreamId(@PathParam("userId") String userId, @PathParam("streamId") String streamId) {
