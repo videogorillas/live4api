@@ -1,5 +1,7 @@
 package com.vg.live.model;
 
+import java.io.File;
+
 public class TSFile {
 
     @Override
