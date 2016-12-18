@@ -1,8 +1,6 @@
 package com.vg.live.model;
 
-import static com.vg.live.model.InternalJSAdapter.tryParseDate;
-
-import com.vg.live.model.Internal.tryParseDate;
+import static com.vg.live.model.Internal.tryParseDate;
 
 import org.stjs.javascript.Date;
 import org.stjs.javascript.SortFunction;
@@ -76,7 +74,7 @@ public class StreamLocation {
     public long getTime() {
         if (timeMsec == 0) {
             if (Internal.isJava) {
-                timeMsec = Internal.tryParseDate(timestamp);
+                timeMsec = tryParseDate(timestamp);
             } else {
                 return (long) new Date(timestamp).getTime();
             }
