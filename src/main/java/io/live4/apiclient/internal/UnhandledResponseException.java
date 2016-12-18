@@ -1,4 +1,4 @@
-package io.live4.apiclient;
+package io.live4.apiclient.internal;
 
 import java.io.IOException;
 

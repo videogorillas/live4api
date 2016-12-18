@@ -2,13 +2,13 @@ package io.live4.apiclient;
 
 import static com.squareup.okhttp.ws.WebSocket.TEXT;
 import static io.live4.api2.Api2Urls.API_2_UPLOAD_AV;
-import static io.live4.apiclient.HttpUtils.GET;
-import static io.live4.apiclient.HttpUtils.JSON_MIMETYPE;
-import static io.live4.apiclient.HttpUtils.LAST_MODIFIED;
-import static io.live4.apiclient.HttpUtils.OCTET_STREAM;
-import static io.live4.apiclient.HttpUtils.httpDateFormat;
-import static io.live4.apiclient.RxRequests.requestString;
-import static io.live4.apiclient.RxRequests.webSocket;
+import static io.live4.apiclient.internal.HttpUtils.GET;
+import static io.live4.apiclient.internal.HttpUtils.JSON_MIMETYPE;
+import static io.live4.apiclient.internal.HttpUtils.LAST_MODIFIED;
+import static io.live4.apiclient.internal.HttpUtils.OCTET_STREAM;
+import static io.live4.apiclient.internal.HttpUtils.httpDateFormat;
+import static io.live4.apiclient.internal.RxRequests.requestString;
+import static io.live4.apiclient.internal.RxRequests.webSocket;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static rx.schedulers.Schedulers.newThread;
 
@@ -31,6 +31,7 @@ import io.live4.api2.Api2Urls;
 import io.live4.api3.Api3HwUrls;
 import io.live4.api3.Api3MissionUrls;
 import io.live4.api3.Api3Urls;
+import io.live4.apiclient.internal.HttpUtils;
 import io.live4.model.Hardware;
 import io.live4.model.LiveMessage;
 import io.live4.model.LoginRequestData;

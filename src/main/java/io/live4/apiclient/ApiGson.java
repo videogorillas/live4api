@@ -3,6 +3,9 @@ package io.live4.apiclient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import io.live4.apiclient.internal.JSDateAdapter;
+import io.live4.apiclient.internal.STJSEnumDeserializer;
+
 import org.stjs.server.json.gson.JSArrayAdapter;
 import org.stjs.server.json.gson.JSMapAdapter;
 
