@@ -1546,17 +1546,18 @@ live4api.Api3Urls = stjs.extend(live4api.Api3Urls, null, [], function(constructo
         return live4api.Api3Urls.WSVIDEO + "/" + streamId;
     };
 }, {}, {});
-var Api1StreamUrls = function() {};
-Api1StreamUrls = stjs.extend(Api1StreamUrls, null, [], function(constructor, prototype) {
+stjs.ns("live4api");
+live4api.Api1StreamUrls = function() {};
+live4api.Api1StreamUrls = stjs.extend(live4api.Api1StreamUrls, null, [], function(constructor, prototype) {
     constructor.API_STREAM = "/api/stream";
     constructor.createUrl = function() {
-        return Api1StreamUrls.API_STREAM;
+        return live4api.Api1StreamUrls.API_STREAM;
     };
     constructor.listUrl = function() {
-        return Api1StreamUrls.API_STREAM;
+        return live4api.Api1StreamUrls.API_STREAM;
     };
     constructor.getUrl = function(id) {
-        return Api1StreamUrls.API_STREAM + "/" + id;
+        return live4api.Api1StreamUrls.API_STREAM + "/" + id;
     };
 }, {}, {});
 stjs.ns("live4api");
