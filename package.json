@@ -1,0 +1,30 @@
+{
+  "name": "live4api",
+  "version": "3.0.1",
+  "description": "LIVE4 API",
+  "main": "live4api.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/videogorillas/live4api.git"
+  },
+  "keywords": [
+    "live4",
+    "api",
+    "live-streaming",
+    "video"
+  ],
+  "author": "zhukov@videogorillas.com",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/videogorillas/live4api/issues"
+  },
+  "homepage": "https://github.com/videogorillas/live4api#readme",
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-contrib-concat": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0"
+  }
+}
