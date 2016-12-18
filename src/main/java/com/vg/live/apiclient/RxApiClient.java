@@ -1,15 +1,14 @@
-package com.vg.live.api3;
+package com.vg.live.apiclient;
 
 import static com.squareup.okhttp.ws.WebSocket.TEXT;
-import static com.vg.live.LiveGson4api3.GSON;
-import static com.vg.live.api.Api2Urls.API_2_UPLOAD_AV;
-import static com.vg.util.HttpUtils.GET;
-import static com.vg.util.HttpUtils.JSON_MIMETYPE;
-import static com.vg.util.HttpUtils.LAST_MODIFIED;
-import static com.vg.util.HttpUtils.OCTET_STREAM;
-import static com.vg.util.HttpUtils.httpDateFormat;
-import static com.vg.util.RxRequests.requestString;
-import static com.vg.util.RxRequests.webSocket;
+import static com.vg.live.api2.Api2Urls.API_2_UPLOAD_AV;
+import static com.vg.live.apiclient.HttpUtils.GET;
+import static com.vg.live.apiclient.HttpUtils.JSON_MIMETYPE;
+import static com.vg.live.apiclient.HttpUtils.LAST_MODIFIED;
+import static com.vg.live.apiclient.HttpUtils.OCTET_STREAM;
+import static com.vg.live.apiclient.HttpUtils.httpDateFormat;
+import static com.vg.live.apiclient.RxRequests.requestString;
+import static com.vg.live.apiclient.RxRequests.webSocket;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static rx.schedulers.Schedulers.newThread;
 
@@ -21,46 +20,54 @@ import java.net.CookiePolicy;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
+import com.google.gson.Gson;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ws.WebSocket;
-import com.vg.live.StreamId;
-import com.vg.live.api.Api2Urls;
+import com.vg.live.api1.Api1StreamUrls;
+import com.vg.live.api2.Api2Urls;
+import com.vg.live.api3.Api3HwUrls;
+import com.vg.live.api3.Api3MissionUrls;
+import com.vg.live.api3.Api3Urls;
 import com.vg.live.model.Hardware;
 import com.vg.live.model.LiveMessage;
 import com.vg.live.model.LoginRequestData;
 import com.vg.live.model.Mission;
+import com.vg.live.model.StreamId;
 import com.vg.live.model.StreamResponse;
 import com.vg.live.model.User;
-import com.vg.live.model.api1.Api1StreamUrls;
-import com.vg.live.model.api3.Api3HwUrls;
-import com.vg.live.model.api3.Api3MissionUrls;
-import com.vg.live.model.api3.Api3Urls;
-import com.vg.util.HttpUtils;
 
 import rx.Observable;
 import rx.subjects.ReplaySubject;
 
 public class RxApiClient {
-    //    private  final String ServerUrl = "http://qa.live4.io"; // QA
-    private String serverUrl = "http://beta.missionkeeper.com"; // MissionKeeper
-    //    private  final String ServerUrl = "http://10.0.1.110:8042"; // VideoGorillas
-    //    private  final String ServerUrl = "http://192.168.1.46:8042"; // Home
-
+    
+    private String serverUrl;
     private ReplaySubject<WebSocket> _ws = ReplaySubject.create(1);
     private Observable<LiveMessage> _liveMessages;
 
     private OkHttpClient httpClient;
 
-    public RxApiClient(String serverUrl) {
-        this.serverUrl = serverUrl;
+    private Gson gson;
 
-        this.httpClient = new OkHttpClient();
+    public RxApiClient(String serverUrl) {
+        this(serverUrl, ApiGson.gson(), newHttpClient());
+    }
+    
+    private static OkHttpClient newHttpClient() {
+        OkHttpClient httpClient = new OkHttpClient();
         CookieManager cookieHandler = new CookieManager();
         cookieHandler.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
         httpClient.setCookieHandler(cookieHandler);
         httpClient.setReadTimeout(30, TimeUnit.SECONDS);
+        return httpClient;
+    }
+
+    public RxApiClient(String serverUrl, Gson gson, OkHttpClient httpClient) {
+        this.serverUrl = serverUrl;
+        this.gson = gson;
+        this.httpClient = httpClient;
 
         this._liveMessages = webSocket(getApiClient(), GET(serverUrl + Api3Urls.API_3_WSUPDATES + "/"),
                 (ws, x) -> _ws.onNext(ws))
@@ -71,7 +78,7 @@ public class RxApiClient {
     }
 
     public Request uploadJsonRequest(StreamId sid, String filename, Object o) {
-        return uploadJsonRequest(sid, filename, System.currentTimeMillis(), GSON.gsonToString(o));
+        return uploadJsonRequest(sid, filename, System.currentTimeMillis(), gsonToString(o));
     }
 
     public Request uploadJsonRequest(StreamId sid, String filename, long mtime, String json) {
@@ -112,11 +119,11 @@ public class RxApiClient {
 
     public Request loginRequest(String email, String password) {
         LoginRequestData lrd = new LoginRequestData(email, password);
-        return HttpUtils.postAsJsonRequest(serverUrl + Api3Urls.API_3_LOGIN, GSON.gsonToString(lrd));
+        return HttpUtils.postAsJsonRequest(serverUrl + Api3Urls.API_3_LOGIN, gsonToString(lrd));
     }
 
     public Request createStreamRequest(StreamResponse sr) {
-        return HttpUtils.postAsJsonRequest(serverUrl + Api2Urls.API_2_STREAM, GSON.gsonToString(sr));
+        return HttpUtils.postAsJsonRequest(serverUrl + Api2Urls.API_2_STREAM, gsonToString(sr));
     }
 
     public Observable<User> login(String email, String password) {
@@ -142,15 +149,15 @@ public class RxApiClient {
     }
 
     public Request createHwRequest(Hardware hw) {
-        return HttpUtils.postAsJsonRequest(serverUrl + Api3HwUrls.createUrl(), GSON.gsonToString(hw));
+        return HttpUtils.postAsJsonRequest(serverUrl + Api3HwUrls.createUrl(), gsonToString(hw));
     }
 
     public Request createMissionRequest(Mission m) {
-        return HttpUtils.postAsJsonRequest(serverUrl + Api3MissionUrls.createUrl(), GSON.gsonToString(m));
+        return HttpUtils.postAsJsonRequest(serverUrl + Api3MissionUrls.createUrl(), gsonToString(m));
     }
 
     public Request updateMissionRequest(Mission m) {
-        return HttpUtils.putAsJsonRequest(serverUrl + Api3MissionUrls.updateUrl(), GSON.gsonToString(m));
+        return HttpUtils.putAsJsonRequest(serverUrl + Api3MissionUrls.updateUrl(), gsonToString(m));
     }
 
     public Observable<Mission> listMissions(String orgId) {
@@ -179,10 +186,18 @@ public class RxApiClient {
 
     public <T> Observable<T> fromJsonRx(String json, Class<T> cls) {
         try {
-            return Observable.just(GSON.fromJson(json, cls));
+            return Observable.just(fromJson(json, cls));
         } catch (Exception e) {
             return Observable.error(e);
         }
+    }
+
+    private <T> T fromJson(String json, Class<T> cls) {
+        return gson.fromJson(json, cls);
+    }
+
+    private String gsonToString(Object o) {
+        return gson.toJson(o);
     }
 
     public Observable<Hardware> createHw(Hardware hw) {
@@ -208,12 +223,12 @@ public class RxApiClient {
     }
 
     public Observable<LiveMessage> streamUpdates(StreamId sid) {
-        wsSendText(GSON.gsonToString(LiveMessage.subscribeStream(sid.toString())));
+        wsSendText(gsonToString(LiveMessage.subscribeStream(sid.toString())));
         return _liveMessages.filter(lm -> sid.toString().equals(lm.streamId));
     }
 
     public Observable<Mission> missionUpdates() {
-        wsSendText(GSON.gsonToString(LiveMessage.subscribe("mission")));
+        wsSendText(gsonToString(LiveMessage.subscribe("mission")));
         return _liveMessages.filter(lm -> lm.mission != null).map(lm -> lm.mission);
     }
 

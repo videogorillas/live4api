@@ -1,6 +1,4 @@
-package com.vg.live;
-
-import com.vg.live.model.UserResponse;
+package com.vg.live.model;
 
 public class Like {
     

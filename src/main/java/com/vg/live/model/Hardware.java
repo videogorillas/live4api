@@ -1,9 +1,9 @@
 package com.vg.live.model;
 
-import static com.vg.live.js.Utils.isBlank;
 import static com.vg.live.model.Hardware.Availability.AVAILABLE;
 import static com.vg.live.model.Hardware.Availability.INUSE;
 import static com.vg.live.model.Hardware.Availability.SCHEDULED;
+import static com.vg.live.model.Internal.isBlank;
 
 import org.stjs.javascript.SortFunction;
 

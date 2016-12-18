@@ -1,4 +1,4 @@
-package com.vg.live.model.api3;
+package com.vg.live.api3;
 
 public class Api3MissionUrls {
     public static final String API_3_MISSION = "/api/3/mission";

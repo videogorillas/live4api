@@ -1,4 +1,4 @@
-package com.vg.util;
+package com.vg.live.apiclient;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -19,7 +19,7 @@ public class HttpUtils {
     }
 
     public static Request GET(HttpUrl url) {
-        return GET(url.toString());
+        return new Request.Builder().url(url).build();
     }
 
     public static Request postAsJsonRequest(String url, String json) {

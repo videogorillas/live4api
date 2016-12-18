@@ -1,6 +1,6 @@
-package com.vg.live.js;
+package com.vg.live.model;
 
-import static com.vg.live.js.VGObjectAdapter.hasOwnProperty;
+import static com.vg.live.model.InternalJSAdapter.hasOwnProperty;
 import static org.stjs.javascript.JSCollections.$array;
 import static org.stjs.javascript.JSCollections.$map;
 import static org.stjs.javascript.JSGlobal.typeof;
@@ -8,7 +8,7 @@ import static org.stjs.javascript.JSGlobal.typeof;
 import org.stjs.javascript.Array;
 import org.stjs.javascript.Map;
 
-public class Utils {
+class Internal {
     public static <T> Array<T> mapValues(Map<String, T> map) {
         Array<T> result = $array();
         if (map == null)

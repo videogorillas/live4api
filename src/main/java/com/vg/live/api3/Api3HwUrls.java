@@ -1,4 +1,4 @@
-package com.vg.live.model.api3;
+package com.vg.live.api3;
 
 public class Api3HwUrls {
     public static final String API_3_HW = "/api/3/hardware";

@@ -1,8 +1,4 @@
-package com.vg.live;
-
-import com.vg.live.js.Utils;
-import com.vg.live.model.Platform;
-import com.vg.live.model.UserResponse;
+package com.vg.live.model;
 
 public class Comment {
     public String uuid;
@@ -20,7 +16,7 @@ public class Comment {
     }
 
     public String getBody() {
-        return Utils.defaultString(body, "");
+        return Internal.defaultString(body, "");
     }
 
     public void setBody(String body) {

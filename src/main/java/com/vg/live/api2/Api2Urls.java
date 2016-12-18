@@ -1,4 +1,4 @@
-package com.vg.live.api;
+package com.vg.live.api2;
 
 public class Api2Urls {
 

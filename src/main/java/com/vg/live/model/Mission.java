@@ -1,8 +1,8 @@
 package com.vg.live.model;
 
-import static com.vg.live.js.Utils.containsKey;
-import static com.vg.live.js.Utils.defaultArray;
-import static com.vg.live.js.Utils.defaultMap;
+import static com.vg.live.model.Internal.containsKey;
+import static com.vg.live.model.Internal.defaultArray;
+import static com.vg.live.model.Internal.defaultMap;
 import static com.vg.live.model.MissionRole.OWNER;
 
 import org.stjs.javascript.Array;

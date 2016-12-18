@@ -1,7 +1,7 @@
 package com.vg.live.model;
 
-import static com.vg.live.js.Utils.defaultMap;
-import static com.vg.live.js.VGObjectAdapter.$or;
+import static com.vg.live.model.Internal.defaultMap;
+import static com.vg.live.model.InternalJSAdapter.$or;
 import static org.stjs.javascript.JSCollections.$map;
 
 import org.stjs.javascript.Map;

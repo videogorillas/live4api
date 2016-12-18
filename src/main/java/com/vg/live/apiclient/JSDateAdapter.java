@@ -1,4 +1,4 @@
-package com.vg.live;
+package com.vg.live.apiclient;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;

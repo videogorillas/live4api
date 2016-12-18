@@ -1,4 +1,4 @@
-package com.vg.live.model.api3;
+package com.vg.live.api3;
 
 public class Api3Urls {
 

@@ -1,6 +1,6 @@
 package com.vg.live.model;
 
-import static com.vg.live.js.Utils.mapValues;
+import static com.vg.live.model.Internal.mapValues;
 
 import org.stjs.javascript.Map;
 

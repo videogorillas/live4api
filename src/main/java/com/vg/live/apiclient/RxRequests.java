@@ -1,4 +1,4 @@
-package com.vg.util;
+package com.vg.live.apiclient;
 
 import java.io.IOException;
 import java.io.InputStream;

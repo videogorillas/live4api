@@ -5,7 +5,6 @@ import org.stjs.javascript.Date;
 import org.stjs.javascript.annotation.ServerSide;
 
 import com.google.code.geocoder.model.GeocoderResult;
-import com.vg.live.StreamId;
 
 public class Stream {
 

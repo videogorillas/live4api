@@ -1,7 +1,5 @@
 package com.vg.live.model;
 
-import com.vg.live.Comment;
-
 import org.stjs.javascript.Array;
 
 public class CommentResponse {

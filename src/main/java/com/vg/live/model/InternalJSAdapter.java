@@ -1,4 +1,4 @@
-package com.vg.live.js;
+package com.vg.live.model;
 
 
 import org.stjs.javascript.Array;
@@ -13,7 +13,7 @@ import org.stjs.javascript.functions.Function1;
 
 @Adapter
 @STJSBridge
-public class VGObjectAdapter {
+class InternalJSAdapter {
 
     @Template("or")
     @Native

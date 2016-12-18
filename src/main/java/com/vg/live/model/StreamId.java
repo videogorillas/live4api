@@ -1,4 +1,4 @@
-package com.vg.live;
+package com.vg.live.model;
 
 import javax.ws.rs.PathParam;
 
@@ -19,14 +19,14 @@ public class StreamId {
         return userId + "/" + streamId;
     }
 
-    private transient int hashCode;
+    private transient int _hashCode;
 
     @Override
     public int hashCode() {
-        if (hashCode == 0) {
-            hashCode = toString().hashCode();
+        if (_hashCode == 0) {
+            _hashCode = toString().hashCode();
         }
-        return hashCode;
+        return _hashCode;
     }
 
     @Override

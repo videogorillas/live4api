@@ -2,8 +2,6 @@ package com.vg.live.model;
 
 import org.stjs.javascript.Array;
 
-import com.vg.live.Like;
-
 public class LikeResponse {
     public final int total_count;
     public final Array<Like> likes;

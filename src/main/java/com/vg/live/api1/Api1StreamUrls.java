@@ -1,4 +1,4 @@
-package com.vg.live.model.api1;
+package com.vg.live.api1;
 
 public class Api1StreamUrls {
     public static final String API_STREAM = "/api/stream";

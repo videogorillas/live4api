@@ -1,7 +1,7 @@
 package com.vg.live.model;
 
-import static com.vg.live.js.Utils.defaultString;
-import static com.vg.live.js.Utils.isNotBlank;
+import static com.vg.live.model.Internal.defaultString;
+import static com.vg.live.model.Internal.isNotBlank;
 import static org.stjs.javascript.JSCollections.$array;
 
 public class Address {
