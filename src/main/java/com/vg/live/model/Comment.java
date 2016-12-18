@@ -21,7 +21,7 @@ public class Comment {
 
     public void setBody(String body) {
         this.body = body;
-        this.mtime = Platform.currentTimeMillis();
+        this.mtime = Internal.currentTimeMillis();
     }
 
 }

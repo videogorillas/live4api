@@ -55,6 +55,9 @@
                 </executions>
                 <configuration>
                     <includes>
+                        <include>com/vg/live/api1/**/*.java</include>
+                        <include>com/vg/live/api2/**/*.java</include>
+                        <include>com/vg/live/api3/**/*.java</include>
                         <include>com/vg/live/model/**/*.java</include>
                     </includes>
                 </configuration>

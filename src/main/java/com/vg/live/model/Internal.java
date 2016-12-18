@@ -6,6 +6,8 @@ import static org.stjs.javascript.JSCollections.$map;
 import static org.stjs.javascript.JSGlobal.typeof;
 
 import org.stjs.javascript.Array;
+import org.stjs.javascript.Date;
+import org.stjs.javascript.JSStringAdapterBase;
 import org.stjs.javascript.Map;
 
 class Internal {
@@ -49,6 +51,20 @@ class Internal {
 
     public static boolean isString(Object anything) {
         return "string".equals(typeof(anything));
+    }
+
+    public static long currentTimeMillis() {
+        return (long) Date.now();
+    }
+
+    public static boolean isJava = "9007199254740993".equals("" + (9007199254740991L + 2));
+
+    public static String fromCharCode(int charcode) {
+        if (!isJava) {
+            return JSStringAdapterBase.fromCharCode(String.class, charcode);
+        } else {
+            return String.valueOf((char) charcode);
+        }
     }
 
 }

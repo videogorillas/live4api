@@ -2,7 +2,6 @@ package com.vg.live.apiclient;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
@@ -84,7 +83,7 @@ public class RxRequests {
         try {
             discardInputStream(r.body().byteStream());
         } catch (IOException e1) {
-            throw new UncheckedIOException(e1);
+            throw new RuntimeException(e1);
         }
     }
     
