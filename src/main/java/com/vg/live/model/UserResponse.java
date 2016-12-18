@@ -1,11 +1,13 @@
 package com.vg.live.model;
 
 import org.stjs.javascript.Array;
+import org.stjs.javascript.annotation.Namespace;
 
 /* Public View for User object.
  This class is using on the WEB side so do not store private secrets,
  tokens, passwords or any field that compromise user private data
  */
+@Namespace("live4api")
 public class UserResponse {
     public final String id;
     public final String name;

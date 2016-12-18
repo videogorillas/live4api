@@ -1,5 +1,8 @@
 package com.vg.live.api3;
 
+import org.stjs.javascript.annotation.Namespace;
+
+@Namespace("live4api")
 public class Api3Urls {
 
     public static final String WSVIDEO = "/api/3/wsvideo";

@@ -6,7 +6,9 @@ import static com.vg.live.model.Hardware.Availability.SCHEDULED;
 import static com.vg.live.model.Internal.isBlank;
 
 import org.stjs.javascript.SortFunction;
+import org.stjs.javascript.annotation.Namespace;
 
+@Namespace("live4api")
 public class Hardware implements Doc {
 
     public static final String TYPE_MC_BOX = "MC_BOX";

@@ -5,7 +5,9 @@ import static com.vg.live.model.InternalJSAdapter.$or;
 import static org.stjs.javascript.JSCollections.$map;
 
 import org.stjs.javascript.Map;
+import org.stjs.javascript.annotation.Namespace;
 
+@Namespace("live4api")
 public class User implements Doc {
     public long _rev;
 

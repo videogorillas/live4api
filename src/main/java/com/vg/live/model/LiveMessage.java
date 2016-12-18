@@ -1,7 +1,9 @@
 package com.vg.live.model;
 
 import org.stjs.javascript.Array;
+import org.stjs.javascript.annotation.Namespace;
 
+@Namespace("live4api")
 public class LiveMessage {
     public String streamId;
 

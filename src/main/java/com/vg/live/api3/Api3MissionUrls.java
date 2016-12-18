@@ -1,5 +1,8 @@
 package com.vg.live.api3;
 
+import org.stjs.javascript.annotation.Namespace;
+
+@Namespace("live4api")
 public class Api3MissionUrls {
     public static final String API_3_MISSION = "/api/3/mission";
     public static final String TOKEN = "/token";

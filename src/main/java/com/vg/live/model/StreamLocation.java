@@ -2,8 +2,10 @@ package com.vg.live.model;
 
 import org.stjs.javascript.Date;
 import org.stjs.javascript.SortFunction;
+import org.stjs.javascript.annotation.Namespace;
 import org.stjs.javascript.functions.Function1;
 
+@Namespace("live4api")
 public class StreamLocation {
 
     public static StreamLocation speedLocation(String timestamp, double speed) {

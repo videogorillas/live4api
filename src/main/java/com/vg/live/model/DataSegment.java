@@ -1,7 +1,9 @@
 package com.vg.live.model;
 
+import org.stjs.javascript.annotation.Namespace;
 import org.stjs.javascript.annotation.Native;
 
+@Namespace("live4api")
 public class DataSegment {
     // prod
     public long playerTime;

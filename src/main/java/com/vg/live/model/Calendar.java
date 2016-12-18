@@ -3,7 +3,9 @@ package com.vg.live.model;
 import static com.vg.live.model.Internal.mapValues;
 
 import org.stjs.javascript.Map;
+import org.stjs.javascript.annotation.Namespace;
 
+@Namespace("live4api")
 public class Calendar implements Doc {
     public long _rev;
     public String id;

@@ -1,7 +1,9 @@
 package com.vg.live.model;
 
 import org.stjs.javascript.Date;
+import org.stjs.javascript.annotation.Namespace;
 
+@Namespace("live4api")
 public class TimeInterval {
     public Date start;
     public Date end;

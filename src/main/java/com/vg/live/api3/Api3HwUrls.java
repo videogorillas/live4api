@@ -1,5 +1,8 @@
 package com.vg.live.api3;
 
+import org.stjs.javascript.annotation.Namespace;
+
+@Namespace("live4api")
 public class Api3HwUrls {
     public static final String API_3_HW = "/api/3/hardware";
     public static final String FIND_BY_PORT = "/findByPort";

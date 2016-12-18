@@ -1,5 +1,8 @@
 package com.vg.live.api2;
 
+import org.stjs.javascript.annotation.Namespace;
+
+@Namespace("live4api")
 public class Api2Urls {
 
     public static final String API_2_START = "/api/2/start";

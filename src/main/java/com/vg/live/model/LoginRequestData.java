@@ -1,5 +1,8 @@
 package com.vg.live.model;
 
+import org.stjs.javascript.annotation.Namespace;
+
+@Namespace("live4api")
 public class LoginRequestData {
     public String l;
     public String p;

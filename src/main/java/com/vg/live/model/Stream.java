@@ -2,10 +2,12 @@ package com.vg.live.model;
 
 import org.stjs.javascript.Array;
 import org.stjs.javascript.Date;
+import org.stjs.javascript.annotation.Namespace;
 import org.stjs.javascript.annotation.ServerSide;
 
 import com.google.code.geocoder.model.GeocoderResult;
 
+@Namespace("live4api")
 public class Stream {
 
     public static Stream createStream(StreamId sid, Privacy privacy) {

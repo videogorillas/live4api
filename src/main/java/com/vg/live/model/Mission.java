@@ -8,7 +8,9 @@ import static com.vg.live.model.MissionRole.OWNER;
 import org.stjs.javascript.Array;
 import org.stjs.javascript.Date;
 import org.stjs.javascript.Map;
+import org.stjs.javascript.annotation.Namespace;
 
+@Namespace("live4api")
 public class Mission implements Doc {
 
     public enum State {

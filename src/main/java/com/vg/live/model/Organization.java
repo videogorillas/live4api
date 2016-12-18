@@ -4,7 +4,9 @@ import static org.stjs.javascript.JSCollections.$array;
 
 import org.stjs.javascript.Array;
 import org.stjs.javascript.Date;
+import org.stjs.javascript.annotation.Namespace;
 
+@Namespace("live4api")
 public class Organization implements Doc {
     public long _rev;
     public String id;

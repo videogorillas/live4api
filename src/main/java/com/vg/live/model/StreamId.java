@@ -2,6 +2,9 @@ package com.vg.live.model;
 
 import javax.ws.rs.PathParam;
 
+import org.stjs.javascript.annotation.Namespace;
+
+@Namespace("live4api")
 public class StreamId {
     //NOTE: these fields are intentionally final - this class is supposed to be immutable
     public final String userId;
