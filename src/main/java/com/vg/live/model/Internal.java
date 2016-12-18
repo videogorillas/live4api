@@ -39,7 +39,7 @@ class Internal {
     }
 
     public static String defaultString(String string, String defaultString) {
-        if (string != null && isString(string) && !"".equals(string)) {
+        if (string != null && !"".equals(string)) {
             return string;
         }
         return defaultString;

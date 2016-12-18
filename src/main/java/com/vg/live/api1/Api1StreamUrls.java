@@ -1,5 +1,8 @@
 package com.vg.live.api1;
 
+import org.stjs.javascript.annotation.Namespace;
+
+@Namespace("live4api")
 public class Api1StreamUrls {
     public static final String API_STREAM = "/api/stream";
 
