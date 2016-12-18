@@ -2,14 +2,12 @@ package com.vg.live.model;
 
 
 import org.stjs.javascript.Array;
-import org.stjs.javascript.JSON;
 import org.stjs.javascript.Map;
 import org.stjs.javascript.annotation.Adapter;
 import org.stjs.javascript.annotation.Native;
 import org.stjs.javascript.annotation.STJSBridge;
 import org.stjs.javascript.annotation.ServerSide;
 import org.stjs.javascript.annotation.Template;
-import org.stjs.javascript.functions.Function1;
 
 @Adapter
 @STJSBridge

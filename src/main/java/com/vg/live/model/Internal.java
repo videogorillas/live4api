@@ -13,7 +13,6 @@ import org.stjs.javascript.Date;
 import org.stjs.javascript.JSStringAdapterBase;
 import org.stjs.javascript.Map;
 import org.stjs.javascript.annotation.Native;
-import org.stjs.javascript.annotation.ServerSide;
 
 class Internal {
     public static <T> Array<T> mapValues(Map<String, T> map) {
