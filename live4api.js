@@ -1130,6 +1130,22 @@ live4api.Api3MissionUrls = stjs.extend(live4api.Api3MissionUrls, null, [], funct
     };
 }, {}, {});
 stjs.ns("live4api");
+live4api.Api3CalendarUrls = function() {};
+live4api.Api3CalendarUrls = stjs.extend(live4api.Api3CalendarUrls, null, [], function(constructor, prototype) {
+    constructor.API_3_CALENDAR = "/api/3/calendar";
+    constructor.OBJECT = "/object";
+    constructor.LIST = "/list";
+    constructor.createUrl = function() {
+        return live4api.Api3CalendarUrls.API_3_CALENDAR + live4api.Api3CalendarUrls.OBJECT;
+    };
+    constructor.getUrl = function(id) {
+        return live4api.Api3CalendarUrls.API_3_CALENDAR + live4api.Api3CalendarUrls.OBJECT + "/" + id;
+    };
+    constructor.listUrl = function(orgId) {
+        return live4api.Api3CalendarUrls.API_3_CALENDAR + live4api.Api3CalendarUrls.LIST + "/" + orgId;
+    };
+}, {}, {});
+stjs.ns("live4api");
 live4api.TSFile = function() {};
 live4api.TSFile = stjs.extend(live4api.TSFile, null, [], function(constructor, prototype) {
     prototype.hashCode = function() {
@@ -1372,7 +1388,7 @@ Internal = stjs.extend(Internal, null, [], function(constructor, prototype) {
         return arr == null ? [] : arr;
     };
     constructor.defaultString = function(string, defaultString) {
-        if (string != null && Internal.isString(string) && !"".equals(string)) {
+        if (string != null && !"".equals(string)) {
             return string;
         }
         return defaultString;
@@ -1476,6 +1492,29 @@ live4api.Api3HwUrls = stjs.extend(live4api.Api3HwUrls, null, [], function(constr
     };
 }, {}, {});
 stjs.ns("live4api");
+live4api.Api3OrgUrls = function() {};
+live4api.Api3OrgUrls = stjs.extend(live4api.Api3OrgUrls, null, [], function(constructor, prototype) {
+    constructor.API_3_ORG = "/api/3/org";
+    constructor.CREATEWITHADMIN = "/createWithAdmin";
+    constructor.OBJECT = "/object";
+    constructor.LIST = "/list";
+    constructor.baseUrl = function() {
+        return live4api.Api3OrgUrls.API_3_ORG + live4api.Api3OrgUrls.OBJECT;
+    };
+    constructor.createUrl = function() {
+        return live4api.Api3OrgUrls.API_3_ORG + live4api.Api3OrgUrls.OBJECT;
+    };
+    constructor.getUrl = function(orgId) {
+        return live4api.Api3OrgUrls.API_3_ORG + live4api.Api3OrgUrls.OBJECT + "/" + orgId;
+    };
+    constructor.listUrl = function(orgId) {
+        return live4api.Api3OrgUrls.API_3_ORG + live4api.Api3OrgUrls.LIST + "/" + orgId;
+    };
+    constructor.createWithAdminUrl = function() {
+        return live4api.Api3OrgUrls.API_3_ORG + live4api.Api3OrgUrls.CREATEWITHADMIN;
+    };
+}, {}, {});
+stjs.ns("live4api");
 live4api.AccessToken = function(token, secret, expires) {
     this.access_token = token;
     this.secret = secret;
@@ -1530,6 +1569,29 @@ live4api.LoginRequestData = stjs.extend(live4api.LoginRequestData, null, [], fun
     prototype.l = null;
     prototype.p = null;
     prototype.t = null;
+}, {}, {});
+stjs.ns("live4api");
+live4api.Api3UserUrls = function() {};
+live4api.Api3UserUrls = stjs.extend(live4api.Api3UserUrls, null, [], function(constructor, prototype) {
+    constructor.API_3_USER = "/api/3/users";
+    constructor.BYEMAIL = "/byemail";
+    constructor.OBJECT = "/object";
+    constructor.LIST = "/list";
+    constructor.createUrl = function() {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.OBJECT;
+    };
+    constructor.updateUrl = function() {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.OBJECT;
+    };
+    constructor.getUrl = function(id) {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.OBJECT + "/" + id;
+    };
+    constructor.listUrl = function(orgId) {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.LIST + "/" + orgId;
+    };
+    constructor.byEmailUrl = function(email) {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.BYEMAIL + "/" + email;
+    };
 }, {}, {});
 stjs.ns("live4api");
 live4api.Api3Urls = function() {};

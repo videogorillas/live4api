@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.vg</groupId>
     <artifactId>live4api3</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <stjs.version>3.3.2</stjs.version>
