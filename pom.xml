@@ -27,7 +27,7 @@
                         <configuration>
                             <pack>true</pack>
                             <generateSourceMap>true</generateSourceMap>
-                            <generatedSourcesDirectory>target/classes-js</generatedSourcesDirectory>
+                            <generatedSourcesDirectory>target/classes</generatedSourcesDirectory>
                         </configuration>
                     </execution>
                     <!-- if you use the JUnit runner -->
@@ -68,10 +68,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
+                <version>3.0.0</version>
                 <configuration>
                     <excludes>
-                        <exclude>**/*.stjs</exclude>
+                        <exclude>**/*.java</exclude>
+                        <exclude>**/*.map</exclude>
                     </excludes>
                 </configuration>
             </plugin>
