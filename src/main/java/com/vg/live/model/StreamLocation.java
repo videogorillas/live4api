@@ -1,5 +1,9 @@
 package com.vg.live.model;
 
+import static com.vg.live.model.InternalJSAdapter.tryParseDate;
+
+import com.vg.live.model.Internal.tryParseDate;
+
 import org.stjs.javascript.Date;
 import org.stjs.javascript.SortFunction;
 import org.stjs.javascript.annotation.Namespace;
@@ -71,11 +75,11 @@ public class StreamLocation {
 
     public long getTime() {
         if (timeMsec == 0) {
-//            if (Platform.isJava) {
-//                timeMsec = Utils.tryParseDate(timestamp);
-//            } else {
+            if (Internal.isJava) {
+                timeMsec = Internal.tryParseDate(timestamp);
+            } else {
                 return (long) new Date(timestamp).getTime();
-//            }
+            }
         }
         return timeMsec;
     }
