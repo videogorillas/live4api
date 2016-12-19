@@ -11,6 +11,13 @@
         <stjs.plugin.version>3.3.2</stjs.plugin.version>
     </properties>
     <build>
+<extensions>
+<extension>
+    <groupId>org.apache.maven.wagon</groupId>
+    <artifactId>wagon-ssh-external</artifactId>
+    <version>2.10</version>
+</extension>
+</extensions>
 
         <plugins>
             <plugin>
