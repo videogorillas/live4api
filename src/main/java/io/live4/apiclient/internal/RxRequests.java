@@ -17,6 +17,7 @@ import com.squareup.okhttp.ws.WebSocketListener;
 
 import okio.Buffer;
 import rx.Observable;
+import rx.functions.Action2;
 import rx.subscriptions.Subscriptions;
 
 public class RxRequests {
@@ -99,7 +100,7 @@ public class RxRequests {
         return count;
     }
 
-    public static Observable<String> webSocket(OkHttpClient c, Request request, BiConsumer<WebSocket, Response> onOpen) {
+    public static Observable<String> webSocket(OkHttpClient c, Request request, Action2<WebSocket, Response> onOpen) {
         Observable<String> wsMsgs = Observable.create(o -> {
             WebSocketCall call = WebSocketCall.create(c, request);
             Subscriptions.create(() -> call.cancel());
@@ -114,7 +115,7 @@ public class RxRequests {
                 public void onOpen(WebSocket webSocket, Response response) {
                     System.out.println("onOpen " + webSocket + " " + response);
                     if (onOpen != null) {
-                        onOpen.accept(webSocket, response);
+                        onOpen.call(webSocket, response);
                     }
                 }
 
