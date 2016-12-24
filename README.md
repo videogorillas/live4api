@@ -25,7 +25,7 @@ dependencies {
 }
 ```
 
-Usage
+### Usage
 
 1.  Create RxApiClient instance: 
 	```
@@ -87,15 +87,35 @@ Usage
 	```
 5. Create a hardware instance:
 	```
-    Hardware hw = Hardware.drone("MyDrone");
+    	Hardware hw = Hardware.drone("MyDrone");
 	```
     
 6. Create a stream:
 	```
-    StreamResponse sr = new StreamResponse();
-    sr.title = "Stream from " + user.getName();
-    sr.hardwareId = hw.getId();
-    Observable<StreamResponse> newStreamRx = rxApiClient.createStream(sr).replay().autoConnect();
-    ```
+	StreamResponse sr = new StreamResponse();
+	sr.title = "Stream from " + user.getName();
+	sr.hardwareId = hw.getId();
+	Observable<StreamResponse> newStreamRx = rxApiClient.createStream(sr).replay().autoConnect();
+	```
+	
+7. Stream uploads:
+	Stream uploads include uploading initial json metadata, video data, metadata (stream locations), and "end of stream" data
+    	
+   
+8. Add stream to mission:
+    	```
+	mission.addStream(stream.streamId);
+	mission.addHardware(hw);
+	rxApiClient.updateMission(m).subscribe(m -> {
+	    // mission updated
+	}, e -> {
+	    e.printStackTrace();
+	});
+    	```
+	
+9. Get mission share token:
+	```
+	Observable<Mission.ShareToken> shareTokenRx = rxApiClient.getShareToken(mission.getId());
+	```
 
 See also [LoginCreateStreamTest](https://github.com/videogorillas/live4api/blob/live4api-demo/src/test/java/io/live4/apiclient/LoginCreateStreamTest.java)
