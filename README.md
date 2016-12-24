@@ -27,65 +27,75 @@ dependencies {
 
 Usage
 
-1. Create RxApiClient instance:
-```
-String url = "http://1.1.1.1:8042";
-RxApiClient rxApiClient = new RxApiClient(url);
-```
+1.  Create RxApiClient instance: 
+	```
+	String url = "http://1.1.1.1:8042";
+	RxApiClient rxApiClient = new RxApiClient(url);
+	```
+	
+2.  Log in:
 
-2. Log in:
+	```
+	String email = "your@email.com";
+	String password = "123";
+	Observable<User> userRx = rxApiClient.login(email, password);
+	userRx.subscribe(user -> {
+	    // Do something with your user here
+	});
+	```
+3. Select organisation:
+	```
+	// This will list all user profiles:
+	Map<String, UserProfile> profiles = user.profiles;
+	for (String orgId : profiles) {
+	    // Chose the organisation here
+	}
+	```
 
-```
-String email = "your@email.com";
-String password = "123";
-Observable<User> userRx = rxApiClient.login(email, password);
-userRx.subscribe(user -> {
-    // Do something with your user here
-});
-```
-
-3. Select organization:
-```
-// This will list all user profiles:
-Map<String, UserProfile> profiles = user.profiles;
-for (String orgId : profiles) {
-    // Chose the organization here
-}
-```
-
-```
-// Alternatively, you can just select the first organization available for streaming:
-String orgId = user.getFirstOrgId();
-```
-
+	```
+		// Alternatively, you can just select the first organization available for streaming:
+	String orgId = user.getFirstOrgId();
+	```
 4. Select mission or create a new one:
-```
-// This will list all available missions in this organization:
-Observable<Mission> missionsRx = rxApiClient.listMissions(orgId);
-missionsRx.subscribe(mission -> {
-    // select mission here
-});
-```
+	```
+	// This will list all available missions in this organization:
+	Observable<Mission> missionsRx = rxApiClient.listMissions(orgId);
+	missionsRx.subscribe(mission -> {
+		// select mission here
+	});
+	```
 
-```
-// Alternatively, you can create a new mission:
-Mission mission = new Mission();
-mission.createdByUserId = user.id;
-mission.startTime = new org.stjs.javascript.Date();
-long oneDay = 24 * 60 * 60 * 1000;
-mission.endTime = new org.stjs.javascript.Date(mission.startTime.getTime() + oneDay);
-mission.hardware = $array();
-mission.joined = $map();
-mission.name = missionName;
-mission.orgId = orgId;
-mission.state = Mission.State.PENDING;
-mission.streamIds = $array();
-mission.addUser(user, MissionRole.OWNER);
+	```
+	// Alternatively, you can create a new mission:
+	Mission mission = new Mission();
+	mission.createdByUserId = user.id;
+	mission.startTime = new org.stjs.javascript.Date();
+	long oneDay = 24 * 60 * 60 * 1000;
+	mission.endTime = new org.stjs.javascript.Date(mission.startTime.getTime() + oneDay);
+	mission.hardware = $array();
+	mission.joined = $map();
+	mission.name = missionName;
+	mission.orgId = orgId;
+	mission.state = Mission.State.PENDING;
+	mission.streamIds = $array();
+	mission.addUser(user, MissionRole.OWNER);
 
-Observable<Mission> missionRx = rxApiClient.createMission(mission);
-missionRx.subscribe(newMission -> {
-    // newMission object contains newly created mission
-});
+	Observable<Mission> missionRx = rxApiClient.createMission(mission);
+	missionRx.subscribe(newMission -> {
+	    // newMission object contains newly created mission
+	});
+	```
+5. Create a hardware instance:
+	```
+    Hardware hw = Hardware.drone("MyDrone");
+	```
+    
+6. Create a stream:
+	```
+    StreamResponse sr = new StreamResponse();
+    sr.title = "Stream from " + user.getName();
+    sr.hardwareId = hw.getId();
+    Observable<StreamResponse> newStreamRx = rxApiClient.createStream(sr).replay().autoConnect();
+    ```
 
-```
-
+See also [LoginCreateStreamTest](https://github.com/videogorillas/live4api/blob/live4api-demo/src/test/java/io/live4/apiclient/LoginCreateStreamTest.java)
