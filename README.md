@@ -26,6 +26,7 @@ dependencies {
 ```
 
 ### Usage
+NOTE: Live4 public API is based on [ReactiveX library](https://github.com/ReactiveX/RxJava). You can find ReactiveX docs [here](https://github.com/ReactiveX/RxJava/wiki).
 
 1.  Create RxApiClient instance: 
 	```
@@ -87,7 +88,7 @@ dependencies {
 	```
 5. Create a hardware instance:
 	```
-    	Hardware hw = Hardware.drone("MyDrone");
+	Hardware hw = Hardware.drone("MyDrone");
 	```
     
 6. Create a stream:
@@ -99,11 +100,11 @@ dependencies {
 	```
 	
 7. Stream uploads:
-	Stream uploads include uploading initial json metadata, video data, metadata (stream locations), and "end of stream" data
+	Stream uploads include uploading initial json metadata, video data, metadata (stream locations), and "end of stream" data.
     	
    
 8. Add stream to mission:
-    	```
+	```
 	mission.addStream(stream.streamId);
 	mission.addHardware(hw);
 	rxApiClient.updateMission(m).subscribe(m -> {
@@ -111,11 +112,13 @@ dependencies {
 	}, e -> {
 	    e.printStackTrace();
 	});
-    	```
+    ```
 	
 9. Get mission share token:
+
 	```
 	Observable<Mission.ShareToken> shareTokenRx = rxApiClient.getShareToken(mission.getId());
+	
 	```
 
 See also [LoginCreateStreamTest](https://github.com/videogorillas/live4api/blob/live4api-demo/src/test/java/io/live4/apiclient/LoginCreateStreamTest.java)
