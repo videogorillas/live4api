@@ -148,11 +148,11 @@ NOTE: Live4 public API is based on [ReactiveX library](https://github.com/Reacti
 	
 	Observable<StreamLocation> locationsRx = Observable.just(loc).repeat();
 
-        Observable<List<StreamLocation>> chunks = locationsRx.buffer(2, SECONDS).filter(list -> !list.isEmpty());
+	Observable<List<StreamLocation>> chunks = locationsRx.buffer(2, SECONDS).filter(list -> !list.isEmpty());
 
-        Observable<Pair<Integer, List<StreamLocation>>> numberedChunks = chunks.zipWith(
+	Observable<Pair<Integer, List<StreamLocation>>> numberedChunks = chunks.zipWith(
                 Observable.range(0, MAX_VALUE), (locations, mseq) -> new Pair(mseq, locations));
-        numberedChunks = numberedChunks.onBackpressureBuffer();
+	numberedChunks = numberedChunks.onBackpressureBuffer();
         
 	Observable<Request> locationUploads = numberedChunks.map(p -> {
             int mseq = p.left;
