@@ -54,7 +54,7 @@ NOTE: Live4 public API is based on [ReactiveX library](https://github.com/Reacti
 	```
 
 	```
-		// Alternatively, you can just select the first organization available for streaming:
+	// Alternatively, you can just select the first organization available for streaming:
 	String orgId = user.getFirstOrgId();
 	```
 4. Select mission or create a new one:
@@ -99,11 +99,7 @@ NOTE: Live4 public API is based on [ReactiveX library](https://github.com/Reacti
 	Observable<StreamResponse> newStreamRx = rxApiClient.createStream(sr).replay().autoConnect();
 	```
 	
-7. Stream uploads:
-	Stream uploads include uploading initial json metadata, video data, metadata (stream locations), and "end of stream" data.
-    	
-   
-8. Add stream to mission:
+7. Add stream to mission:
 	```
 	mission.addStream(stream.streamId);
 	mission.addHardware(hw);
@@ -114,11 +110,75 @@ NOTE: Live4 public API is based on [ReactiveX library](https://github.com/Reacti
 	});
     ```
 	
-9. Get mission share token:
+8. Get mission share token:
 
 	```
 	Observable<Mission.ShareToken> shareTokenRx = rxApiClient.getShareToken(mission.getId());
+	```
 	
+9. Stream uploads:
+	
+	Stream uploads include uploading initial json metadata, video data, metadata (stream locations), and "end of stream" data.
+	
+	Json metadata:
+	```
+	StreamId sid = stream.sid();
+	
+	DebugJs noStripAacDebugJs = new DebugJs();
+	noStripAacDebugJs.stripaac = false;
+        
+	Observable<Request> debugjs = Observable.just(rxApiClient.uploadJsonRequest(sid, DebugJs.DEBUG_JS, noStripAacDebugJs));
+	```
+    	
+	Video data:
+	```
+	// You should actually set up your video stream here:
+	Observable<Request> videoUploadsRx = ...
+	```
+	
+	Stream locations metadata:
+	```
+	// The next code fakes stream locations for demo purposes. In the real life, you would take these locations from drone data, mobile data, etc.:
+	StreamLocation loc = StreamLocation.latLng(sdf.format(new Date()), 42, 42);
+	loc.altitude = new Double(42);
+	loc.course = new Double(42);
+	loc.horizontalAccuracy = new Double(42);
+	loc.verticalAccuracy = new Double(42);
+	loc.speed = new Double(42);
+	
+	Observable<StreamLocation> locationsRx = Observable.just(loc).repeat();
+
+        Observable<List<StreamLocation>> chunks = locationsRx.buffer(2, SECONDS).filter(list -> !list.isEmpty());
+
+        Observable<Pair<Integer, List<StreamLocation>>> numberedChunks = chunks.zipWith(
+                Observable.range(0, MAX_VALUE), (locations, mseq) -> new Pair(mseq, locations));
+        numberedChunks = numberedChunks.onBackpressureBuffer();
+        
+	Observable<Request> locationUploads = numberedChunks.map(p -> {
+            int mseq = p.left;
+            List<StreamLocation> locations = p.right;
+            String filename = locationsFilename(mseq);
+            return rxApiClient.uploadJsonRequest(sid, filename, Collections.singletonMap("locations", locations));
+        });
+	```
+	
+	Video data and stream locations metadata is then merged (we don't care about the order here):
+	```
+	Observable<Request> uploadRequests = Observable.merge(videoUploadsRx, locationsRx);
+	```
+	
+	End of stream data:
+	```
+	// End of stream data holds information about all uploaded chunks:
+	Observable<Request> eosUploadsRx = ...
+	```
+	
+	Json metadata, video data, locations metadata, and eos streams are concatenated then:
+	```
+	Observable<Response> uploads = Observable.concat(debugjs, uploadRequests, eosUploadsRx)
+	    .onBackpressureBuffer()
+	    .concatMap(request -> {
+		return uploadWithRetry(client, request);
+	    });
 	```
 
-See also [LoginCreateStreamTest](https://github.com/videogorillas/live4api/blob/live4api-demo/src/test/java/io/live4/apiclient/LoginCreateStreamTest.java)
