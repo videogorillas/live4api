@@ -105,8 +105,10 @@ public class LoginCreateStreamTest {
                             });
 
                     return uploads;
-                }); 
+                });
             });            
+        }, e -> {
+            e.printStackTrace();
         });
     }
     
