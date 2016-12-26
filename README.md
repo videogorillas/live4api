@@ -5,6 +5,13 @@ LIVE4 Public API
 With Maven:
 
 ```
+<repositories>
+    <repository>
+        <id>vg-corporate-repo</id>
+	<url>http://kote.videogorillas.com/m2repo/</url>
+    </repository>
+</repositories>
+
 <dependency>
     <groupId>io.live4</groupId>
     <artifactId>live4api3</artifactId>
