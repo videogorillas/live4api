@@ -145,6 +145,10 @@ public class RxApiClient {
         return GET(serverUrl + Api3MissionUrls.getUrl(id));
     }
 
+    public String getShareMissionUrl(Mission.ShareToken shareToken) {
+        return serverUrl + Api3MissionUrls.shareMissionUrl(shareToken.missionId, shareToken.token);
+    }
+
     public Request listHwRequest(String orgId) {
         return GET(serverUrl + Api3HwUrls.listUrl(orgId));
     }
@@ -177,7 +181,11 @@ public class RxApiClient {
     }
 
     public Request getStreamRequest(StreamId id) {
-        return GET(serverUrl + Api1StreamUrls.getUrl(id.toString()));
+        return GET(getStreamUrl(id));
+    }
+
+    public String getStreamUrl(StreamId id) {
+        return serverUrl + Api1StreamUrls.getUrl(id.toString());
     }
 
     public Observable<Mission.ShareToken> getShareToken(String missionId) {
