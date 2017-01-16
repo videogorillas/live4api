@@ -15,10 +15,13 @@ public class Api3MissionUrls {
     public static final String OBJECT = "/object";
     public static final String LIST = "/list";
 
+    public static final String _MISSIONS = "/missions";
+    public static final String MISSION_SHARE_PARAM = "t";
+
     public static String baseUrl() {
         return API_3_MISSION + OBJECT;
     }
-    
+
     public static String createUrl() {
         return API_3_MISSION + OBJECT;
     }
@@ -63,4 +66,7 @@ public class Api3MissionUrls {
         return API_3_MISSION + INVITE + "/" + missionId;
     }
 
+    public static String shareMissionUrl(String missionId, String shareToken) {
+        return _MISSIONS + "/" + missionId + "?" + MISSION_SHARE_PARAM + "=" + shareToken;
+    }
 }
