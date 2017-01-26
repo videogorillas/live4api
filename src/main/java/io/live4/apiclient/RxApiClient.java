@@ -78,6 +78,10 @@ public class RxApiClient {
                         .share();
     }
 
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
     public Request uploadJsonRequest(StreamId sid, String filename, Object o) {
         return uploadJsonRequest(sid, filename, System.currentTimeMillis(), gsonToString(o));
     }
@@ -110,9 +114,10 @@ public class RxApiClient {
         return os.toByteArray();
     }
 
-    public OkHttpClient newUploaderClient() {
-        return new OkHttpClient();
-    }
+    // NEVER USED:
+    //    public OkHttpClient newUploaderClient() {
+    //        return new OkHttpClient();
+    //    }
 
     public OkHttpClient getApiClient() {
         return httpClient;

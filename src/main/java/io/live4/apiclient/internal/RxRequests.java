@@ -3,7 +3,6 @@ package io.live4.apiclient.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
 
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
