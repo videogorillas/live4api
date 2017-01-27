@@ -17,6 +17,8 @@ public class Api3MissionUrls {
 
     public static final String _MISSIONS = "/missions";
     public static final String MISSION_SHARE_PARAM = "t";
+    public static final String CHAT_TOKEN = "/chatToken";
+    public static final String AUDIO_CHAT_TOKEN = "/audioChatToken";
 
     public static String baseUrl() {
         return API_3_MISSION + OBJECT;

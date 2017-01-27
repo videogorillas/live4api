@@ -38,6 +38,7 @@ import io.live4.model.LoginRequestData;
 import io.live4.model.Mission;
 import io.live4.model.StreamId;
 import io.live4.model.StreamResponse;
+import io.live4.model.TwilioToken;
 import io.live4.model.User;
 import rx.Observable;
 import rx.subjects.ReplaySubject;
@@ -126,6 +127,10 @@ public class RxApiClient {
     public Request createStreamRequest(StreamResponse sr) {
         return HttpUtils.postAsJsonRequest(serverUrl + Api2Urls.API_2_STREAM, gsonToString(sr));
     }
+    
+    public Request accessTokenRequest() {
+        return HttpUtils.GET(serverUrl + Api3MissionUrls.CHAT_TOKEN);
+    }
 
     public Observable<User> login(String email, String password) {
         return requestString(getApiClient(), loginRequest(email, password))
@@ -192,6 +197,11 @@ public class RxApiClient {
         return requestString(getApiClient(), GET(serverUrl + Api3MissionUrls.tokenUrl(missionId)))
                 .concatMap(json -> fromJsonRx(json, Mission.ShareToken.class));
     }
+    
+    public Observable<TwilioToken> requestChatToken() {
+        return requestString(getApiClient(), accessTokenRequest())
+                .concatMap(json -> fromJsonRx(json, TwilioToken.class));
+    }
 
     public <T> Observable<T> fromJsonRx(String json, Class<T> cls) {
         try {
@@ -254,5 +264,4 @@ public class RxApiClient {
         }).subscribe(x -> {
         }, err -> err.printStackTrace());
     }
-
 }
