@@ -1,3 +1,5 @@
+dist/
+node/
 node_modules
 target/
 *.class
