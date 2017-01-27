@@ -13,7 +13,7 @@ module.exports = function(grunt) {
                 concat : {
                     "bundle" : {
                         src : jsFiles,
-                        dest : "live4api.js"
+                        dest : "dist/live4api.js"
                     }
                 }
             });
