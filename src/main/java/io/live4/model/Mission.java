@@ -150,7 +150,8 @@ public class Mission implements Doc {
     }
 
     public boolean isLive() {
-        return State.STARTED.equals(state);
+        double time = Date.now();
+        return startTime.getTime() <= time && time <= endTime.getTime();
     }
 
     public boolean isScheduled() {
@@ -159,7 +160,8 @@ public class Mission implements Doc {
     }
 
     public boolean isCompleted() {
-        return State.ENDED.equals(state);
+        double time = Date.now();
+        return state != Mission.State.CANCELLED && endTime.getTime() <= time;
     }
 
     public void addHardware(Hardware h) {
