@@ -154,8 +154,7 @@ public class Mission implements Doc {
     }
 
     public boolean isScheduled() {
-        double time = Date.now();
-        return startTime.getTime() >= time;
+        return State.PENDING.equals(state);
     }
 
     public boolean isCompleted() {
