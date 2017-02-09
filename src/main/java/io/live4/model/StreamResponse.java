@@ -13,6 +13,8 @@ public class StreamResponse extends Stream {
     public Array<Tag> tags;
     public String m3u8;
     public String mpd;
+    @Deprecated
+    public String dash;
     public String webm;
     public String mp4;
     public String thumb;
