@@ -53,6 +53,8 @@ public class Stream {
     public int height = -1;
 
     public String hardwareId;
+    
+    public String liveCodecs;
 
     public StreamId sid() {
         return new StreamId(userId, filename);
