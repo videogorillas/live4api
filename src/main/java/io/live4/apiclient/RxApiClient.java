@@ -17,7 +17,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -67,13 +66,6 @@ public class RxApiClient {
         cookieHandler.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
         httpClient.setCookieHandler(cookieHandler);
         httpClient.setReadTimeout(30, TimeUnit.SECONDS);
-        
-        try {
-            httpClient.setSslSocketFactory(CustomTrust.createSSLSocketFactory());
-        } catch (GeneralSecurityException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
         
         List<Protocol> protocolList = new ArrayList<>();
         protocolList.add(Protocol.HTTP_1_1);
