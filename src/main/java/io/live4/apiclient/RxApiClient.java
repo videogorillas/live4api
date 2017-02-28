@@ -17,11 +17,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
 import com.google.gson.Gson;
 import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Protocol;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.ws.WebSocket;
@@ -63,6 +67,18 @@ public class RxApiClient {
         cookieHandler.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
         httpClient.setCookieHandler(cookieHandler);
         httpClient.setReadTimeout(30, TimeUnit.SECONDS);
+        
+        try {
+            httpClient.setSslSocketFactory(CustomTrust.createSSLSocketFactory());
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+        
+        List<Protocol> protocolList = new ArrayList<>();
+        protocolList.add(Protocol.HTTP_1_1);
+        httpClient.setProtocols(protocolList);
+       
         return httpClient;
     }
 
@@ -77,6 +93,10 @@ public class RxApiClient {
                         .retryWhen(e -> e.doOnNext(err -> System.err.println("retry " + err)).delay(1, SECONDS))
                         .repeatWhen(e -> e.delay(1, SECONDS))
                         .share();
+    }
+    
+    public String getServerUrl() {
+        return serverUrl;
     }
 
     public Request uploadJsonRequest(StreamId sid, String filename, Object o) {
