@@ -16,7 +16,7 @@ public class Api3Urls {
     public static String wsVideo(String streamId) {
         return WSVIDEO + "/" + streamId;
     }
-    public static String getLocationsUrl(String streamId) {
+    public static String locationsUrl(String streamId) {
         return API_3_LOCATIONS + "/" + streamId;
     }
 }

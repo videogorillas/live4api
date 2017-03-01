@@ -210,7 +210,7 @@ public class RxApiClient {
     }
     
     public String getLocationsUrl(StreamId id) {
-        return serverUrl + Api3Urls.getLocationsUrl(id.toString());
+        return serverUrl + Api3Urls.locationsUrl(id.toString());
     }
 
     public Observable<Mission.ShareToken> getShareToken(String missionId) {
