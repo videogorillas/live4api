@@ -204,6 +204,14 @@ public class RxApiClient {
     public String getStreamUrl(StreamId id) {
         return serverUrl + Api1StreamUrls.getUrl(id.toString());
     }
+    
+    public Request getLocationsRequest(StreamId id) {
+        return GET(getLocationsUrl(id));
+    }
+    
+    public String getLocationsUrl(StreamId id) {
+        return serverUrl + Api3Urls.locationsUrl(id.toString());
+    }
 
     public Observable<Mission.ShareToken> getShareToken(String missionId) {
         return requestString(getApiClient(), GET(serverUrl + Api3MissionUrls.tokenUrl(missionId)))
