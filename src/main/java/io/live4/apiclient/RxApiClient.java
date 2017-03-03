@@ -208,7 +208,8 @@ public class RxApiClient {
 
     public Observable<StreamLocation> getLocations(StreamId id) {
         return requestString(getApiClient(), getLocationsRequest(id))
-                .concatMap(json -> fromJsonRx(json, StreamLocation.class));
+                .concatMap(json -> fromJsonRx(json, StreamLocation[].class))
+                .concatMap(arr -> Observable.from(arr));
     }
 
     public Request getLocationsRequest(StreamId id) {
