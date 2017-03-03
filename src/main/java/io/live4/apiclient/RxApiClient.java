@@ -40,6 +40,7 @@ import io.live4.model.LiveMessage;
 import io.live4.model.LoginRequestData;
 import io.live4.model.Mission;
 import io.live4.model.StreamId;
+import io.live4.model.StreamLocation;
 import io.live4.model.StreamResponse;
 import io.live4.model.TwilioToken;
 import io.live4.model.User;
@@ -204,7 +205,12 @@ public class RxApiClient {
     public String getStreamUrl(StreamId id) {
         return serverUrl + Api1StreamUrls.getUrl(id.toString());
     }
-    
+
+    public Observable<StreamLocation> getLocations(StreamId id) {
+        return requestString(getApiClient(), getLocationsRequest(id))
+                .concatMap(json -> fromJsonRx(json, StreamLocation.class));
+    }
+
     public Request getLocationsRequest(StreamId id) {
         return GET(getLocationsUrl(id));
     }
