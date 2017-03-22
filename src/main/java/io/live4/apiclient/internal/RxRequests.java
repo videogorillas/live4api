@@ -35,7 +35,11 @@ public class RxRequests {
                 @Override
                 public void onResponse(Response response) throws IOException {
                     needCancel.set(false);
-                    o.onNext(response);
+                    if (response.isSuccessful()) {
+                        o.onNext(response);
+                    } else {
+                        o.onError(new RequestException(request, null));
+                    }
                     o.onCompleted();
                 }
 
