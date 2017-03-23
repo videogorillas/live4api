@@ -63,6 +63,10 @@ public class Stream {
     public boolean isLive() {
         return getStatus() == LiveStatus.LIVE;
     }
+    
+    public boolean isStandby() {
+        return getStatus() == LiveStatus.STANDBY;
+    }
 
     public boolean isUploading() {
         LiveStatus _status = getStatus();
