@@ -63,9 +63,9 @@ public class Stream {
     public boolean isLive() {
         return getStatus() == LiveStatus.LIVE;
     }
-    
-    public boolean isStandby() {
-        return getStatus() == LiveStatus.STANDBY;
+
+    public boolean isScheduled() {
+        return getStatus() == LiveStatus.SCHEDULED || getStatus() == LiveStatus.STANDBY;
     }
 
     public boolean isUploading() {
