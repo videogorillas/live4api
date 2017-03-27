@@ -6,6 +6,7 @@ import org.stjs.javascript.annotation.Namespace;
 public class Api3Urls {
 
     public static final String WSVIDEO = "/api/3/wsvideo";
+    public static final String API_3_WSPUSHVIDEO = "/api/3/wspushvideo";
     public static final String API_3_ORG_STORAGE_UPLOAD = "/api/3/orgstorage/upload";
     public static final String API_3_ORG_STORAGE_GET = "/api/3/orgstorage/get";
     public static final String API_3_HWLOG = "/api/3/hwlog";
@@ -15,6 +16,9 @@ public class Api3Urls {
     public static final String API_3_LOCATIONS = "/api/3/locations";
     public static String wsVideo(String streamId) {
         return WSVIDEO + "/" + streamId;
+    }
+    public static String wsPushVideo(String streamId) {
+        return API_3_WSPUSHVIDEO + "/" + streamId;
     }
     public static String locationsUrl(String streamId) {
         return API_3_LOCATIONS + "/" + streamId;

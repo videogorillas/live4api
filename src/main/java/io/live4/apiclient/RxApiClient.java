@@ -131,6 +131,10 @@ public class RxApiClient {
     public OkHttpClient getApiClient() {
         return httpClient;
     }
+    
+    public String getWsPushVideoUrl(StreamId id) {
+        return serverUrl + Api3Urls.wsPushVideo(id.toString());
+    }
 
     public Request loginRequest(String email, String password) {
         LoginRequestData lrd = new LoginRequestData(email, password);
