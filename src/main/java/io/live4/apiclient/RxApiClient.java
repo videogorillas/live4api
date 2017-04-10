@@ -2,11 +2,13 @@ package io.live4.apiclient;
 
 import static com.squareup.okhttp.ws.WebSocket.TEXT;
 import static io.live4.api2.Api2Urls.API_2_UPLOAD_AV;
+import static io.live4.api2.Api2Urls.API_2_UPLOAD_LOG;
 import static io.live4.apiclient.internal.HttpUtils.GET;
 import static io.live4.apiclient.internal.HttpUtils.JSON_MIMETYPE;
 import static io.live4.apiclient.internal.HttpUtils.LAST_MODIFIED;
 import static io.live4.apiclient.internal.HttpUtils.OCTET_STREAM;
 import static io.live4.apiclient.internal.HttpUtils.httpDateFormat;
+import static io.live4.apiclient.internal.RxRequests.okResponseRx;
 import static io.live4.apiclient.internal.RxRequests.requestString;
 import static io.live4.apiclient.internal.RxRequests.webSocket;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
@@ -113,6 +116,16 @@ public class RxApiClient {
         Request.Builder builder = new Request.Builder().header(LAST_MODIFIED, httpDateFormat(file.lastModified()));
         builder.url(buildUrl).post(RequestBody.create(OCTET_STREAM, file));
         return builder.build();
+    }
+    
+    public Request uploadLogsRequest(String logs) {
+        Request.Builder builder = new Request.Builder().header(LAST_MODIFIED, httpDateFormat(new Date().getTime()));
+        builder.url(serverUrl + API_2_UPLOAD_LOG + "/" + System.currentTimeMillis()).post(RequestBody.create(HttpUtils.OCTET_STREAM, logs));
+        return builder.build();
+    }
+    
+    public Observable<Boolean> uploadLogs(String logs) {
+        return okResponseRx(httpClient, uploadLogsRequest(logs)).map(r -> r.isSuccessful());
     }
 
     private static byte[] gzip(String json) throws IOException {
