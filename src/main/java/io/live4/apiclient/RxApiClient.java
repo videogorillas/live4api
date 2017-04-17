@@ -10,7 +10,6 @@ import static io.live4.apiclient.internal.HttpUtils.OCTET_STREAM;
 import static io.live4.apiclient.internal.HttpUtils.httpDateFormat;
 import static io.live4.apiclient.internal.RxRequests.okResponseRx;
 import static io.live4.apiclient.internal.RxRequests.requestString;
-import static io.live4.apiclient.internal.RxRequests.webSocket;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static rx.schedulers.Schedulers.newThread;
 
@@ -22,6 +21,7 @@ import java.net.CookiePolicy;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPOutputStream;
 
@@ -38,6 +38,8 @@ import io.live4.api3.Api3HwUrls;
 import io.live4.api3.Api3MissionUrls;
 import io.live4.api3.Api3Urls;
 import io.live4.apiclient.internal.HttpUtils;
+import io.live4.apiclient.internal.RxWebSocket;
+import io.live4.apiclient.internal.RxWebSocket.WebSocketEvent;
 import io.live4.model.Hardware;
 import io.live4.model.LiveMessage;
 import io.live4.model.LoginRequestData;
@@ -48,20 +50,23 @@ import io.live4.model.StreamResponse;
 import io.live4.model.TwilioToken;
 import io.live4.model.User;
 import rx.Observable;
+import rx.Subscription;
 import rx.subjects.ReplaySubject;
 
 public class RxApiClient {
     
+    private static final long WS_SEND_TEXT_TIMEOUT = 2000L;
     private String serverUrl;
-    private ReplaySubject<WebSocket> _ws = ReplaySubject.create(1);
     private Observable<LiveMessage> _liveMessages;
+    private ConcurrentSkipListSet<String> subscribeMessages = new ConcurrentSkipListSet<>();
 
     private OkHttpClient httpClient;
 
     private Gson gson;
+    private RxWebSocket rxws;
 
     public RxApiClient(String serverUrl) {
-        this(serverUrl, ApiGson.gson(), newHttpClient());
+        this(serverUrl.replaceAll("/$", ""), ApiGson.gson(), newHttpClient());
     }
     
     private static OkHttpClient newHttpClient() {
@@ -77,18 +82,37 @@ public class RxApiClient {
        
         return httpClient;
     }
-
+    Subscription subscription;
+    
     public RxApiClient(String serverUrl, Gson gson, OkHttpClient httpClient) {
         this.serverUrl = serverUrl;
         this.gson = gson;
         this.httpClient = httpClient;
-
-        this._liveMessages = webSocket(getApiClient(), GET(serverUrl + Api3Urls.API_3_WSUPDATES + "/"),
-                (ws, x) -> _ws.onNext(ws))
-                        .concatMap(json -> fromJsonRx(json, LiveMessage.class))
-                        .retryWhen(e -> e.doOnNext(err -> System.err.println("retry " + err)).delay(1, SECONDS))
-                        .repeatWhen(e -> e.delay(1, SECONDS))
-                        .share();
+        
+        rxws = RxWebSocket.createRxWebSocket(httpClient, serverUrl + Api3Urls.API_3_WSUPDATES + "/", 1000);
+       
+        this._liveMessages = rxws
+                .getMessages()
+                .concatMap(json -> fromJsonRx(json, LiveMessage.class))
+                .doOnSubscribe(() -> {
+                    subscription = rxws.getOpenWebSockets().subscribe(ws -> {
+                        debug("open: " + ws);
+                        subscribeMessages.forEach(msg -> {
+                            debug(msg);
+                            try {
+                                ws.sendMessage(RequestBody.create(TEXT, msg));
+                            } catch (IOException e1) {
+                                error(e1);
+                            }
+                        });
+                    });
+                })
+                .doOnUnsubscribe(() -> {
+                    if (subscription != null && !subscription.isUnsubscribed()) {
+                        debug("unsubscribe api client");
+                        subscription.unsubscribe();
+                    }
+                }).share();
     }
     
     public String getServerUrl() {
@@ -286,26 +310,26 @@ public class RxApiClient {
     }
 
     public Observable<LiveMessage> streamUpdates(StreamId sid) {
-        wsSendText(gsonToString(LiveMessage.subscribeStream(sid.toString())));
-        return _liveMessages.filter(lm -> sid.toString().equals(lm.streamId));
+        String sub = gsonToString(LiveMessage.subscribeStream(sid.toString()));
+        Observable<String> sent = rxws.sendText(sub, WS_SEND_TEXT_TIMEOUT).take(1).doOnNext(x -> subscribeMessages.add(sub));
+        Observable<LiveMessage> updates = sent.concatMap(x -> _liveMessages.filter(lm -> sid.toString().equals(lm.streamId)));
+        return updates.doOnUnsubscribe(() -> subscribeMessages.remove(sub));
     }
 
     public Observable<Mission> missionUpdates() {
-        wsSendText(gsonToString(LiveMessage.subscribe("mission")));
-        return _liveMessages.filter(lm -> lm.mission != null).map(lm -> lm.mission);
+        String sub = gsonToString(LiveMessage.subscribe("mission"));
+        Observable<String> sent = rxws.sendText(sub, WS_SEND_TEXT_TIMEOUT).take(1).doOnNext(x -> subscribeMessages.add(sub));
+
+        Observable<Mission> updates = sent
+                .concatMap(x -> _liveMessages.filter(lm -> lm.mission != null).map(lm -> lm.mission));
+        return updates.doOnUnsubscribe(() -> subscribeMessages.remove(sub));
     }
 
-    private void wsSendText(String msg) {
-        Observable<WebSocket> websocketReady = _ws.take(1).subscribeOn(newThread());
-        websocketReady.zipWith(Observable.just(msg), (ws, _msg) -> {
-            try {
-                ws.sendMessage(RequestBody.create(TEXT, _msg));
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            return true;
-        }).subscribe(x -> {
-        }, err -> err.printStackTrace());
+    private void error(Object msg) {
+        System.err.println(msg);
+    }
+
+    private void debug(Object string) {
+//        System.out.println(string);
     }
 }

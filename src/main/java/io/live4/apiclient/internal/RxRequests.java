@@ -35,11 +35,7 @@ public class RxRequests {
                 @Override
                 public void onResponse(Response response) throws IOException {
                     needCancel.set(false);
-                    if (response.isSuccessful()) {
-                        o.onNext(response);
-                    } else {
-                        o.onError(new RequestException(request, null));
-                    }
+                    o.onNext(response);
                     o.onCompleted();
                 }
 
@@ -55,7 +51,7 @@ public class RxRequests {
 
     public static Observable<Response> okResponseRx(OkHttpClient c, Request request) {
         return responseRx(c, request).concatMap(r -> {
-            boolean ok = r != null && (r.code() == 200 || r.code() == 206);
+            boolean ok = r != null && r.isSuccessful();
             if (ok) {
                 return Observable.just(r);
             }
