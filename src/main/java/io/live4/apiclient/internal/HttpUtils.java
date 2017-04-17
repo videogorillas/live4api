@@ -23,7 +23,7 @@ public class HttpUtils {
     }
 
     public static Request postAsJsonRequest(String url, String json) {
-        String buildUrl = String.format(url);
+        String buildUrl = url;
         Request.Builder builder = new Request.Builder();
         builder.url(buildUrl).post(RequestBody.create(JSON_MIMETYPE, json));
         return builder.build();

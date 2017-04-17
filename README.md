@@ -8,7 +8,7 @@ With Maven:
 <dependency>
     <groupId>io.live4</groupId>
     <artifactId>live4api3</artifactId>
-    <version>3.0.2</version>
+    <version>3.1.26</version>
 </dependency>
 ```
 
@@ -21,8 +21,16 @@ repositories {
 }
 
 dependencies {
-    compile 'io.live4:live4api3:3.0.2'
+    compile 'io.live4:live4api3:3.1.26'
 }
+```
+
+### Command line tools
+
+Print stream updates 
+
+```
+java -cp live4api3-3.1.26-uberjar.jar io.live4.apiclient.StreamUpdatesMain http://$USER:$PASSWORD@beta.missionkeeper.com/
 ```
 
 ### Usage

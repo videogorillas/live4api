@@ -14,7 +14,7 @@ import org.stjs.javascript.JSStringAdapterBase;
 import org.stjs.javascript.Map;
 import org.stjs.javascript.annotation.Native;
 
-class Internal {
+public class Internal {
     public static <T> Array<T> mapValues(Map<String, T> map) {
         Array<T> result = $array();
         if (map == null)
