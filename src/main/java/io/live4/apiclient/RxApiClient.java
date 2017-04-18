@@ -97,14 +97,14 @@ public class RxApiClient {
                 .doOnSubscribe(() -> {
                     subscription = rxws.getOpenWebSockets().subscribe(ws -> {
                         debug("open: " + ws);
-                        subscribeMessages.forEach(msg -> {
+                        for(String msg : subscribeMessages) {
                             debug(msg);
                             try {
                                 ws.sendMessage(RequestBody.create(TEXT, msg));
                             } catch (IOException e1) {
                                 error(e1);
                             }
-                        });
+                        }
                     });
                 })
                 .doOnUnsubscribe(() -> {
