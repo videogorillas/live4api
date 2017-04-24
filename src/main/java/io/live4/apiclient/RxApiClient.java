@@ -10,8 +10,6 @@ import static io.live4.apiclient.internal.HttpUtils.OCTET_STREAM;
 import static io.live4.apiclient.internal.HttpUtils.httpDateFormat;
 import static io.live4.apiclient.internal.RxRequests.okResponseRx;
 import static io.live4.apiclient.internal.RxRequests.requestString;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static rx.schedulers.Schedulers.newThread;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -30,16 +28,15 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Protocol;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.ws.WebSocket;
 
 import io.live4.api1.Api1StreamUrls;
 import io.live4.api2.Api2Urls;
 import io.live4.api3.Api3HwUrls;
 import io.live4.api3.Api3MissionUrls;
 import io.live4.api3.Api3Urls;
+import io.live4.api3.Api3UserUrls;
 import io.live4.apiclient.internal.HttpUtils;
 import io.live4.apiclient.internal.RxWebSocket;
-import io.live4.apiclient.internal.RxWebSocket.WebSocketEvent;
 import io.live4.model.Hardware;
 import io.live4.model.LiveMessage;
 import io.live4.model.LoginRequestData;
@@ -51,7 +48,6 @@ import io.live4.model.TwilioToken;
 import io.live4.model.User;
 import rx.Observable;
 import rx.Subscription;
-import rx.subjects.ReplaySubject;
 
 public class RxApiClient {
     
@@ -176,6 +172,15 @@ public class RxApiClient {
     public Request loginRequest(String email, String password) {
         LoginRequestData lrd = new LoginRequestData(email, password);
         return HttpUtils.postAsJsonRequest(serverUrl + Api3Urls.API_3_LOGIN, gsonToString(lrd));
+    }
+    
+    public Request getUserRequest(String userId) {
+        return GET(serverUrl + Api3UserUrls.getUrl(userId));
+    }
+    
+    public Observable<User> getUser(String userId) {
+        return requestString(getApiClient(), getUserRequest(userId))
+                .concatMap(json -> fromJsonRx(json, User.class));
     }
 
     public Request createStreamRequest(StreamResponse sr) {
