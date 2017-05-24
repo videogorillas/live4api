@@ -9,7 +9,6 @@ public class Api3UserUrls {
 
     public static final String OBJECT = "/object";
     public static final String LIST = "/list";
-    public static final String CHECK = "/check";
 
     public static final String createUrl() {
         return API_3_USER + OBJECT;
@@ -29,9 +28,5 @@ public class Api3UserUrls {
 
     public static String byEmailUrl(String email) {
         return API_3_USER + BYEMAIL + "/" + email;
-    }
-
-    public static String checkUserByEmail(String email) {
-        return API_3_USER + CHECK + "/" + email;
     }
 }
