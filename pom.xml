@@ -4,7 +4,7 @@
     <groupId>io.live4</groupId>
     <artifactId>live4api3</artifactId>
     <!-- READ THISE BEFORE UPDATING VERSION http://semver.org/ -->
-    <version>3.1.29</version>
+    <version>3.1.30</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <stjs.version>3.3.2</stjs.version>
