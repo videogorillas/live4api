@@ -174,6 +174,16 @@ public class RxApiClient {
         return HttpUtils.postAsJsonRequest(serverUrl + Api3Urls.API_3_LOGIN, gsonToString(lrd));
     }
     
+    public Request resetPasswordRequest(String email) {
+        LoginRequestData lrd = new LoginRequestData(email, null);
+        return HttpUtils.postAsJsonRequest(serverUrl + Api3Urls.API_3_RESETPASSWORD, gsonToString(lrd));
+    }
+    
+    public Observable<User> resetPassword(String email) {
+        return requestString(getApiClient(), resetPasswordRequest(email))
+                .concatMap(json -> fromJsonRx(json, User.class));
+    }
+    
     public Request getUserRequest(String userId) {
         return GET(serverUrl + Api3UserUrls.getUrl(userId));
     }
