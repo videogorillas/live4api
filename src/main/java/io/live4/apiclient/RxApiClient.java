@@ -323,6 +323,17 @@ public class RxApiClient {
         return requestString(getApiClient(), updateMissionRequest(mission))
                 .concatMap(json -> fromJsonRx(json, Mission.class));
     }
+    
+    public Request updateStreamTitleRequest(String streamId, String title) {
+        StreamResponse sr = new StreamResponse();
+        sr.title = title;
+        return HttpUtils.putAsJsonRequest(serverUrl + Api2Urls.updateStreamTitleUrl(streamId), gsonToString(sr));
+    }
+    
+    public Observable<StreamResponse> updateStreamTitle(String streamId, String title) {
+        return requestString(getApiClient(), updateStreamTitleRequest(streamId, title))
+                .concatMap(json -> fromJsonRx(json, StreamResponse.class));
+    }
 
     public Observable<LiveMessage> streamUpdates(StreamId sid) {
         String sub = gsonToString(LiveMessage.subscribeStream(sid.toString()));

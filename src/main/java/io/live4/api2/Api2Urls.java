@@ -24,5 +24,9 @@ public class Api2Urls {
     public static final String API_2_ACTIVITY = "/api/2/activity";
     public static final String API_2_COMMENT = "/api/2/comment";
     public static final String API_2_REPORT = "/api/2/report";
+    
+    public static String updateStreamTitleUrl(String streamId) {
+        return API_2_STREAM_UPDATE_TITLE + "/" + streamId;
+    }
 
 }
