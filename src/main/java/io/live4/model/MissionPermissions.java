@@ -9,6 +9,9 @@ import static io.live4.model.Mission.isScheduler;
 import static io.live4.model.MissionRole.UNKNOWN;
 import static io.live4.model.UserRole.EXTERNAL;
 
+import org.stjs.javascript.annotation.Namespace;
+
+@Namespace("live4api")
 public class MissionPermissions {
     public static boolean canEditMisson(User u, Mission m) {
         return m.hasOwnerPermissions(u);
