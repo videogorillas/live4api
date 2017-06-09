@@ -104,5 +104,14 @@ public class Internal {
     
         return tryParse;
     }
-
+    
+    public static boolean eq(String str, String str2) {
+        if (str == null) {
+            if (str2 == null) {
+                return true;
+            }
+            return false;
+        }
+        return str.equals(str2);
+    }
 }
