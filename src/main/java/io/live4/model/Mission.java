@@ -3,6 +3,7 @@ package io.live4.model;
 import static io.live4.model.Internal.containsKey;
 import static io.live4.model.Internal.defaultArray;
 import static io.live4.model.Internal.defaultMap;
+import static io.live4.model.Internal.eq;
 import static io.live4.model.MissionRole.OWNER;
 
 import org.stjs.javascript.Array;
@@ -191,5 +192,7 @@ public class Mission implements Doc {
     public static boolean isOwner(User u, Mission m) {
         return MissionRole.OWNER == defaultMap(m.roles).$get(u.id);
     }
-
+    public static boolean isScheduler(User u, Mission m) {
+        return eq(m.createdByUserId, u.id);
+    }
 }
