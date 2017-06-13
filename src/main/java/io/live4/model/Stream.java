@@ -9,6 +9,7 @@ import com.google.code.geocoder.model.GeocoderResult;
 
 @Namespace("live4api")
 public class Stream {
+    public long _rev;
 
     public static Stream createStream(StreamId sid, Privacy privacy) {
         Stream s = new Stream();
