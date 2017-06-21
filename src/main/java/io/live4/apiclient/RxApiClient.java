@@ -33,6 +33,7 @@ import io.live4.api1.Api1StreamUrls;
 import io.live4.api2.Api2Urls;
 import io.live4.api3.Api3HwUrls;
 import io.live4.api3.Api3MissionUrls;
+import io.live4.api3.Api3OrgUrls;
 import io.live4.api3.Api3Urls;
 import io.live4.api3.Api3UserUrls;
 import io.live4.apiclient.internal.HttpUtils;
@@ -41,6 +42,7 @@ import io.live4.model.Hardware;
 import io.live4.model.LiveMessage;
 import io.live4.model.LoginRequestData;
 import io.live4.model.Mission;
+import io.live4.model.Organization;
 import io.live4.model.StreamId;
 import io.live4.model.StreamLocation;
 import io.live4.model.StreamResponse;
@@ -191,6 +193,15 @@ public class RxApiClient {
     public Observable<User> getUser(String userId) {
         return requestString(getApiClient(), getUserRequest(userId))
                 .concatMap(json -> fromJsonRx(json, User.class));
+    }
+    
+    public Request geOrganizationRequest(String orgId) {
+        return GET(serverUrl + Api3OrgUrls.getUrl(orgId));
+    }
+    
+    public Observable<Organization> getOrganization(String orgId) {
+        return requestString(getApiClient(), geOrganizationRequest(orgId))
+                .concatMap(json -> fromJsonRx(json, Organization.class));
     }
 
     public Request createStreamRequest(StreamResponse sr) {
