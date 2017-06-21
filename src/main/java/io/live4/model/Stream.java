@@ -57,6 +57,17 @@ public class Stream {
     
     public String liveCodecs;
 
+    boolean closed = false;
+
+    public String m3u8;
+    public String mpd;
+    @Deprecated
+    public String dash;
+    public String webm;
+    public String mp4;
+    public String thumb;
+    public String md;
+
     public StreamId sid() {
         return new StreamId(userId, filename);
     }
@@ -102,8 +113,6 @@ public class Stream {
         this.status = status;
     }
 
-    boolean closed = false;
-
     //TODO: client explicitly called api close to mark upload finished for ALL files of this stream
     public boolean isClosed() {
         return closed;
@@ -111,6 +120,18 @@ public class Stream {
 
     public void setClosed(boolean closed) {
         this.closed = closed;
+    }
+
+    public String getMp4() {
+        return mp4;
+    }
+
+    public String getThumb() {
+        return thumb;
+    }
+
+    public String getM3u8() {
+        return m3u8;
     }
 
 }
