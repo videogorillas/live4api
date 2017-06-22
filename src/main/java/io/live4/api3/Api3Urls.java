@@ -14,6 +14,7 @@ public class Api3Urls {
     public static final String API_3_RESETPASSWORD = "/api/3/resetpassword";
     public static final String API_3_WSUPDATES = "/api/3/wsupdates";
     public static final String API_3_LOCATIONS = "/api/3/locations";
+    public static final String API_3_CHECKTOKEN = "/api/3/checktoken";
     public static String wsVideo(String streamId) {
         return WSVIDEO + "/" + streamId;
     }
@@ -22,5 +23,8 @@ public class Api3Urls {
     }
     public static String locationsUrl(String streamId) {
         return API_3_LOCATIONS + "/" + streamId;
+    }
+    public static String checkTokenUrl(String token) {
+        return API_3_CHECKTOKEN + "/" + token;
     }
 }
