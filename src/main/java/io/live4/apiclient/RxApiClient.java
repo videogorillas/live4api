@@ -43,6 +43,7 @@ import io.live4.model.LiveMessage;
 import io.live4.model.LoginRequestData;
 import io.live4.model.Mission;
 import io.live4.model.Organization;
+import io.live4.model.Stream;
 import io.live4.model.StreamId;
 import io.live4.model.StreamLocation;
 import io.live4.model.StreamResponse;
@@ -204,7 +205,7 @@ public class RxApiClient {
                 .concatMap(json -> fromJsonRx(json, Organization.class));
     }
 
-    public Request createStreamRequest(StreamResponse sr) {
+    public Request createStreamRequest(Stream sr) {
         return HttpUtils.postAsJsonRequest(serverUrl + Api2Urls.API_2_STREAM, gsonToString(sr));
     }
     
@@ -217,7 +218,7 @@ public class RxApiClient {
                 .concatMap(json -> fromJsonRx(json, User.class));
     }
 
-    public Observable<StreamResponse> createStream(StreamResponse sr) {
+    public Observable<StreamResponse> createStream(Stream sr) {
         return requestString(getApiClient(), createStreamRequest(sr))
                 .concatMap(json -> fromJsonRx(json, StreamResponse.class));
     }
@@ -336,7 +337,7 @@ public class RxApiClient {
     }
     
     public Request updateStreamTitleRequest(String streamId, String title) {
-        StreamResponse sr = new StreamResponse();
+        Stream sr = new Stream();
         sr.title = title;
         return HttpUtils.putAsJsonRequest(serverUrl + Api2Urls.updateStreamTitleUrl(streamId), gsonToString(sr));
     }
