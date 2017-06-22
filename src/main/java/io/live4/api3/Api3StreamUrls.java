@@ -16,4 +16,9 @@ public class Api3StreamUrls {
     public static String getUrl(String id) {
         return API_3_STREAM + OBJECT + "/" + id;
     }
+    
+    public static String updateUrl() {
+        return API_3_STREAM + OBJECT;
+    }
+
 }
