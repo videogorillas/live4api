@@ -1,14 +1,17 @@
 package io.live4.model;
 
+import static org.stjs.javascript.JSCollections.$castArray;
+
 import org.stjs.javascript.Array;
 import org.stjs.javascript.Date;
+import org.stjs.javascript.JSCollections;
 import org.stjs.javascript.annotation.Namespace;
 import org.stjs.javascript.annotation.ServerSide;
 
 import com.google.code.geocoder.model.GeocoderResult;
 
 @Namespace("live4api")
-public class Stream {
+public class Stream implements Doc {
     public long _rev;
 
     public static Stream createStream(StreamId sid, Privacy privacy) {
@@ -132,6 +135,23 @@ public class Stream {
 
     public String getM3u8() {
         return m3u8;
+    }
+
+    @Override
+    public String getId() {
+        return sid().toString();
+    }
+
+    @Override
+    public void setId(String id) {
+        Array<String> split = $castArray(id.split("/"));
+        userId = split.$get(0);
+        filename = split.$get(1);
+    }
+
+    @Override
+    public boolean isActive() {
+        return true;
     }
 
 }
