@@ -2,6 +2,9 @@ package io.live4.model;
 
 import static io.live4.model.Privacy.PRIVATE;
 
+import org.stjs.javascript.annotation.Namespace;
+
+@Namespace("live4api")
 public class StreamPermissions {
     public static boolean canUpdateStreamById(StreamId sid, User user) {
         if (sid == null || user == null) {
