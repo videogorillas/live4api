@@ -11,6 +11,7 @@ import io.live4.api2.Api2Urls;
 import io.live4.api3.Api3HwUrls;
 import io.live4.api3.Api3MissionUrls;
 import io.live4.api3.Api3OrgUrls;
+import io.live4.api3.Api3StreamUrls;
 import io.live4.api3.Api3Urls;
 import io.live4.api3.Api3UserUrls;
 import io.live4.model.Mission.ShareToken;
@@ -70,6 +71,10 @@ public class ServerUrl {
 
     public String createStreamUrl() {
         return serverUrl + Api2Urls.API_2_STREAM;
+    }
+    
+    public String updateStreamUrl() {
+        return serverUrl + Api3StreamUrls.updateUrl();
     }
 
     public String listMissions(String orgId) {

@@ -5,6 +5,8 @@ import static io.live4.apiclient.internal.HttpUtils.JSON_MIMETYPE;
 import static io.live4.apiclient.internal.HttpUtils.LAST_MODIFIED;
 import static io.live4.apiclient.internal.HttpUtils.OCTET_STREAM;
 import static io.live4.apiclient.internal.HttpUtils.httpDateFormat;
+import static io.live4.apiclient.internal.HttpUtils.postAsJsonRequest;
+import static io.live4.apiclient.internal.HttpUtils.putAsJsonRequest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -78,12 +80,12 @@ public class ApiRequest {
 
     public Request login(String email, String password) {
         LoginRequestData lrd = new LoginRequestData(email, password);
-        return HttpUtils.postAsJsonRequest(serverUrl.login(), gsonToString(lrd));
+        return postAsJsonRequest(serverUrl.login(), gsonToString(lrd));
     }
 
     public Request resetPassword(String email) {
         LoginRequestData lrd = new LoginRequestData(email, null);
-        return HttpUtils.postAsJsonRequest(serverUrl.resetPassword(), gsonToString(lrd));
+        return postAsJsonRequest(serverUrl.resetPassword(), gsonToString(lrd));
     }
 
     public Request getUser(String userId) {
@@ -95,11 +97,15 @@ public class ApiRequest {
     }
 
     public Request createStream(Stream sr) {
-        return HttpUtils.postAsJsonRequest(serverUrl.createStreamUrl(), gsonToString(sr));
+        return postAsJsonRequest(serverUrl.createStreamUrl(), gsonToString(sr));
+    }
+    
+    public Request updateStream(Stream sr) {
+        return putAsJsonRequest(serverUrl.updateStreamUrl(), gsonToString(sr));
     }
 
     public Request accessToken() {
-        return HttpUtils.GET(serverUrl.chatToken());
+        return GET(serverUrl.chatToken());
     }
 
     public Request listMissions(String orgId) {
@@ -115,15 +121,15 @@ public class ApiRequest {
     }
 
     public Request createHw(Hardware hw) {
-        return HttpUtils.postAsJsonRequest(serverUrl.createHw(), gsonToString(hw));
+        return postAsJsonRequest(serverUrl.createHw(), gsonToString(hw));
     }
 
     public Request createMission(Mission m) {
-        return HttpUtils.postAsJsonRequest(serverUrl.createMission(), gsonToString(m));
+        return postAsJsonRequest(serverUrl.createMission(), gsonToString(m));
     }
 
     public Request updateMission(Mission m) {
-        return HttpUtils.putAsJsonRequest(serverUrl.updateMission(), gsonToString(m));
+        return putAsJsonRequest(serverUrl.updateMission(), gsonToString(m));
     }
 
     public Request getStream(StreamId id) {
@@ -137,7 +143,7 @@ public class ApiRequest {
     public Request updateStreamTitle(String streamId, String title) {
         Stream sr = new Stream();
         sr.title = title;
-        return HttpUtils.putAsJsonRequest(serverUrl.updateStreamTitleUrl(streamId), gsonToString(sr));
+        return putAsJsonRequest(serverUrl.updateStreamTitleUrl(streamId), gsonToString(sr));
     }
 
 }

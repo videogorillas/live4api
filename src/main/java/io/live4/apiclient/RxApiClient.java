@@ -69,8 +69,8 @@ public class RxApiClient {
        
         return httpClient;
     }
-    Subscription subscription;
-    public ApiRequest request;
+    private Subscription subscription;
+    public final ApiRequest request;
 
     public RxApiClient(String serverUrl, Gson gson, OkHttpClient httpClient) {
         this.serverUrl = new ServerUrl(serverUrl);
@@ -120,13 +120,11 @@ public class RxApiClient {
     }
 
     public Observable<User> resetPassword(String email) {
-        return requestString(getApiClient(), request.resetPassword(email))
-                .concatMap(json -> fromJsonRx(json, User.class));
+        return requestObject(request.resetPassword(email), User.class);
     }
 
     public Observable<User> getUser(String userId) {
-        return requestString(getApiClient(), request.getUser(userId))
-                .concatMap(json -> fromJsonRx(json, User.class));
+        return requestObject(request.getUser(userId), User.class);
     }
 
     public Observable<User> getUserByMissionToken(String token) {
@@ -136,8 +134,7 @@ public class RxApiClient {
     }
 
     public Observable<Organization> getOrganization(String orgId) {
-        return requestString(getApiClient(), request.getOrganization(orgId))
-                .concatMap(json -> fromJsonRx(json, Organization.class));
+        return requestObject(request.getOrganization(orgId), Organization.class);
     }
 
     public Observable<Boolean> isTokenValid(String token) {
@@ -155,56 +152,39 @@ public class RxApiClient {
     }
 
     public Observable<User> login(String email, String password) {
-        return requestString(getApiClient(), request.login(email, password))
-                .concatMap(json -> fromJsonRx(json, User.class));
+        return requestObject(request.login(email, password), User.class);
     }
 
     public Observable<StreamResponse> createStream(Stream sr) {
-        return requestString(getApiClient(), request.createStream(sr))
-                .concatMap(json -> fromJsonRx(json, StreamResponse.class));
+        return requestObject(request.createStream(sr), StreamResponse.class);
     }
 
     public Observable<Mission> listMissions(String orgId) {
-        return requestString(getApiClient(), request.listMissions(orgId))
-                .concatMap(json -> fromJsonRx(json, Mission[].class))
-                .concatMap(arr -> Observable.from(arr));
+        return requestObject(request.listMissions(orgId), Mission[].class).concatMap(arr -> Observable.from(arr));
     }
 
     public Observable<Mission> getMission(String id) {
-        return requestString(getApiClient(), request.getMission(id)).concatMap(json -> fromJsonRx(json, Mission.class));
+        return requestObject(request.getMission(id), Mission.class);
     }
 
     public Observable<StreamResponse> getStream(StreamId id) {
-        return requestString(getApiClient(), request.getStream(id))
-                .concatMap(json -> fromJsonRx(json, StreamResponse.class));
+        return requestObject(request.getStream(id), StreamResponse.class);
     }
 
     public Observable<StreamLocation> getLocations(StreamId id) {
-        return requestString(getApiClient(), request.getLocations(id))
-                .concatMap(json -> fromJsonRx(json, StreamLocation[].class))
-                .concatMap(arr -> Observable.from(arr));
+        return requestObject(request.getLocations(id), StreamLocation[].class).concatMap(arr -> Observable.from(arr));
     }
 
     public Observable<Mission.ShareToken> getShareToken(String missionId) {
-        return requestString(getApiClient(), GET(serverUrl.shareToken(missionId)))
-                .concatMap(json -> fromJsonRx(json, Mission.ShareToken.class));
+        return requestObject(GET(serverUrl.shareToken(missionId)), Mission.ShareToken.class);
     }
 
     public Observable<TwilioToken> requestChatToken() {
-        return requestString(getApiClient(), request.accessToken())
-                .concatMap(json -> fromJsonRx(json, TwilioToken.class));
+        return requestObject(request.accessToken(), TwilioToken.class);
     }
 
     public <T> Observable<T> fromJsonRx(String json, Class<T> cls) {
-        try {
-            return Observable.just(fromJson(json, cls));
-        } catch (Exception e) {
-            return Observable.error(e);
-        }
-    }
-
-    private <T> T fromJson(String json, Class<T> cls) {
-        return gson.fromJson(json, cls);
+        return Observable.fromCallable(() -> gson.fromJson(json, cls));
     }
 
     String gsonToString(Object o) {
@@ -212,30 +192,29 @@ public class RxApiClient {
     }
 
     public Observable<Hardware> createHw(Hardware hw) {
-        return requestString(getApiClient(), request.createHw(hw)).concatMap(json -> fromJsonRx(json, Hardware.class));
+        return requestObject(request.createHw(hw), Hardware.class);
     }
 
     public Observable<Hardware> getHwByExternalId(String externalId, String orgId) {
-        Observable<Hardware> concatMap = requestString(getApiClient(), request.listHw(orgId))
-                .concatMap(json -> fromJsonRx(json, Hardware[].class))
+        return requestObject(request.listHw(orgId), Hardware[].class)
                 .concatMap(arr -> Observable.from(arr))
                 .filter(_hw -> externalId.equals(_hw.externalId));
-        return concatMap;
     }
 
     public Observable<Mission> createMission(Mission mission) {
-        return requestString(getApiClient(), request.createMission(mission))
-                .concatMap(json -> fromJsonRx(json, Mission.class));
+        return requestObject(request.createMission(mission), Mission.class);
     }
 
     public Observable<Mission> updateMission(Mission mission) {
-        return requestString(getApiClient(), request.updateMission(mission))
-                .concatMap(json -> fromJsonRx(json, Mission.class));
+        return requestObject(request.updateMission(mission), Mission.class);
     }
 
     public Observable<StreamResponse> updateStreamTitle(String streamId, String title) {
-        return requestString(getApiClient(), request.updateStreamTitle(streamId, title))
-                .concatMap(json -> fromJsonRx(json, StreamResponse.class));
+        return requestObject(request.updateStreamTitle(streamId, title), StreamResponse.class);
+    }
+
+    private <T> Observable<T> requestObject(Request req, Class<T> cls) {
+        return requestString(getApiClient(), req).concatMap(json -> fromJsonRx(json, cls));
     }
 
     public Observable<LiveMessage> streamUpdates(StreamId sid) {
@@ -254,8 +233,11 @@ public class RxApiClient {
         return updates.doOnUnsubscribe(() -> subscribeMessages.remove(sub));
     }
 
-    public Observable<Stream> updateStream(Stream stream, Consumer<Stream> resolveConflict){
-        return null;
+    public Observable<Stream> getAndUpdateStream(StreamId sid, Consumer<Stream> transformer) {
+        return getStream(sid).concatMap(stream -> {
+            transformer.accept(stream);
+            return requestObject(request.updateStream(stream), Stream.class);
+        });
     }
 
     private void error(Object msg) {
