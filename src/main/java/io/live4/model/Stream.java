@@ -11,6 +11,7 @@ import org.stjs.javascript.annotation.ServerSide;
 import com.google.code.geocoder.model.GeocoderResult;
 
 @Namespace("live4api")
+@ReadOnly //all fields can only be updated by super admin except marked with @ReadWrite
 public class Stream implements Doc {
     public long _rev;
 
@@ -43,16 +44,16 @@ public class Stream implements Doc {
     //when user started recording
     public long startTimeMsec;
 
-    public String title;
-
-    private Privacy privacy;
-    public boolean locationHidden;
+    //these fields can be updated by owner of this stream via API
+    @ReadWrite public String title;
+    @ReadWrite private Privacy privacy;
+    @ReadWrite public boolean locationHidden;
+    @ReadWrite public Array<Tag> tags2;
 
     public int avgSpeed;
     public int maxSpeed;
     public int maxAlt;
 
-    public Array<Tag> tags2;
     public int width = -1;
     public int height = -1;
 
