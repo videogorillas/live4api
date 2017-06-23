@@ -2,6 +2,8 @@ package io.live4.apiclient;
 
 import static com.squareup.okhttp.ws.WebSocket.TEXT;
 import static io.live4.apiclient.internal.HttpUtils.GET;
+import static io.live4.apiclient.internal.HttpUtils.LAST_MODIFIED;
+import static io.live4.apiclient.internal.HttpUtils.httpDateFormat;
 import static io.live4.apiclient.internal.RxRequests.okResponseRx;
 import static io.live4.apiclient.internal.RxRequests.requestString;
 
@@ -9,6 +11,7 @@ import java.io.IOException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.TimeUnit;
@@ -17,9 +20,12 @@ import java.util.function.Consumer;
 import com.google.gson.Gson;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Protocol;
+import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 
+import io.live4.api3.Api3MissionUrls;
 import io.live4.api3.Api3Urls;
+import io.live4.api3.Api3UserUrls;
 import io.live4.apiclient.internal.RxWebSocket;
 import io.live4.model.Hardware;
 import io.live4.model.LiveMessage;
@@ -65,7 +71,7 @@ public class RxApiClient {
     }
     Subscription subscription;
     public ApiRequest request;
-    
+
     public RxApiClient(String serverUrl, Gson gson, OkHttpClient httpClient) {
         this.serverUrl = new ServerUrl(serverUrl);
         this.gson = gson;
@@ -112,20 +118,40 @@ public class RxApiClient {
     public OkHttpClient getApiClient() {
         return httpClient;
     }
-    
+
     public Observable<User> resetPassword(String email) {
         return requestString(getApiClient(), request.resetPassword(email))
                 .concatMap(json -> fromJsonRx(json, User.class));
     }
-    
+
     public Observable<User> getUser(String userId) {
         return requestString(getApiClient(), request.getUser(userId))
                 .concatMap(json -> fromJsonRx(json, User.class));
     }
-    
+
+    public Observable<User> getUserByMissionToken(String token) {
+        Request get = GET(serverUrl + Api3MissionUrls.getUserByMissionToken(token));
+        return requestString(getApiClient(), get)
+                .concatMap(json -> fromJsonRx(json, User.class));
+    }
+
     public Observable<Organization> getOrganization(String orgId) {
         return requestString(getApiClient(), request.getOrganization(orgId))
                 .concatMap(json -> fromJsonRx(json, Organization.class));
+    }
+
+    public Observable<Boolean> isTokenValid(String token) {
+        Request.Builder builder = new Request.Builder().header(LAST_MODIFIED, httpDateFormat(new Date().getTime()));
+        builder.url(serverUrl + Api3MissionUrls.checkTokenUrl(token)).get();
+        Request r = builder.build();
+        return requestString(getApiClient(), r).concatMap(json -> fromJsonRx(json, Boolean.class));
+    }
+
+    public Observable<Boolean> isUserTemp(String email) {
+        Request.Builder builder = new Request.Builder().header(LAST_MODIFIED, httpDateFormat(new Date().getTime()));
+        builder.url(serverUrl + Api3UserUrls.isUserTemp(email)).get();
+        Request r = builder.build();
+        return requestString(getApiClient(), r).concatMap(json -> fromJsonRx(json, Boolean.class));
     }
 
     public Observable<User> login(String email, String password) {
@@ -206,7 +232,7 @@ public class RxApiClient {
         return requestString(getApiClient(), request.updateMission(mission))
                 .concatMap(json -> fromJsonRx(json, Mission.class));
     }
-    
+
     public Observable<StreamResponse> updateStreamTitle(String streamId, String title) {
         return requestString(getApiClient(), request.updateStreamTitle(streamId, title))
                 .concatMap(json -> fromJsonRx(json, StreamResponse.class));
@@ -227,7 +253,7 @@ public class RxApiClient {
                 .concatMap(x -> _liveMessages.filter(lm -> lm.mission != null).map(lm -> lm.mission));
         return updates.doOnUnsubscribe(() -> subscribeMessages.remove(sub));
     }
-    
+
     public Observable<Stream> updateStream(Stream stream, Consumer<Stream> resolveConflict){
         return null;
     }

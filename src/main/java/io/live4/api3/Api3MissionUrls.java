@@ -19,6 +19,9 @@ public class Api3MissionUrls {
     public static final String MISSION_SHARE_PARAM = "t";
     public static final String CHAT_TOKEN = "/chatToken";
     public static final String AUDIO_CHAT_TOKEN = "/audioChatToken";
+    public static final String BY_MISSION_TOKEN = "/byMissionToken";
+    public static final String IS_TOKEN_VALID = "/isTokenValid";
+
 
     public static String baseUrl() {
         return API_3_MISSION + OBJECT;
@@ -70,5 +73,13 @@ public class Api3MissionUrls {
 
     public static String shareMissionUrl(String missionId, String shareToken) {
         return _MISSIONS + "/" + missionId + "?" + MISSION_SHARE_PARAM + "=" + shareToken;
+    }
+
+    public static String getUserByMissionToken(String token) {
+        return API_3_MISSION + BY_MISSION_TOKEN + "/" + token;
+    }
+
+    public static String checkTokenUrl(String token) {
+        return IS_TOKEN_VALID + "/" + token;
     }
 }
