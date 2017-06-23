@@ -2157,13 +2157,14 @@ live4api.Stream = stjs.extend(live4api.Stream, null, [live4api.Doc], function(co
         return true;
     };
 }, {startLocation: "live4api.StreamLocation", status: {name: "Enum", arguments: ["live4api.LiveStatus"]}, privacy: {name: "Enum", arguments: ["live4api.Privacy"]}, tags2: {name: "Array", arguments: ["live4api.Tag"]}}, {});
-var StreamPermissions = function() {};
-StreamPermissions = stjs.extend(StreamPermissions, null, [], function(constructor, prototype) {
+stjs.ns("live4api");
+live4api.StreamPermissions = function() {};
+live4api.StreamPermissions = stjs.extend(live4api.StreamPermissions, null, [], function(constructor, prototype) {
     constructor.canUpdateStreamById = function(sid, user) {
         if (sid == null || user == null) {
             return false;
         }
-        return StreamPermissions.userOwnsStream(sid, user);
+        return live4api.StreamPermissions.userOwnsStream(sid, user);
     };
     constructor.userOwnsStream = function(sid, user) {
         return user.isSuperAdmin() || sid.userId.equals(user.getId());
@@ -2172,13 +2173,13 @@ StreamPermissions = stjs.extend(StreamPermissions, null, [], function(constructo
         if (sid == null || user == null) {
             return false;
         }
-        return StreamPermissions.userOwnsStream(sid, user);
+        return live4api.StreamPermissions.userOwnsStream(sid, user);
     };
     constructor.canGetStream = function(stream, user) {
         if (stream == null || user == null) {
             return false;
         }
-        return StreamPermissions.userOwnsStream(stream.sid(), user) || !live4api.Privacy.PRIVATE.equals(stream.getPrivacy());
+        return live4api.StreamPermissions.userOwnsStream(stream.sid(), user) || !live4api.Privacy.PRIVATE.equals(stream.getPrivacy());
     };
 }, {}, {});
 stjs.ns("live4api");
