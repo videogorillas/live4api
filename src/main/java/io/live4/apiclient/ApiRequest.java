@@ -19,6 +19,8 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Request.Builder;
 import com.squareup.okhttp.RequestBody;
 
+import io.live4.api3.Api3MissionUrls;
+import io.live4.api3.Api3UserUrls;
 import io.live4.apiclient.internal.HttpUtils;
 import io.live4.model.Hardware;
 import io.live4.model.LoginRequestData;
@@ -90,6 +92,18 @@ public class ApiRequest {
 
     public Request getUser(String userId) {
         return GET(serverUrl.getUser(userId));
+    }
+
+    public Request getUserByMissionToken(String token) {
+        return GET(serverUrl + Api3MissionUrls.getUserByMissionToken(token));
+    }
+
+    public Request isTokenValid(String token) {
+        return GET(serverUrl + Api3MissionUrls.checkTokenUrl(token));
+    }
+
+    public Request isUserTemp(String email) {
+        return GET(serverUrl + Api3UserUrls.isUserTemp(email));
     }
 
     public Request getOrganization(String orgId) {

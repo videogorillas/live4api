@@ -128,9 +128,7 @@ public class RxApiClient {
     }
 
     public Observable<User> getUserByMissionToken(String token) {
-        Request get = GET(serverUrl + Api3MissionUrls.getUserByMissionToken(token));
-        return requestString(getApiClient(), get)
-                .concatMap(json -> fromJsonRx(json, User.class));
+        return requestObject(request.getUserByMissionToken(token), User.class);
     }
 
     public Observable<Organization> getOrganization(String orgId) {
@@ -138,17 +136,11 @@ public class RxApiClient {
     }
 
     public Observable<Boolean> isTokenValid(String token) {
-        Request.Builder builder = new Request.Builder().header(LAST_MODIFIED, httpDateFormat(new Date().getTime()));
-        builder.url(serverUrl + Api3MissionUrls.checkTokenUrl(token)).get();
-        Request r = builder.build();
-        return requestString(getApiClient(), r).concatMap(json -> fromJsonRx(json, Boolean.class));
+        return requestObject(request.isTokenValid(token), Boolean.class);
     }
 
     public Observable<Boolean> isUserTemp(String email) {
-        Request.Builder builder = new Request.Builder().header(LAST_MODIFIED, httpDateFormat(new Date().getTime()));
-        builder.url(serverUrl + Api3UserUrls.isUserTemp(email)).get();
-        Request r = builder.build();
-        return requestString(getApiClient(), r).concatMap(json -> fromJsonRx(json, Boolean.class));
+        return requestObject(request.isUserTemp(email), Boolean.class);
     }
 
     public Observable<User> login(String email, String password) {
