@@ -1,12 +1,13 @@
 package io.live4.apiclient;
 
-import static io.live4.apiclient.internal.HttpUtils.GET;
-import static io.live4.apiclient.internal.HttpUtils.JSON_MIMETYPE;
-import static io.live4.apiclient.internal.HttpUtils.LAST_MODIFIED;
-import static io.live4.apiclient.internal.HttpUtils.OCTET_STREAM;
-import static io.live4.apiclient.internal.HttpUtils.httpDateFormat;
-import static io.live4.apiclient.internal.HttpUtils.postAsJsonRequest;
-import static io.live4.apiclient.internal.HttpUtils.putAsJsonRequest;
+import com.google.gson.Gson;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Request.Builder;
+import com.squareup.okhttp.RequestBody;
+import io.live4.api3.Api3MissionUrls;
+import io.live4.api3.Api3UserUrls;
+import io.live4.apiclient.internal.HttpUtils;
+import io.live4.model.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -14,19 +15,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.zip.GZIPOutputStream;
 
-import com.google.gson.Gson;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Request.Builder;
-import com.squareup.okhttp.RequestBody;
-
-import io.live4.api3.Api3MissionUrls;
-import io.live4.api3.Api3UserUrls;
-import io.live4.apiclient.internal.HttpUtils;
-import io.live4.model.Hardware;
-import io.live4.model.LoginRequestData;
-import io.live4.model.Mission;
-import io.live4.model.Stream;
-import io.live4.model.StreamId;
+import static io.live4.apiclient.internal.HttpUtils.*;
 
 public class ApiRequest {
 
@@ -96,6 +85,10 @@ public class ApiRequest {
 
     public Request getUserByMissionToken(String token) {
         return GET(serverUrl + Api3MissionUrls.getUserByMissionToken(token));
+    }
+
+    public Request inviteToMission(User user, String missionId) {
+        return postAsJsonRequest(serverUrl.inviteToMission(missionId), gsonToString(user));
     }
 
     public Request isTokenValid(String token) {

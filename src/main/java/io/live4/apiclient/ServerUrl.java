@@ -65,6 +65,10 @@ public class ServerUrl {
         return serverUrl + Api3UserUrls.getUrl(userId);
     }
 
+    public String inviteToMission(String missionId) {
+        return serverUrl + Api3MissionUrls.inviteUrl(missionId);
+    }
+
     public String getOrg(String orgId) {
         return serverUrl + Api3OrgUrls.getUrl(orgId);
     }

@@ -1,44 +1,29 @@
 package io.live4.apiclient;
 
-import static com.squareup.okhttp.ws.WebSocket.TEXT;
-import static io.live4.apiclient.internal.HttpUtils.GET;
-import static io.live4.apiclient.internal.HttpUtils.LAST_MODIFIED;
-import static io.live4.apiclient.internal.HttpUtils.httpDateFormat;
-import static io.live4.apiclient.internal.RxRequests.okResponseRx;
-import static io.live4.apiclient.internal.RxRequests.requestString;
-
-import java.io.IOException;
-import java.net.CookieManager;
-import java.net.CookiePolicy;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-
 import com.google.gson.Gson;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Protocol;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
-
-import io.live4.api3.Api3MissionUrls;
 import io.live4.api3.Api3Urls;
-import io.live4.api3.Api3UserUrls;
 import io.live4.apiclient.internal.RxWebSocket;
-import io.live4.model.Hardware;
-import io.live4.model.LiveMessage;
-import io.live4.model.Mission;
-import io.live4.model.Organization;
-import io.live4.model.Stream;
-import io.live4.model.StreamId;
-import io.live4.model.StreamLocation;
-import io.live4.model.StreamResponse;
-import io.live4.model.TwilioToken;
-import io.live4.model.User;
+import io.live4.model.*;
 import rx.Observable;
 import rx.Subscription;
+
+import java.io.IOException;
+import java.net.CookieManager;
+import java.net.CookiePolicy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
+
+import static com.squareup.okhttp.ws.WebSocket.TEXT;
+import static io.live4.apiclient.internal.HttpUtils.GET;
+import static io.live4.apiclient.internal.RxRequests.okResponseRx;
+import static io.live4.apiclient.internal.RxRequests.requestString;
 
 public class RxApiClient {
     
@@ -129,6 +114,10 @@ public class RxApiClient {
 
     public Observable<User> getUserByMissionToken(String token) {
         return requestObject(request.getUserByMissionToken(token), User.class);
+    }
+
+    public Observable<User> inviteToMission(User user, String missionId) {
+        return requestObject(request.inviteToMission(user, missionId), User.class);
     }
 
     public Observable<Organization> getOrganization(String orgId) {
