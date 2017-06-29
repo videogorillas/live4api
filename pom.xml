@@ -4,7 +4,7 @@
     <groupId>io.live4</groupId>
     <artifactId>live4api3</artifactId>
     <!-- READ THISE BEFORE UPDATING VERSION http://semver.org/ -->
-    <version>3.4.1</version>
+    <version>3.5.0-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <stjs.version>3.3.2</stjs.version>
@@ -313,7 +313,7 @@
         <dependency>
             <groupId>io.reactivex</groupId>
             <artifactId>rxjava</artifactId>
-            <version>1.2.6</version>
+            <version>1.2.10</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp</groupId>
