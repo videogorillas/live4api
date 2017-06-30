@@ -11,6 +11,13 @@
         <stjs.plugin.version>3.3.2</stjs.plugin.version>
         <retrolambda.plugin.version>2.3.0</retrolambda.plugin.version>
     </properties>
+    <scm>
+        <url>https://github.com/videogorillas/live4api</url>
+        <connection>scm:git:https://github.com/videogorillas/live4api.git</connection>
+        <developerConnection>scm:git:https://github.com/videogorillas/live4api.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+    
     <profiles>
         <profile>
             <id>jsbuild-dev</id>
