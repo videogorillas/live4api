@@ -1609,7 +1609,7 @@ live4api.Api3MissionUrls = stjs.extend(live4api.Api3MissionUrls, null, [], funct
         return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.BY_MISSION_TOKEN + "/" + token;
     };
     constructor.checkTokenUrl = function(token) {
-        return live4api.Api3MissionUrls.IS_TOKEN_VALID + "/" + token;
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.IS_TOKEN_VALID + "/" + token;
     };
 }, {}, {});
 stjs.ns("live4api");
