@@ -4,11 +4,9 @@ import static org.stjs.javascript.JSCollections.$castArray;
 
 import org.stjs.javascript.Array;
 import org.stjs.javascript.Date;
-import org.stjs.javascript.JSCollections;
 import org.stjs.javascript.annotation.Namespace;
-import org.stjs.javascript.annotation.ServerSide;
 
-import com.google.code.geocoder.model.GeocoderResult;
+import google.maps.GeocoderResult;
 
 @Namespace("live4api")
 @ReadOnly //all fields can only be updated by super admin except marked with @ReadWrite
@@ -29,7 +27,6 @@ public class Stream implements Doc {
 
     public String startAddress; // TODO: move to StreamLocation object
 
-    @ServerSide
     public Array<GeocoderResult> startGeoCoder; // TODO: move to StreamLocation object
     public StreamLocation startLocation;
 
