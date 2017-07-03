@@ -190,9 +190,25 @@ NOTE: Live4 public API is based on [ReactiveX library](https://github.com/Reacti
         });
     ```
 
-# Release
+# Release snapshots && npm
+
+0. `npm install`
 1. Make sure that pom.xml & package.json versions are the same;
+
+**IMPORTANT**
+
+```
+# package.json
+  "version": "3.5.0-betaX",
+
+# pom.xml
+<version>3.5.0-betaX-SNAPSHOT</version>
+```
+
 2. `mvn clean package`
 3. `grunt`
-4. `npm login`
-5. `npm publish`
+4. `mvn release:prepare`
+4.1. Agree with questions
+5. `git push`
+6. `npm login`
+7. `npm publish`
