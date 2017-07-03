@@ -84,7 +84,6 @@
                 </executions>
                 <configuration>
                     <includes>
-                        <include>google/maps/**/*.java</include>
                         <include>io/live4/api1/**/*.java</include>
                         <include>io/live4/api2/**/*.java</include>
                         <include>io/live4/api3/**/*.java</include>

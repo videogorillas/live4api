@@ -6,8 +6,6 @@ import org.stjs.javascript.Array;
 import org.stjs.javascript.Date;
 import org.stjs.javascript.annotation.Namespace;
 
-import google.maps.GeocoderResult;
-
 @Namespace("live4api")
 @ReadOnly //all fields can only be updated by super admin except marked with @ReadWrite
 public class Stream implements Doc {
