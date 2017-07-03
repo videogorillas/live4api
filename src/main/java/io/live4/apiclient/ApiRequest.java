@@ -127,6 +127,10 @@ public class ApiRequest {
         return GET(serverUrl.listHw(orgId));
     }
 
+    public Request getHw(String hwId) {
+        return GET(serverUrl.getHw(hwId));
+    }
+
     public Request createHw(Hardware hw) {
         return postAsJsonRequest(serverUrl.createHw(), gsonToString(hw));
     }

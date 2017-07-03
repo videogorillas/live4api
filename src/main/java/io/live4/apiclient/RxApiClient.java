@@ -176,6 +176,10 @@ public class RxApiClient {
         return requestObject(request.createHw(hw), Hardware.class);
     }
 
+    public Observable<Hardware> getHw(String hwId) {
+        return requestObject(request.getHw(hwId), Hardware.class);
+    }
+
     public Observable<Hardware> getHwByExternalId(String externalId, String orgId) {
         return requestObject(request.listHw(orgId), Hardware[].class)
                 .concatMap(arr -> Observable.from(arr))

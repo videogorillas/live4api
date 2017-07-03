@@ -117,6 +117,10 @@ public class ServerUrl {
         return serverUrl + Api3HwUrls.listUrl(orgId);
     }
 
+    public String getHw(String hwId) {
+        return serverUrl + Api3HwUrls.getUrl(hwId);
+    }
+
     public String shareToken(String missionId) {
         return serverUrl + Api3MissionUrls.tokenUrl(missionId);
     }
