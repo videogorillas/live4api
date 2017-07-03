@@ -1284,6 +1284,20 @@ live4api.Api1StreamUrls = stjs.extend(live4api.Api1StreamUrls, null, [], functio
         return live4api.Api1StreamUrls.API_STREAM + "/" + id;
     };
 }, {}, {});
+var GeocoderResult = function() {};
+GeocoderResult = stjs.extend(GeocoderResult, null, [], function(constructor, prototype) {
+    prototype.types = null;
+    prototype.formattedAddress = null;
+    prototype.addressComponents = null;
+    prototype.geometry = null;
+    prototype.partialMatch = false;
+    prototype.getFormattedAddress = function() {
+        return this.formattedAddress;
+    };
+    prototype.getGeometry = function() {
+        return this.geometry;
+    };
+}, {types: {name: "Array", arguments: [null]}, addressComponents: {name: "Array", arguments: ["GeocoderAddressComponent"]}, geometry: "GeocoderGeometry"}, {});
 stjs.ns("live4api");
 live4api.LiveStatus = stjs.enumeration("SCHEDULED", "STANDBY", "LIVE", "UPLOADING", "UPLOADING_METADATA", "RECORDED");
 stjs.ns("live4api");
@@ -1373,6 +1387,17 @@ live4api.Api2Urls = stjs.extend(live4api.Api2Urls, null, [], function(constructo
         return live4api.Api2Urls.API_2_STREAM_UPDATE_TITLE + "/" + streamId;
     };
 }, {}, {});
+var GeocoderGeometry = function() {};
+GeocoderGeometry = stjs.extend(GeocoderGeometry, null, [], function(constructor, prototype) {
+    prototype.location = null;
+    prototype.locationType = null;
+    prototype.viewport = null;
+    prototype.bounds = null;
+    prototype.getLocation = function() {
+        return this.location;
+    };
+}, {location: "google.maps.LatLng", locationType: {name: "Enum", arguments: ["GeocoderLocationType"]}, viewport: "google.maps.LatLngBounds", bounds: "google.maps.LatLngBounds"}, {});
+var GeocoderLocationType = stjs.enumeration("APPROXIMATE", "GEOMETRIC_CENTER", "RANGE_INTERPOLATED", "ROOFTOP", "UNKNOWN");
 stjs.ns("live4api");
 live4api.LoginRequestData = function(login, pass) {
     this.l = login;
@@ -1460,6 +1485,12 @@ live4api.Api3HwUrls = stjs.extend(live4api.Api3HwUrls, null, [], function(constr
         return live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.RELEASE + "/" + id;
     };
 }, {}, {});
+var GeocoderAddressComponent = function() {};
+GeocoderAddressComponent = stjs.extend(GeocoderAddressComponent, null, [], function(constructor, prototype) {
+    prototype.longName = null;
+    prototype.shortName = null;
+    prototype.types = null;
+}, {types: {name: "Array", arguments: [null]}}, {});
 stjs.ns("live4api");
 live4api.Api3UserUrls = function() {};
 live4api.Api3UserUrls = stjs.extend(live4api.Api3UserUrls, null, [], function(constructor, prototype) {
@@ -2069,6 +2100,7 @@ live4api.Stream = stjs.extend(live4api.Stream, null, [live4api.Doc], function(co
     prototype.userId = null;
     prototype.filename = null;
     prototype.startAddress = null;
+    prototype.startGeoCoder = null;
     prototype.startLocation = null;
     prototype.onCdn = false;
     prototype.onYoutube = null;
@@ -2156,7 +2188,7 @@ live4api.Stream = stjs.extend(live4api.Stream, null, [live4api.Doc], function(co
     prototype.isActive = function() {
         return true;
     };
-}, {startLocation: "live4api.StreamLocation", status: {name: "Enum", arguments: ["live4api.LiveStatus"]}, privacy: {name: "Enum", arguments: ["live4api.Privacy"]}, tags2: {name: "Array", arguments: ["live4api.Tag"]}}, {});
+}, {startGeoCoder: {name: "Array", arguments: ["GeocoderResult"]}, startLocation: "live4api.StreamLocation", status: {name: "Enum", arguments: ["live4api.LiveStatus"]}, privacy: {name: "Enum", arguments: ["live4api.Privacy"]}, tags2: {name: "Array", arguments: ["live4api.Tag"]}}, {});
 stjs.ns("live4api");
 live4api.StreamPermissions = function() {};
 live4api.StreamPermissions = stjs.extend(live4api.StreamPermissions, null, [], function(constructor, prototype) {
@@ -2577,7 +2609,7 @@ live4api.StreamResponse = stjs.extend(live4api.StreamResponse, live4api.Stream, 
     prototype.isoDate = function() {
         return new Date(this.ctime).toISOString();
     };
-}, {user: "live4api.UserResponse", tags: {name: "Array", arguments: ["live4api.Tag"]}, likes: "live4api.LikeResponse", comments: "live4api.CommentResponse", startLocation: "live4api.StreamLocation", status: {name: "Enum", arguments: ["live4api.LiveStatus"]}, privacy: {name: "Enum", arguments: ["live4api.Privacy"]}, tags2: {name: "Array", arguments: ["live4api.Tag"]}}, {});
+}, {user: "live4api.UserResponse", tags: {name: "Array", arguments: ["live4api.Tag"]}, likes: "live4api.LikeResponse", comments: "live4api.CommentResponse", startGeoCoder: {name: "Array", arguments: ["GeocoderResult"]}, startLocation: "live4api.StreamLocation", status: {name: "Enum", arguments: ["live4api.LiveStatus"]}, privacy: {name: "Enum", arguments: ["live4api.Privacy"]}, tags2: {name: "Array", arguments: ["live4api.Tag"]}}, {});
 //# sourceMappingURL=live4api3.map
 
 module.exports = live4api;
