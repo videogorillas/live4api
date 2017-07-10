@@ -62,4 +62,15 @@ class InternalJSAdapter {
         }
         return false;
     }
+    
+    @Template("adapter")
+    @Native
+    public static Array<String> keys(Class<Object> o, Object _instance){
+        Map<String, Object> m = (Map) _instance;
+        Array<String> keys = new Array<String>();
+        for (String key : m) {
+            keys.push(key);
+        }
+        return keys;
+    }
 }

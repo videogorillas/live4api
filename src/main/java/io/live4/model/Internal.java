@@ -114,4 +114,8 @@ public class Internal {
         }
         return str.equals(str2);
     }
+    
+    public static <T> Array<String> keys(Map<String, T> map) {
+        return map == null ? $array() : InternalJSAdapter.keys(Object.class, map);
+    }
 }
