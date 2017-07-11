@@ -37,6 +37,8 @@ export default class Hardware implements Doc {
 
     static android (name: string): Hardware;
 
+    static ios (name: string): Hardware;
+
     static  statusLabel (s: Availability): string;
 
     //UI only: meaningless for daos
