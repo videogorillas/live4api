@@ -1,8 +1,10 @@
 package io.live4.model;
 
-import static io.live4.model.InternalJSAdapter.hasOwnProperty;
+import static io.live4.js.internal.InternalJSAdapter.hasOwnProperty;
+import static org.stjs.javascript.Global.window;
 import static org.stjs.javascript.JSCollections.$array;
 import static org.stjs.javascript.JSCollections.$map;
+import static org.stjs.javascript.JSGlobal.JSON;
 import static org.stjs.javascript.JSGlobal.typeof;
 
 import java.text.ParseException;
@@ -13,6 +15,9 @@ import org.stjs.javascript.Date;
 import org.stjs.javascript.JSStringAdapterBase;
 import org.stjs.javascript.Map;
 import org.stjs.javascript.annotation.Native;
+
+import io.live4.js.internal.InternalJSAdapter;
+import io.live4.js.internal.Typefy;
 
 public class Internal {
     public static <T> Array<T> mapValues(Map<String, T> map) {
@@ -113,5 +118,16 @@ public class Internal {
             return false;
         }
         return str.equals(str2);
+    }
+    
+    public static <T> Array<String> keys(Map<String, T> map) {
+        return map == null ? $array() : InternalJSAdapter.keys(Object.class, map);
+    }
+    
+    public static <T> T typefyJson(String json, Class<T> cls) {
+        if (json != null) {
+            return Typefy.typefy(JSON.parse(json), cls);
+        }
+        return null;
     }
 }

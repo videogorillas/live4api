@@ -50,7 +50,7 @@ public class MissionPermissions {
     }
 
     public static boolean canViewCompletedMission(User u, Mission m) {
-        return (Mission.State.ENDED == m.state) && (containsKey(m.roles, u.id) || Mission.isOrgAdmin(u, m));
+        return (MissionState.ENDED == m.state) && (containsKey(m.roles, u.id) || Mission.isOrgAdmin(u, m));
     }
 
     public static boolean canShareMission(User user, Mission mission) {
@@ -91,7 +91,7 @@ public class MissionPermissions {
     }
 
     public static boolean canPreviewMission(Mission mission) {
-        return mission != null && mission.state != Mission.State.CANCELLED;
+        return mission != null && mission.state != MissionState.CANCELLED;
     }
 
     public static boolean canViewMission(Mission mission, User user) {
