@@ -1,3 +1,4 @@
+var Rx = require('rx')
 /*
  *  Copyright 2011 Alexandru Craciun, Eyal Kaspi
  *

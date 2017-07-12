@@ -2,6 +2,7 @@ package io.live4.internal;
 
 import static java.util.stream.Collectors.joining;
 
+import java.io.File;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -18,6 +19,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.stjs.javascript.Array;
 import org.stjs.javascript.Map;
@@ -35,14 +37,32 @@ import io.live4.model.User;
 
 public class TypeScriptTest {
     private static final String PADDING = "    ";
+    
+    @Test
+    public void testGenerateAll() throws Exception {
+        List<Class> excluded = Arrays.asList(Internal.class, BaseAsyncDao.class);
+        
+        List<Class> all = new ArrayList<>();
+        all.addAll(ClassFinder.find("io.live4.model"));
+        all.addAll(ClassFinder.find("io.live4.js"));
+        all.removeAll(excluded);
+        
+        PrintStream out = new PrintStream(new File("index.d.ts"));
+        out.println("import {Observable} from 'rx';");
+        for (Class<?> class1 : all) {
+            generate(class1, out);
+        }
+    }
 
     @Test
+    @Ignore
     public void testName() throws Exception {
         Class cls = StreamResponse.class;
         generate(cls, System.err);
     }
 
     @Test
+    @Ignore
     public void testSimple() throws Exception {
         Class cls = User.class;
         Method method = Stream.of(cls.getMethods()).filter(m -> m.getName().contains("getId")).findFirst().orElse(null);
@@ -51,6 +71,7 @@ public class TypeScriptTest {
     }
 
     @Test
+    @Ignore
     @SuppressWarnings({ "unused", "rawtypes" })
     public void testGenerics() throws Exception {
         Class cls = CalendarApi.class;
@@ -89,19 +110,7 @@ public class TypeScriptTest {
         return pt;
     }
 
-    @Test
-    public void testGenerateAll() throws Exception {
-        List<Class> excluded = Arrays.asList(Internal.class, BaseAsyncDao.class);
-        
-        List<Class> all = new ArrayList<>();
-        all.addAll(ClassFinder.find("io.live4.model"));
-        all.addAll(ClassFinder.find("io.live4.js"));
-        all.removeAll(excluded);
-        
-        for (Class<?> class1 : all) {
-            generate(class1, System.err);
-        }
-    }
+    
 
     private void generate(Class cls, PrintStream out) {
         
@@ -116,7 +125,7 @@ public class TypeScriptTest {
         if (cls.isEnum()) {
             Object[] enumConstants = cls.getEnumConstants();
             String collect = Stream.of(enumConstants).map(x -> x.toString()).collect(joining(", "));
-            out.printf("export enum %s { %s };\n", cls.getSimpleName(), collect);
+            out.printf("export enum %s { %s }\n", cls.getSimpleName(), collect);
             return;
         }
         {
@@ -356,12 +365,12 @@ public class TypeScriptTest {
                 checkState(actualTypeArguments.length == 2, "expected 2 params");
                 Type in = actualTypeArguments[0];
                 Type out = actualTypeArguments[1];
-                return String.format("(in: %s) => %s", ts(in), ts(out));
+                return String.format("(arg: %s) => %s", ts(in), ts(out));
             } else if (Callback1.class.equals(rawType)) {
                 Type[] actualTypeArguments = pgt.getActualTypeArguments();
                 checkState(actualTypeArguments.length == 1, "Callback1 expected 1 param");
                 Type in = actualTypeArguments[0];
-                return String.format("(in: %s) => void", ts(in));
+                return String.format("(arg: %s) => void", ts(in));
             } else if (Observable.class.equals(rawType)) {
                 Type[] actualTypeArguments = pgt.getActualTypeArguments();
                 checkState(actualTypeArguments.length == 1, "Observable expected 1 param");
