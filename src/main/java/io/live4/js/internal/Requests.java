@@ -11,43 +11,52 @@ import com.vg.js.bridge.Rx;
 
 import org.stjs.javascript.Map;
 import org.stjs.javascript.XMLHttpRequest;
+import org.stjs.javascript.annotation.Namespace;
 import org.stjs.javascript.dom.FormData;
 import org.stjs.javascript.typed.ArrayBuffer;
 
 import com.vg.js.bridge.Rx.Observable;
 
+@Namespace("live4api")
 public class Requests {
 
-    public static Observable<String> postAsJson(String url, Object o) {
+    private String serverUrl;
+
+    public Requests(String serverUrl) {
+        this.serverUrl = serverUrl == null ? "" : serverUrl;
+    }
+
+    public Observable<String> postAsJson(String url, Object o) {
         return request(url, JSON.stringify(o), "POST", $map("Content-type", "application/json"));
     }
 
-    public static Observable<String> putAsJson(String url, Object o) {
+    public Observable<String> putAsJson(String url, Object o) {
         return request(url, JSON.stringify(o), "PUT", $map("Content-type", "application/json"));
     }
 
-    public static Observable<String> get(String url) {
+    public Observable<String> get(String url) {
         return request(url, null, "GET", null);
     }
 
-    public static Observable<String> delete_(String url) {
+    public Observable<String> deleteRequest(String url) {
         return request(url, null, "DELETE", null);
     }
 
-    public static Observable<Object> getJson(String url) {
+    public Observable<Object> getJson(String url) {
         return request(url, null, "GET", null).filter(response->!eq(response, "")).map(jsonResponse -> JSON.parse(jsonResponse));
     }
 
-    public static Observable<String> request(String url, String data, String method, Map<String, String> headers) {
+    public Observable<String> request(String url, String data, String method, Map<String, String> headers) {
+        String _url = serverUrl+url;
         Observable<String> o = Observable.$create(observer -> {
-            RequestObserver requestObserver = new RequestObserver(url, data, headers, null, method, observer).invoke();
+            RequestObserver requestObserver = new RequestObserver(_url, data, headers, null, method, observer).invoke();
             MutableBoolean loaded = requestObserver.getLoaded();
             XMLHttpRequest http = requestObserver.getHttp();
 
             return () -> {
                 if (!loaded.value) {
                     if (http.readyState != 4) {
-                        dbg("abort " + method + " " + url);
+                        dbg("abort " + method + " " + _url);
                         http.abort();
                     }
                 }
@@ -56,16 +65,17 @@ public class Requests {
         return o;
     }
 
-    public static Observable<String> formPost(String url, FormData data) {
+    public Observable<String> formPost(String url, FormData data) {
+        String _url = serverUrl+url;
         Observable<String> o = Observable.$create(observer -> {
-            RequestObserver requestObserver = new RequestObserver(url, null, null, data, "POST", observer).invoke();
+            RequestObserver requestObserver = new RequestObserver(_url, null, null, data, "POST", observer).invoke();
             MutableBoolean loaded = requestObserver.getLoaded();
             XMLHttpRequest http = requestObserver.getHttp();
 
             return () -> {
                 if (!loaded.value) {
                     if (http.readyState != 4) {
-                        dbg("abort FORMPOST " + url);
+                        dbg("abort FORMPOST " + _url);
                         http.abort();
                     }
                 }
@@ -76,16 +86,17 @@ public class Requests {
 
     public static boolean debug = true;
 
-    private static void dbg(String msg) {
+    static void dbg(String msg) {
         if (debug) {
             console.log(msg);
         }
     }
 
-    public static Observable<ArrayBuffer> getArrayBuffer(String url) {
+    public Observable<ArrayBuffer> getArrayBuffer(String url) {
+        String _url = serverUrl+url;
         Observable<ArrayBuffer> o = Observable.create(observer -> {
             XMLHttpRequest http = new XMLHttpRequest();
-            http.open("GET", url, true);
+            http.open("GET", _url, true);
             http.responseType = "arraybuffer";
             http.onreadystatechange = () -> {
                 if (http.readyState == 4) {
@@ -102,7 +113,7 @@ public class Requests {
         return o;
     }
 
-    public static Observable<String> _delete(String url) {
+    public Observable<String> _delete(String url) {
         return request(url, null, "DELETE", null);
     }
 
@@ -125,15 +136,15 @@ public class Requests {
             this.observer = observer;
         }
 
-        public XMLHttpRequest getHttp() {
+        XMLHttpRequest getHttp() {
             return http;
         }
 
-        public MutableBoolean getLoaded() {
+        MutableBoolean getLoaded() {
             return loaded;
         }
 
-        public RequestObserver invoke() {
+        RequestObserver invoke() {
             http = new XMLHttpRequest();
             http.open(method, url);
             keys(headers).$forEach(h -> http.setRequestHeader(h, headers.$get(h)));

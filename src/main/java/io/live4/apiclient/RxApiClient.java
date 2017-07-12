@@ -156,8 +156,8 @@ public class RxApiClient {
         return requestObject(request.getLocations(id), StreamLocation[].class).concatMap(arr -> Observable.from(arr));
     }
 
-    public Observable<Mission.ShareToken> getShareToken(String missionId) {
-        return requestObject(GET(serverUrl.shareToken(missionId)), Mission.ShareToken.class);
+    public Observable<MissionShareToken> getShareToken(String missionId) {
+        return requestObject(GET(serverUrl.shareToken(missionId)), MissionShareToken.class);
     }
 
     public Observable<TwilioToken> requestChatToken() {

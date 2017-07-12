@@ -1,8 +1,8 @@
 package io.live4.model;
 
-import static io.live4.model.Hardware.Availability.AVAILABLE;
-import static io.live4.model.Hardware.Availability.INUSE;
-import static io.live4.model.Hardware.Availability.SCHEDULED;
+import static io.live4.model.HwAvailability.AVAILABLE;
+import static io.live4.model.HwAvailability.INUSE;
+import static io.live4.model.HwAvailability.SCHEDULED;
 import static io.live4.model.Internal.isBlank;
 
 import org.stjs.javascript.SortFunction;
@@ -33,7 +33,7 @@ public class Hardware implements Doc {
     };
     //UI only: meaningless for daos
     //marked as transient to disable GSON serialization
-    public transient Availability _availability;
+    public transient HwAvailability _availability;
     public transient Calendar _calendar;
     public transient String _orgName;
 
@@ -66,7 +66,7 @@ public class Hardware implements Doc {
     }
 
     public boolean isScheduled() {
-        return _availability == Availability.SCHEDULED || _availability == INUSE;
+        return _availability == HwAvailability.SCHEDULED || _availability == INUSE;
     }
 
     public Hardware setPort(int port) {
@@ -76,10 +76,6 @@ public class Hardware implements Doc {
 
     public boolean belongsToOrg(String orgId) {
         return !isBlank(orgId) && orgId.equals(this.orgId);
-    }
-
-    public enum Availability {
-        AVAILABLE, SCHEDULED, INUSE
     }
 
     public Hardware(String name, String type) {
@@ -92,7 +88,7 @@ public class Hardware implements Doc {
         return orgId != null;
     }
 
-    public static String statusLabel(Availability s) {
+    public static String statusLabel(HwAvailability s) {
         if (s == AVAILABLE) {
             return "Available";
         } else if (s == SCHEDULED) {
@@ -118,9 +114,9 @@ public class Hardware implements Doc {
         this.id = id;
     }
     
-    public Availability getAvailabilityFor(TimeInterval ti) {
+    public HwAvailability getAvailabilityFor(TimeInterval ti) {
         if (this._calendar == null)
-            return Availability.AVAILABLE;
+            return HwAvailability.AVAILABLE;
         return _calendar.isBusyAt(ti) ? SCHEDULED : AVAILABLE;
     }
 

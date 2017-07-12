@@ -14,7 +14,7 @@ import io.live4.api3.Api3OrgUrls;
 import io.live4.api3.Api3StreamUrls;
 import io.live4.api3.Api3Urls;
 import io.live4.api3.Api3UserUrls;
-import io.live4.model.Mission.ShareToken;
+import io.live4.model.MissionShareToken;
 import io.live4.model.StreamId;
 import io.live4.model.User;
 
@@ -89,7 +89,7 @@ public class ServerUrl {
         return serverUrl + Api3MissionUrls.getUrl(id);
     }
 
-    public String shareMission(ShareToken shareToken) {
+    public String shareMission(MissionShareToken shareToken) {
         return serverUrl + Api3MissionUrls.shareMissionUrl(shareToken.missionId, shareToken.token);
     }
 

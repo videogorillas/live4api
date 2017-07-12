@@ -1,4 +1,4 @@
-package io.live4.model;
+package io.live4.js.internal;
 
 
 import org.stjs.javascript.Array;
@@ -11,7 +11,7 @@ import org.stjs.javascript.annotation.Template;
 
 @Adapter
 @STJSBridge
-class InternalJSAdapter {
+public class InternalJSAdapter {
 
     @Template("or")
     @Native
@@ -73,4 +73,7 @@ class InternalJSAdapter {
         }
         return keys;
     }
+    
+    @Template("adapter")
+    public native static <T> T create(Class<Object> o, Object _prototype);
 }

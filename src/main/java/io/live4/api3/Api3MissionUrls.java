@@ -82,4 +82,6 @@ public class Api3MissionUrls {
     public static String checkTokenUrl(String token) {
         return API_3_MISSION + IS_TOKEN_VALID + "/" + token;
     }
+
+    public static final String SHARE_TO_EMAIL_PARAM = "toEmail";
 }

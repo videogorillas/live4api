@@ -1,7 +1,7 @@
 package io.live4.model;
 
+import static io.live4.js.internal.InternalJSAdapter.$or;
 import static io.live4.model.Internal.defaultMap;
-import static io.live4.model.InternalJSAdapter.$or;
 import static org.stjs.javascript.JSCollections.$map;
 
 import org.stjs.javascript.Map;

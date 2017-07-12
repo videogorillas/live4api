@@ -70,12 +70,12 @@ public class ApiRequest {
     }
 
     public Request login(String email, String password) {
-        LoginRequestData lrd = new LoginRequestData(email, password);
+        LoginRequest lrd = new LoginRequest(email, password);
         return postAsJsonRequest(serverUrl.login(), gsonToString(lrd));
     }
 
     public Request resetPassword(String email) {
-        LoginRequestData lrd = new LoginRequestData(email, null);
+        LoginRequest lrd = new LoginRequest(email, null);
         return postAsJsonRequest(serverUrl.resetPassword(), gsonToString(lrd));
     }
 

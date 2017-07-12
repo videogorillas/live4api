@@ -1003,6 +1003,373 @@ stjs.getField=function(obj, field){
 var live4api = {};
 
 stjs.ns("live4api");
+live4api.LiveMessage = function() {};
+live4api.LiveMessage = stjs.extend(live4api.LiveMessage, null, [], function(constructor, prototype) {
+    prototype.streamId = null;
+    prototype.stream = null;
+    prototype.nearby = null;
+    prototype.durationHLS = null;
+    prototype.durationDash = null;
+    prototype.map = null;
+    prototype.action = null;
+    prototype.calendar = null;
+    prototype.org = null;
+    prototype.hardware = null;
+    prototype.mission = null;
+    prototype.user = null;
+    prototype.hwStatus = null;
+    prototype.hasMap = function() {
+        return this.map != null;
+    };
+    prototype.hasDuration = function() {
+        return this.durationDash != null || this.durationHLS != null;
+    };
+    prototype.hasNearby = function() {
+        return this.nearby != null;
+    };
+    prototype.hasStream = function() {
+        return this.stream != null;
+    };
+    constructor.subscribeStream = function(sid) {
+        var tm = new live4api.LiveMessage();
+        tm.action = "stream/subscribe";
+        tm.streamId = sid;
+        return tm;
+    };
+    constructor.unsubscribeStream = function(sid) {
+        var tm = new live4api.LiveMessage();
+        tm.action = "stream/unsubscribe";
+        tm.streamId = sid;
+        return tm;
+    };
+    constructor.subscribe = function(what) {
+        var tm = new live4api.LiveMessage();
+        tm.action = what + "/subscribe";
+        return tm;
+    };
+}, {stream: "live4api.StreamResponse", nearby: {name: "Array", arguments: ["live4api.DataSegment"]}, map: {name: "Array", arguments: ["live4api.DataSegment"]}, calendar: "live4api.Calendar", org: "live4api.Organization", hardware: "live4api.Hardware", mission: "live4api.Mission", user: "live4api.User", hwStatus: "live4api.HWStatus"}, {});
+stjs.ns("live4api");
+live4api.WRX = function(url, onOpen) {
+    this.onOpen = onOpen;
+    this.url = url;
+};
+live4api.WRX = stjs.extend(live4api.WRX, null, [], function(constructor, prototype) {
+    prototype.onOpen = null;
+    prototype.url = null;
+    prototype.ws = null;
+    constructor.webSocketMessages = function(url) {
+        return new live4api.WRX(url, null).connect().map(function(m) {
+            return m.data;
+        });
+    };
+    prototype.send = function(data) {
+        this.ws.send(data);
+    };
+    prototype.connect = function() {
+        return Rx.Observable.create(stjs.bind(this, function(eventObserver) {
+            this.ws = new WebSocket(this.url);
+            this.ws.onopen = stjs.bind(this, function(domEvent) {
+                if (this.onOpen != null) {
+                    this.onOpen(this, domEvent);
+                }
+            });
+            this.ws.onmessage = stjs.bind(eventObserver, "onNext");
+            this.ws.onerror = stjs.bind(eventObserver, "onError");
+            this.ws.onclose = function(e) {
+                eventObserver.onCompleted();
+            };
+            return stjs.bind(this, function() {
+                this.close();
+            });
+        }));
+    };
+    prototype.close = function() {
+        if (this.ws.readyState != WebSocket.CLOSED && this.ws.readyState != WebSocket.CLOSING) {
+            this.ws.close(1000, "ok");
+        }
+    };
+    constructor.webSocket = function(uri, onOpen) {
+        return Rx.Observable.create(function(eventObserver) {
+            var _ws = new WebSocket(uri);
+            _ws.onopen = function(domEvent) {
+                if (onOpen != null) {
+                    onOpen(_ws, domEvent);
+                }
+            };
+            _ws.onmessage = function(msg) {
+                eventObserver.onNext(msg.data);
+            };
+            _ws.onerror = stjs.bind(eventObserver, "onError");
+            _ws.onclose = function(e) {
+                if (e.code == 1008) {
+                    var err = new Error(e.reason);
+                    eventObserver.onError(err);
+                }
+                eventObserver.onCompleted();
+            };
+            return function() {
+                if (_ws.readyState != WebSocket.CLOSED && _ws.readyState != WebSocket.CLOSING) {
+                    _ws.close(1000, "ok");
+                }
+            };
+        });
+    };
+}, {onOpen: {name: "Callback2", arguments: ["live4api.WRX", "DOMEvent"]}, ws: "WebSocket"}, {});
+stjs.ns("live4api");
+live4api.UserResponse = function(id, name, userpic, type, intoURL, homeTown, activities) {
+    this.id = id;
+    this.name = name;
+    this.userpic = userpic;
+    this.type = type;
+    this.intoURL = intoURL;
+    this.homeTown = homeTown;
+    this.activities = activities;
+};
+live4api.UserResponse = stjs.extend(live4api.UserResponse, null, [], function(constructor, prototype) {
+    prototype.id = null;
+    prototype.name = null;
+    prototype.userpic = null;
+    prototype.type = null;
+    prototype.intoURL = null;
+    prototype.introUrl = null;
+    prototype.homeTown = null;
+    prototype.activities = null;
+    prototype.activites = null;
+}, {type: {name: "Enum", arguments: ["live4api.LoginType"]}, activities: {name: "Array", arguments: ["live4api.UserActivityResponse"]}, activites: {name: "Array", arguments: ["live4api.UserActivityResponse"]}}, {});
+stjs.ns("live4api");
+live4api.UserActivityResponse = function() {};
+live4api.UserActivityResponse = stjs.extend(live4api.UserActivityResponse, null, [], function(constructor, prototype) {
+    prototype.thumb = null;
+    prototype.hashTags = null;
+}, {hashTags: {name: "Array", arguments: [null]}}, {});
+stjs.ns("live4api");
+live4api.LoginType = stjs.enumeration("Facebook", "Twitter", "Email");
+stjs.ns("live4api");
+live4api.MissionShareToken = function() {};
+live4api.MissionShareToken = stjs.extend(live4api.MissionShareToken, null, [], function(constructor, prototype) {
+    prototype.token = null;
+    prototype.missionId = null;
+    prototype.userId = null;
+    prototype.invitedId = null;
+}, {}, {});
+stjs.ns("live4api");
+live4api.Api3MissionUrls = function() {};
+live4api.Api3MissionUrls = stjs.extend(live4api.Api3MissionUrls, null, [], function(constructor, prototype) {
+    constructor.API_3_MISSION = "/api/3/mission";
+    constructor.TOKEN = "/token";
+    constructor.SHARE = "/share";
+    constructor.JOIN = "Join";
+    constructor.UNSHARE = "/unshare";
+    constructor.CANCEL_NOTIFICATION = "/cancelNotification";
+    constructor.INVITE = "/invite";
+    constructor.OBJECT = "/object";
+    constructor.LIST = "/list";
+    constructor._MISSIONS = "/missions";
+    constructor.MISSION_SHARE_PARAM = "t";
+    constructor.CHAT_TOKEN = "/chatToken";
+    constructor.AUDIO_CHAT_TOKEN = "/audioChatToken";
+    constructor.BY_MISSION_TOKEN = "/byMissionToken";
+    constructor.IS_TOKEN_VALID = "/isTokenValid";
+    constructor.baseUrl = function() {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.OBJECT;
+    };
+    constructor.createUrl = function() {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.OBJECT;
+    };
+    constructor.updateUrl = function() {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.OBJECT;
+    };
+    constructor.getUrl = function(id) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.OBJECT + "/" + id;
+    };
+    constructor.listUrl = function(orgId) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.LIST + "/" + orgId;
+    };
+    constructor.tokenUrl = function(missionId) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.TOKEN + "/" + missionId;
+    };
+    constructor.shareUrl = function(missionId) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.SHARE + "/" + missionId;
+    };
+    constructor.unshareUrl = function(missionId) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.UNSHARE + "/" + missionId;
+    };
+    constructor.joinUrl = function(missionId) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.JOIN + "/" + missionId;
+    };
+    constructor.baseJoinUrl = function() {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.JOIN;
+    };
+    constructor.cancelNotificationUrl = function(missionId) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.CANCEL_NOTIFICATION + "/" + missionId;
+    };
+    constructor.inviteUrl = function(missionId) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.INVITE + "/" + missionId;
+    };
+    constructor.shareMissionUrl = function(missionId, shareToken) {
+        return live4api.Api3MissionUrls._MISSIONS + "/" + missionId + "?" + live4api.Api3MissionUrls.MISSION_SHARE_PARAM + "=" + shareToken;
+    };
+    constructor.getUserByMissionToken = function(token) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.BY_MISSION_TOKEN + "/" + token;
+    };
+    constructor.checkTokenUrl = function(token) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.IS_TOKEN_VALID + "/" + token;
+    };
+    constructor.SHARE_TO_EMAIL_PARAM = "toEmail";
+}, {}, {});
+stjs.ns("live4api");
+live4api.TimeInterval = function(startTime, endTime) {
+    this.start = startTime;
+    this.end = endTime;
+};
+live4api.TimeInterval = stjs.extend(live4api.TimeInterval, null, [], function(constructor, prototype) {
+    prototype.start = null;
+    prototype.end = null;
+    prototype.contains = function(d) {
+        var stime = this.start.getTime();
+        var etime = this.end.getTime();
+        var time = d.getTime();
+        return stime <= time && time <= etime;
+    };
+    prototype.overlaps = function(that) {
+        return this.contains(that.start) || this.contains(that.end);
+    };
+}, {start: "Date", end: "Date"}, {});
+stjs.ns("live4api");
+live4api.Dimension = function(w, h) {
+    this.width = w;
+    this.height = h;
+};
+live4api.Dimension = stjs.extend(live4api.Dimension, null, [], function(constructor, prototype) {
+    prototype.width = 0;
+    prototype.height = 0;
+}, {}, {});
+/**
+ *  Usage:
+ * 
+ *  VGJS.typefy
+ * 
+ *  <pre>
+ *   Object obj = JSON.parse("{\"email\": \"zhuker@videogorillas.com\"}");
+ *   User user = VGJS.typefy(obj, User.class);
+ *   console.log(user.getEmail())
+ *  </pre>
+ * 
+ *  VGJS.typefyArray
+ * 
+ *  <pre>
+ * 
+ *   Object obj = JSON.parse("[{\"email\": \"zhuker@videogorillas.com\"}]");
+ *   Array<User> users = VGJS.typefyArray(obj, User.class);
+ *   console.log(users.$get(0).getEmail())
+ * 
+ *  </pre>
+ * 
+ *  @author zhukov
+ */
+stjs.ns("live4api");
+live4api.Typefy = function() {};
+live4api.Typefy = stjs.extend(live4api.Typefy, null, [], function(constructor, prototype) {
+    constructor.elementType = function(type) {
+        if ((typeof type) == "function") 
+            return type;
+        if (Boolean((type)["arguments"])) {
+            return eval(((type)["arguments"])[0]);
+        }
+        if ((typeof type) == "string") 
+            return eval(type);
+        return Object;
+    };
+    constructor.getEnum = function(enumClassName, enumEntryName) {
+        var enumClass = eval(enumClassName);
+        return (enumClass)[enumEntryName];
+    };
+    constructor.convert = function(td, json) {
+        if (!Boolean(td)) {
+            return json;
+        }
+        if ((td).hasOwnProperty("name")) {
+            var name = (td)["name"];
+            var args = (td)["arguments"];
+            if ("Enum".equals(name) && args != null && args.length > 0) {
+                return live4api.Typefy.getEnum(args[0], json);
+            }
+        }
+        if (Date == td || "Date" == td) {
+            return new Date(json);
+        }
+        console.log("td", (typeof td), td, json);
+         throw new RuntimeException("dont know what to do");
+    };
+    constructor.typefyArray = function(obj, cls) {
+        if (Array.isArray(obj)) {
+            var result = [];
+            var arr = obj;
+            for (var idx = 0; idx < arr.length; idx++) {
+                result.push(live4api.Typefy.typefy(arr[idx], cls));
+            }
+            return result;
+        }
+         throw new RuntimeException("array expected got " + (typeof obj) + " instead");
+    };
+    constructor.typefy = function(obj, cls) {
+        if (Array.isArray(obj)) {
+            var result = [];
+            var _obj = obj;
+            for (var idx = 0; idx < _obj.length; idx++) {
+                result.push(live4api.Typefy.typefy(_obj[idx], live4api.Typefy.elementType(cls)));
+            }
+            return result;
+        }
+        if (obj == null) 
+            return null;
+        var ret = null;
+        if (cls == null) {
+            return obj;
+        } else if ((typeof cls) == "string") {
+            ret = eval("new " + cls + "();");
+            cls = (ret).constructor;
+        } else if ((typeof cls) == "object" && "Map" == (cls)["name"]) {
+            var args = (cls)["arguments"];
+            cls = eval(args[1]);
+            ret = obj;
+            var map = obj;
+            for (var key in map) {
+                var prop = map[key];
+                if (prop == null) 
+                    continue;
+                if ((typeof prop) == "string") {
+                    (ret)[key] = live4api.Typefy.convert(cls, prop);
+                } else if ((typeof prop) == "object") {
+                    (ret)[key] = live4api.Typefy.typefy(prop, cls);
+                }
+            }
+            return map;
+        } else if ((typeof cls) == "object" && "Enum" == (cls)["name"]) {
+            var args = (cls)["arguments"];
+            return live4api.Typefy.getEnum(args[0], (obj)["_name"]);
+        } else {
+            ret = (Object).create((cls).prototype);
+        }
+        for (var key in (ret)) {
+            var prop = (obj)[key];
+            if (prop == null) 
+                continue;
+            var _td = (cls)["$typeDescription"];
+            var td = _td != null ? _td[key] : null;
+            if (!Boolean(td)) {
+                (ret)[key] = prop;
+            }
+            if ((typeof prop) == "string") {
+                (ret)[key] = live4api.Typefy.convert(td, prop);
+            } else if ((typeof prop) == "object") {
+                (ret)[key] = live4api.Typefy.typefy(prop, td);
+            }
+        }
+        return ret;
+    };
+}, {}, {});
+stjs.ns("live4api");
 live4api.Api3OrgUrls = function() {};
 live4api.Api3OrgUrls = stjs.extend(live4api.Api3OrgUrls, null, [], function(constructor, prototype) {
     constructor.API_3_ORG = "/api/3/org";
@@ -1025,6 +1392,86 @@ live4api.Api3OrgUrls = stjs.extend(live4api.Api3OrgUrls, null, [], function(cons
         return live4api.Api3OrgUrls.API_3_ORG + live4api.Api3OrgUrls.CREATEWITHADMIN;
     };
 }, {}, {});
+stjs.ns("live4api");
+live4api.NewOrgAdminProfile = function(org, admin, profile) {
+    this.org = org;
+    this.admin = admin;
+    this.profile = profile;
+};
+live4api.NewOrgAdminProfile = stjs.extend(live4api.NewOrgAdminProfile, null, [], function(constructor, prototype) {
+    prototype.org = null;
+    prototype.admin = null;
+    prototype.profile = null;
+}, {org: "live4api.Organization", admin: "live4api.User", profile: "live4api.UserProfile"}, {});
+stjs.ns("live4api");
+live4api.Api3Urls = function() {};
+live4api.Api3Urls = stjs.extend(live4api.Api3Urls, null, [], function(constructor, prototype) {
+    constructor.WSVIDEO = "/api/3/wsvideo";
+    constructor.API_3_WSPUSHVIDEO = "/api/3/wspushvideo";
+    constructor.API_3_ORG_STORAGE_UPLOAD = "/api/3/orgstorage/upload";
+    constructor.API_3_ORG_STORAGE_GET = "/api/3/orgstorage/get";
+    constructor.API_3_HWLOG = "/api/3/hwlog";
+    constructor.API_3_LOGIN = "/api/3/login";
+    constructor.API_3_LOGOUT = "/api/3/logout";
+    constructor.API_3_RESETPASSWORD = "/api/3/resetpassword";
+    constructor.API_3_WSUPDATES = "/api/3/wsupdates";
+    constructor.API_3_LOCATIONS = "/api/3/locations";
+    constructor.wsVideo = function(streamId) {
+        return live4api.Api3Urls.WSVIDEO + "/" + streamId;
+    };
+    constructor.wsPushVideo = function(streamId) {
+        return live4api.Api3Urls.API_3_WSPUSHVIDEO + "/" + streamId;
+    };
+    constructor.locationsUrl = function(streamId) {
+        return live4api.Api3Urls.API_3_LOCATIONS + "/" + streamId;
+    };
+    constructor.API_3_OVERLAY = "/api/3/overlay";
+    constructor.OVERLAY_OBJECT = "/object";
+}, {}, {});
+stjs.ns("live4api");
+live4api.LikeResponse = function(likes, has_liked) {
+    if (likes != null) {
+        this.total_count = likes.length;
+        this.likes = likes;
+        this.has_liked = has_liked;
+    } else {
+        this.total_count = 0;
+        this.likes = null;
+        this.has_liked = false;
+    }
+};
+live4api.LikeResponse = stjs.extend(live4api.LikeResponse, null, [], function(constructor, prototype) {
+    prototype.total_count = 0;
+    prototype.likes = null;
+    prototype.can_like = true;
+    prototype.has_liked = null;
+}, {likes: {name: "Array", arguments: ["live4api.Like"]}}, {});
+stjs.ns("live4api");
+live4api.Like = function() {};
+live4api.Like = stjs.extend(live4api.Like, null, [], function(constructor, prototype) {
+    prototype.uuid = null;
+    prototype.streamId = null;
+    prototype.sid = null;
+    prototype.user = null;
+    prototype.startMsec = 0;
+    prototype.ctime = 0;
+    prototype.getId = function() {
+        return this.uuid;
+    };
+    prototype.toString = function() {
+        var userid = null;
+        if (this.user != null) {
+            userid = this.user.id;
+        }
+        return "<Like: streamId=" + this.streamId + "; from=" + userid + "; startMsec=" + this.startMsec + ">";
+    };
+}, {sid: "live4api.StreamId", user: "live4api.UserResponse"}, {});
+stjs.ns("live4api");
+live4api.MissionRole = stjs.enumeration("UNKNOWN", "PILOT", "PARTICIPANT", "OBSERVER", "OWNER");
+stjs.ns("live4api");
+live4api.UserRole = stjs.enumeration("USER", "ORG_ADMIN", "SUPER_ADMIN", "EXTERNAL");
+stjs.ns("live4api");
+live4api.MissionState = stjs.enumeration("PENDING", "STARTED", "CANCELLED", "ENDED");
 stjs.ns("live4api");
 live4api.TSFile = function() {};
 live4api.TSFile = stjs.extend(live4api.TSFile, null, [], function(constructor, prototype) {
@@ -1095,40 +1542,182 @@ live4api.TSFile = stjs.extend(live4api.TSFile, null, [], function(constructor, p
     };
 }, {}, {});
 stjs.ns("live4api");
-live4api.DataSegment = function(playerTime, l) {
-    this.playerTime = playerTime;
-    this.location = l;
+live4api.StreamId = function(userId, streamId) {
+    this.userId = userId;
+    this.streamId = streamId;
 };
-live4api.DataSegment = stjs.extend(live4api.DataSegment, null, [], function(constructor, prototype) {
-    prototype.playerTime = 0;
-    prototype.location = null;
-    prototype.nearBy = null;
-    prototype.width = 0;
-    prototype.left = 0;
-    prototype.isEmpty = false;
-    prototype.widthScaled = 0;
-    prototype.leftScaled = 0;
-    prototype.tsfile = null;
-    prototype.descr = null;
-    prototype.getTime = function() {
-        return this.left;
-    };
-    prototype.setWidth = function(width) {
-        this.width = width;
-    };
-    prototype.setLeft = function(left) {
-        this.left = left;
-    };
+live4api.StreamId = stjs.extend(live4api.StreamId, null, [], function(constructor, prototype) {
+    prototype.userId = null;
+    prototype.streamId = null;
     prototype.toString = function() {
-        return String.format("%b; w%d; l%d p%d", this.isEmpty, this.width, this.left, this.playerTime);
+        return this.userId + "/" + this.streamId;
     };
-    prototype.scale = function(i) {
-        this.widthScaled = Math.max(stjs.trunc(this.width / i), 1);
-        this.leftScaled = stjs.trunc(this.left / i);
+    prototype._hashCode = 0;
+    prototype.hashCode = function() {
+        if (this._hashCode == 0) {
+            this._hashCode = this.toString().hashCode();
+        }
+        return this._hashCode;
     };
-}, {location: "live4api.StreamLocation", tsfile: "live4api.TSFile"}, {});
+    prototype.equals = function(obj) {
+        if (obj != null) {
+            return this.toString().equals(obj.toString());
+        }
+        return false;
+    };
+    constructor.sid = function(userId, streamId) {
+        return new live4api.StreamId(userId, streamId);
+    };
+}, {}, {});
+stjs.ns("live4api");
+live4api.Api3CalendarUrls = function() {};
+live4api.Api3CalendarUrls = stjs.extend(live4api.Api3CalendarUrls, null, [], function(constructor, prototype) {
+    constructor.API_3_CALENDAR = "/api/3/calendar";
+    constructor.OBJECT = "/object";
+    constructor.LIST = "/list";
+    constructor.createUrl = function() {
+        return live4api.Api3CalendarUrls.API_3_CALENDAR + live4api.Api3CalendarUrls.OBJECT;
+    };
+    constructor.getUrl = function(id) {
+        return live4api.Api3CalendarUrls.API_3_CALENDAR + live4api.Api3CalendarUrls.OBJECT + "/" + id;
+    };
+    constructor.listUrl = function(orgId) {
+        return live4api.Api3CalendarUrls.API_3_CALENDAR + live4api.Api3CalendarUrls.LIST + "/" + orgId;
+    };
+}, {}, {});
+stjs.ns("live4api");
+live4api.Api1StreamUrls = function() {};
+live4api.Api1StreamUrls = stjs.extend(live4api.Api1StreamUrls, null, [], function(constructor, prototype) {
+    constructor.API_STREAM = "/api/stream";
+    constructor.createUrl = function() {
+        return live4api.Api1StreamUrls.API_STREAM;
+    };
+    constructor.listUrl = function() {
+        return live4api.Api1StreamUrls.API_STREAM;
+    };
+    constructor.getUrl = function(id) {
+        return live4api.Api1StreamUrls.API_STREAM + "/" + id;
+    };
+}, {}, {});
+stjs.ns("live4api");
+live4api.HWLogEntry = function(hw, m, action, missionOwner) {
+    this.timestamp = new Date();
+    this.hwId = hw.id;
+    this.missionId = m.getId();
+    this.action = action;
+    this.hwName = hw.name;
+    this.hwType = hw.type;
+    this.orgId = hw.orgId;
+    this.hwPort = hw.port;
+    this.missionName = m.name;
+    this.missionState = m.state.toString();
+    this.location = m.location;
+    this.startTime = m.startTime;
+    this.missionOwner = missionOwner;
+};
+live4api.HWLogEntry = stjs.extend(live4api.HWLogEntry, null, [], function(constructor, prototype) {
+    prototype.hwId = null;
+    prototype.missionId = null;
+    prototype.startTime = null;
+    prototype.missionOwner = null;
+    prototype.action = null;
+    prototype.hwName = null;
+    prototype.hwType = null;
+    prototype.orgId = null;
+    prototype.hwPort = 0;
+    prototype.missionName = null;
+    prototype.missionState = null;
+    prototype.location = null;
+    prototype.timestamp = null;
+}, {startTime: "Date", timestamp: "Date"}, {});
+stjs.ns("live4api");
+live4api.LiveStatus = stjs.enumeration("SCHEDULED", "STANDBY", "LIVE", "UPLOADING", "UPLOADING_METADATA", "RECORDED");
+stjs.ns("live4api");
+live4api.Tag = function(id, name) {
+    this.id = id;
+    this.name = name;
+    this.startMsec = 0;
+    this.stopMsec = 0;
+};
+live4api.Tag = stjs.extend(live4api.Tag, null, [], function(constructor, prototype) {
+    prototype.id = null;
+    prototype.name = null;
+    prototype.startMsec = 0;
+    prototype.stopMsec = 0;
+    prototype.toString = function() {
+        return "Tag<" + this.id + "=" + this.name + ">";
+    };
+}, {}, {});
+stjs.ns("live4api");
+live4api.GeocoderResult = function() {};
+live4api.GeocoderResult = stjs.extend(live4api.GeocoderResult, null, [], function(constructor, prototype) {
+    prototype.types = null;
+    prototype.formattedAddress = null;
+    prototype.addressComponents = null;
+    prototype.geometry = null;
+    prototype.partialMatch = false;
+}, {types: {name: "Array", arguments: [null]}, addressComponents: {name: "Array", arguments: ["live4api.GeocoderAddressComponent"]}, geometry: "live4api.GeocoderGeometry"}, {});
+stjs.ns("live4api");
+live4api.Doc = function() {};
+live4api.Doc = stjs.extend(live4api.Doc, null, [], function(constructor, prototype) {
+    prototype.getId = function() {};
+    prototype.setId = function(id) {};
+    prototype.isActive = function() {};
+}, {}, {});
 stjs.ns("live4api");
 live4api.Privacy = stjs.enumeration("PUBLIC", "PRIVATE", "UNLISTED");
+stjs.ns("live4api");
+live4api.HwAvailability = stjs.enumeration("AVAILABLE", "SCHEDULED", "INUSE");
+stjs.ns("live4api");
+live4api.CommentResponse = function(comments) {
+    if (comments != null) {
+        this.total_count = comments.length;
+        this.comments = comments;
+    } else {
+        this.total_count = 0;
+        this.comments = null;
+    }
+};
+live4api.CommentResponse = stjs.extend(live4api.CommentResponse, null, [], function(constructor, prototype) {
+    prototype.total_count = 0;
+    prototype.comments = null;
+}, {comments: {name: "Array", arguments: ["live4api.Comment"]}}, {});
+stjs.ns("live4api");
+live4api.LoginRequest = function(login, pass) {
+    this.l = login;
+    this.p = pass;
+};
+live4api.LoginRequest = stjs.extend(live4api.LoginRequest, null, [], function(constructor, prototype) {
+    prototype.l = null;
+    prototype.p = null;
+    prototype.t = null;
+}, {}, {});
+stjs.ns("live4api");
+live4api.Api2Urls = function() {};
+live4api.Api2Urls = stjs.extend(live4api.Api2Urls, null, [], function(constructor, prototype) {
+    constructor.API_2_START = "/api/2/start";
+    constructor.API_2_BEST = "/api/2/best";
+    constructor.API_2_STREAM_UPDATE_TITLE = "/api/2/streamUpdateTitle";
+    constructor.API_2_STREAM = "/api/2/stream";
+    constructor.API_2_UPLOAD_LOCATION = "/api/2/upload/location";
+    constructor.API_2_UPLOAD_LOG = "/api/2/upload/log";
+    constructor.API_2_UPLOAD_AV = "/api/2/upload/av";
+    constructor.API_2_NOTIFY_REGISTER = "/api/2/notify/register";
+    constructor.API_2_MYSTREAMS = "/api/2/mystreams";
+    constructor.API_2_CLOSE = "/api/2/close";
+    constructor.API_2_END = "/api/2/end";
+    constructor.API_2_USER = "/api/2/user";
+    constructor.API_2_SEARCH = "/api/2/search";
+    constructor.API_2_EXPLORE = "/api/2/explore";
+    constructor.API_2_LOGIN = "/api/2/login";
+    constructor.API_2_LIKE = "/api/2/like";
+    constructor.API_2_ACTIVITY = "/api/2/activity";
+    constructor.API_2_COMMENT = "/api/2/comment";
+    constructor.API_2_REPORT = "/api/2/report";
+    constructor.updateStreamTitleUrl = function(streamId) {
+        return live4api.Api2Urls.API_2_STREAM_UPDATE_TITLE + "/" + streamId;
+    };
+}, {}, {});
 stjs.ns("live4api");
 live4api.BillingInfo = function() {};
 live4api.BillingInfo = stjs.extend(live4api.BillingInfo, null, [], function(constructor, prototype) {
@@ -1138,13 +1727,6 @@ live4api.BillingInfo = stjs.extend(live4api.BillingInfo, null, [], function(cons
     prototype.amount = null;
     prototype.card = null;
     prototype.information = null;
-}, {}, {});
-stjs.ns("live4api");
-live4api.Doc = function() {};
-live4api.Doc = stjs.extend(live4api.Doc, null, [], function(constructor, prototype) {
-    prototype.getId = function() {};
-    prototype.setId = function(id) {};
-    prototype.isActive = function() {};
 }, {}, {});
 stjs.ns("live4api");
 live4api.EndOfStream = function() {
@@ -1180,15 +1762,163 @@ live4api.CameraFile = stjs.extend(live4api.CameraFile, null, [], function(constr
     };
 }, {sortByFilename: {name: "SortFunction", arguments: ["live4api.CameraFile"]}}, {});
 stjs.ns("live4api");
-live4api.UserActivityResponse = function() {};
-live4api.UserActivityResponse = stjs.extend(live4api.UserActivityResponse, null, [], function(constructor, prototype) {
-    prototype.thumb = null;
-    prototype.hashTags = null;
-}, {hashTags: {name: "Array", arguments: [null]}}, {});
+live4api.GeocoderGeometry = function() {};
+live4api.GeocoderGeometry = stjs.extend(live4api.GeocoderGeometry, null, [], function(constructor, prototype) {
+    prototype.location = null;
+    prototype.locationType = null;
+    prototype.viewport = null;
+    prototype.bounds = null;
+}, {location: "google.maps.LatLng", locationType: {name: "Enum", arguments: ["google.maps.GeocoderLocationType"]}, viewport: "google.maps.LatLngBounds", bounds: "google.maps.LatLngBounds"}, {});
 stjs.ns("live4api");
-live4api.UserRole = stjs.enumeration("USER", "ORG_ADMIN", "SUPER_ADMIN", "EXTERNAL");
+live4api.GeocoderAddressComponent = function() {};
+live4api.GeocoderAddressComponent = stjs.extend(live4api.GeocoderAddressComponent, null, [], function(constructor, prototype) {
+    prototype.longName = null;
+    prototype.shortName = null;
+    prototype.types = null;
+}, {types: {name: "Array", arguments: [null]}}, {});
 stjs.ns("live4api");
-live4api.MissionRole = stjs.enumeration("UNKNOWN", "PILOT", "PARTICIPANT", "OBSERVER", "OWNER");
+live4api.UserProfile = function() {};
+live4api.UserProfile = stjs.extend(live4api.UserProfile, null, [], function(constructor, prototype) {
+    prototype.department = null;
+    prototype.title = null;
+    prototype.phone = null;
+    prototype.notes = null;
+    prototype.role = null;
+    prototype.active = false;
+}, {role: {name: "Enum", arguments: ["live4api.UserRole"]}}, {});
+stjs.ns("live4api");
+live4api.Api3HwUrls = function() {};
+live4api.Api3HwUrls = stjs.extend(live4api.Api3HwUrls, null, [], function(constructor, prototype) {
+    constructor.API_3_HW = "/api/3/hardware";
+    constructor.FIND_BY_PORT = "/findByPort";
+    constructor.RELEASE = "/release";
+    constructor.OBJECT = "/object";
+    constructor.LIST = "/list";
+    constructor.createUrl = function() {
+        return live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.OBJECT;
+    };
+    constructor.getUrl = function(id) {
+        return live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.OBJECT + "/" + id;
+    };
+    constructor.listUrl = function(orgId) {
+        return live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.LIST + "/" + orgId;
+    };
+    constructor.findByPortUrl = function(port) {
+        return live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.FIND_BY_PORT + "/" + port;
+    };
+    constructor.releaseUrl = function(id) {
+        return live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.RELEASE + "/" + id;
+    };
+    constructor.REASSIGN = "/reassign";
+}, {}, {});
+stjs.ns("live4api");
+live4api.Api3UserUrls = function() {};
+live4api.Api3UserUrls = stjs.extend(live4api.Api3UserUrls, null, [], function(constructor, prototype) {
+    constructor.API_3_USER = "/api/3/users";
+    constructor.BYEMAIL = "/byemail";
+    constructor.OBJECT = "/object";
+    constructor.LIST = "/list";
+    constructor.CHECK = "/check";
+    constructor.ISTEMP = "/istemp";
+    constructor.createUrl = function() {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.OBJECT;
+    };
+    constructor.updateUrl = function() {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.OBJECT;
+    };
+    constructor.getUrl = function(id) {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.OBJECT + "/" + id;
+    };
+    constructor.listUrl = function(orgId) {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.LIST + "/" + orgId;
+    };
+    constructor.byEmailUrl = function(email) {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.BYEMAIL + "/" + email;
+    };
+    constructor.checkUserByEmail = function(email) {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.CHECK + "/" + email;
+    };
+    constructor.isUserTemp = function(email) {
+        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.ISTEMP + "/" + email;
+    };
+}, {}, {});
+stjs.ns("live4api");
+live4api.Api3StreamUrls = function() {};
+live4api.Api3StreamUrls = stjs.extend(live4api.Api3StreamUrls, null, [], function(constructor, prototype) {
+    constructor.API_3_STREAM = "/api/3/stream";
+    constructor.OBJECT = "/object";
+    constructor.LIST = "/list";
+    constructor.createUrl = function() {
+        return live4api.Api3StreamUrls.API_3_STREAM + live4api.Api3StreamUrls.OBJECT;
+    };
+    constructor.getUrl = function(id) {
+        return live4api.Api3StreamUrls.API_3_STREAM + live4api.Api3StreamUrls.OBJECT + "/" + id;
+    };
+    constructor.updateUrl = function() {
+        return live4api.Api3StreamUrls.API_3_STREAM + live4api.Api3StreamUrls.OBJECT;
+    };
+}, {}, {});
+var MutableBoolean = function(value) {
+    this.value = value;
+};
+MutableBoolean = stjs.extend(MutableBoolean, null, [], function(constructor, prototype) {
+    prototype.value = false;
+}, {}, {});
+var ReadWrite = function() {};
+ReadWrite = stjs.extend(ReadWrite, null, [], null, {}, {});
+var TwilioToken = function() {};
+TwilioToken = stjs.extend(TwilioToken, null, [], function(constructor, prototype) {
+    prototype.identity = null;
+    prototype.token = null;
+}, {}, {});
+stjs.ns("live4api");
+live4api.AccessToken = function(token, secret, expires) {
+    this.access_token = token;
+    this.secret = secret;
+    this.expires = expires;
+};
+live4api.AccessToken = stjs.extend(live4api.AccessToken, null, [], function(constructor, prototype) {
+    prototype.secret = null;
+    prototype.access_token = null;
+    prototype.expires = 0;
+}, {}, {});
+stjs.ns("live4api");
+live4api.HwState = stjs.enumeration("CLOSED", "OPEN", "DATA_RECEIVED", "DATA_PARSED", "BAD_DATA");
+stjs.ns("live4api");
+live4api.DataSegment = function(playerTime, l) {
+    this.playerTime = playerTime;
+    this.location = l;
+};
+live4api.DataSegment = stjs.extend(live4api.DataSegment, null, [], function(constructor, prototype) {
+    prototype.playerTime = 0;
+    prototype.location = null;
+    prototype.nearBy = null;
+    prototype.width = 0;
+    prototype.left = 0;
+    prototype.isEmpty = false;
+    prototype.widthScaled = 0;
+    prototype.leftScaled = 0;
+    prototype.tsfile = null;
+    prototype.descr = null;
+    prototype.getTime = function() {
+        return this.left;
+    };
+    prototype.setWidth = function(width) {
+        this.width = width;
+    };
+    prototype.setLeft = function(left) {
+        this.left = left;
+    };
+    prototype.toString = function() {
+        return String.format("%b; w%d; l%d p%d", this.isEmpty, this.width, this.left, this.playerTime);
+    };
+    prototype.scale = function(i) {
+        this.widthScaled = Math.max(stjs.trunc(this.width / i), 1);
+        this.leftScaled = stjs.trunc(this.left / i);
+    };
+}, {location: "live4api.StreamLocation", tsfile: "live4api.TSFile"}, {});
+var ReadOnly = function() {};
+ReadOnly = stjs.extend(ReadOnly, null, [], null, {}, {});
 var Internal = function() {};
 Internal = stjs.extend(Internal, null, [], function(constructor, prototype) {
     constructor.mapValues = function(map) {
@@ -1245,718 +1975,102 @@ Internal = stjs.extend(Internal, null, [], function(constructor, prototype) {
         }
         return str.equals(str2);
     };
-}, {}, {});
-stjs.ns("live4api");
-live4api.Api3CalendarUrls = function() {};
-live4api.Api3CalendarUrls = stjs.extend(live4api.Api3CalendarUrls, null, [], function(constructor, prototype) {
-    constructor.API_3_CALENDAR = "/api/3/calendar";
-    constructor.OBJECT = "/object";
-    constructor.LIST = "/list";
-    constructor.createUrl = function() {
-        return live4api.Api3CalendarUrls.API_3_CALENDAR + live4api.Api3CalendarUrls.OBJECT;
+    constructor.keys = function(map) {
+        return map == null ? [] : (Object).keys(map);
     };
-    constructor.getUrl = function(id) {
-        return live4api.Api3CalendarUrls.API_3_CALENDAR + live4api.Api3CalendarUrls.OBJECT + "/" + id;
-    };
-    constructor.listUrl = function(orgId) {
-        return live4api.Api3CalendarUrls.API_3_CALENDAR + live4api.Api3CalendarUrls.LIST + "/" + orgId;
+    constructor.typefyJson = function(json, cls) {
+        if (json != null) {
+            return live4api.Typefy.typefy(JSON.parse(json), cls);
+        }
+        return null;
     };
 }, {}, {});
-stjs.ns("live4api");
-live4api.CommentResponse = function(comments) {
-    if (comments != null) {
-        this.total_count = comments.length;
-        this.comments = comments;
-    } else {
-        this.total_count = 0;
-        this.comments = null;
-    }
+var BaseAsyncDao = function(cls, updates, requests) {
+    this.cls = cls;
+    this.requests = requests;
+    this._wsrx = updates.share();
 };
-live4api.CommentResponse = stjs.extend(live4api.CommentResponse, null, [], function(constructor, prototype) {
-    prototype.total_count = 0;
-    prototype.comments = null;
-}, {comments: {name: "Array", arguments: ["live4api.Comment"]}}, {});
-var TwilioToken = function() {};
-TwilioToken = stjs.extend(TwilioToken, null, [], function(constructor, prototype) {
-    prototype.identity = null;
-    prototype.token = null;
-}, {}, {});
-stjs.ns("live4api");
-live4api.UserResponse = function(id, name, userpic, type, intoURL, homeTown, activities) {
-    this.id = id;
-    this.name = name;
-    this.userpic = userpic;
-    this.type = type;
-    this.intoURL = intoURL;
-    this.homeTown = homeTown;
-    this.activities = activities;
-};
-live4api.UserResponse = stjs.extend(live4api.UserResponse, null, [], function(constructor, prototype) {
-    prototype.id = null;
-    prototype.name = null;
-    prototype.userpic = null;
-    prototype.type = null;
-    prototype.intoURL = null;
-    prototype.introUrl = null;
-    prototype.homeTown = null;
-    prototype.activities = null;
-    prototype.activites = null;
-}, {type: {name: "Enum", arguments: ["live4api.LoginType"]}, activities: {name: "Array", arguments: ["live4api.UserActivityResponse"]}, activites: {name: "Array", arguments: ["live4api.UserActivityResponse"]}}, {});
-stjs.ns("live4api");
-live4api.Tag = function(id, name) {
-    this.id = id;
-    this.name = name;
-    this.startMsec = 0;
-    this.stopMsec = 0;
-};
-live4api.Tag = stjs.extend(live4api.Tag, null, [], function(constructor, prototype) {
-    prototype.id = null;
-    prototype.name = null;
-    prototype.startMsec = 0;
-    prototype.stopMsec = 0;
-    prototype.toString = function() {
-        return "Tag<" + this.id + "=" + this.name + ">";
-    };
-}, {}, {});
-stjs.ns("live4api");
-live4api.LiveStatus = stjs.enumeration("SCHEDULED", "STANDBY", "LIVE", "UPLOADING", "UPLOADING_METADATA", "RECORDED");
-stjs.ns("live4api");
-live4api.GeocoderResult = function() {};
-live4api.GeocoderResult = stjs.extend(live4api.GeocoderResult, null, [], function(constructor, prototype) {
-    prototype.types = null;
-    prototype.formattedAddress = null;
-    prototype.addressComponents = null;
-    prototype.geometry = null;
-    prototype.partialMatch = false;
-}, {types: {name: "Array", arguments: [null]}, addressComponents: {name: "Array", arguments: ["live4api.GeocoderAddressComponent"]}, geometry: "live4api.GeocoderGeometry"}, {});
-stjs.ns("live4api");
-live4api.LikeResponse = function(likes, has_liked) {
-    if (likes != null) {
-        this.total_count = likes.length;
-        this.likes = likes;
-        this.has_liked = has_liked;
-    } else {
-        this.total_count = 0;
-        this.likes = null;
-        this.has_liked = false;
-    }
-};
-live4api.LikeResponse = stjs.extend(live4api.LikeResponse, null, [], function(constructor, prototype) {
-    prototype.total_count = 0;
-    prototype.likes = null;
-    prototype.can_like = true;
-    prototype.has_liked = null;
-}, {likes: {name: "Array", arguments: ["live4api.Like"]}}, {});
-stjs.ns("live4api");
-live4api.StreamId = function(userId, streamId) {
-    this.userId = userId;
-    this.streamId = streamId;
-};
-live4api.StreamId = stjs.extend(live4api.StreamId, null, [], function(constructor, prototype) {
-    prototype.userId = null;
-    prototype.streamId = null;
-    prototype.toString = function() {
-        return this.userId + "/" + this.streamId;
-    };
-    prototype._hashCode = 0;
-    prototype.hashCode = function() {
-        if (this._hashCode == 0) {
-            this._hashCode = this.toString().hashCode();
-        }
-        return this._hashCode;
-    };
-    prototype.equals = function(obj) {
-        if (obj != null) {
-            return this.toString().equals(obj.toString());
-        }
-        return false;
-    };
-    constructor.sid = function(userId, streamId) {
-        return new live4api.StreamId(userId, streamId);
-    };
-}, {}, {});
-stjs.ns("live4api");
-live4api.Api3StreamUrls = function() {};
-live4api.Api3StreamUrls = stjs.extend(live4api.Api3StreamUrls, null, [], function(constructor, prototype) {
-    constructor.API_3_STREAM = "/api/3/stream";
-    constructor.OBJECT = "/object";
-    constructor.LIST = "/list";
-    constructor.createUrl = function() {
-        return live4api.Api3StreamUrls.API_3_STREAM + live4api.Api3StreamUrls.OBJECT;
-    };
-    constructor.getUrl = function(id) {
-        return live4api.Api3StreamUrls.API_3_STREAM + live4api.Api3StreamUrls.OBJECT + "/" + id;
-    };
-    constructor.updateUrl = function() {
-        return live4api.Api3StreamUrls.API_3_STREAM + live4api.Api3StreamUrls.OBJECT;
-    };
-}, {}, {});
-stjs.ns("live4api");
-live4api.Api3MissionUrls = function() {};
-live4api.Api3MissionUrls = stjs.extend(live4api.Api3MissionUrls, null, [], function(constructor, prototype) {
-    constructor.API_3_MISSION = "/api/3/mission";
-    constructor.TOKEN = "/token";
-    constructor.SHARE = "/share";
-    constructor.JOIN = "Join";
-    constructor.UNSHARE = "/unshare";
-    constructor.CANCEL_NOTIFICATION = "/cancelNotification";
-    constructor.INVITE = "/invite";
-    constructor.OBJECT = "/object";
-    constructor.LIST = "/list";
-    constructor._MISSIONS = "/missions";
-    constructor.MISSION_SHARE_PARAM = "t";
-    constructor.CHAT_TOKEN = "/chatToken";
-    constructor.AUDIO_CHAT_TOKEN = "/audioChatToken";
-    constructor.BY_MISSION_TOKEN = "/byMissionToken";
-    constructor.IS_TOKEN_VALID = "/isTokenValid";
-    constructor.baseUrl = function() {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.OBJECT;
-    };
-    constructor.createUrl = function() {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.OBJECT;
-    };
-    constructor.updateUrl = function() {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.OBJECT;
-    };
-    constructor.getUrl = function(id) {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.OBJECT + "/" + id;
-    };
-    constructor.listUrl = function(orgId) {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.LIST + "/" + orgId;
-    };
-    constructor.tokenUrl = function(missionId) {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.TOKEN + "/" + missionId;
-    };
-    constructor.shareUrl = function(missionId) {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.SHARE + "/" + missionId;
-    };
-    constructor.unshareUrl = function(missionId) {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.UNSHARE + "/" + missionId;
-    };
-    constructor.joinUrl = function(missionId) {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.JOIN + "/" + missionId;
-    };
-    constructor.baseJoinUrl = function() {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.JOIN;
-    };
-    constructor.cancelNotificationUrl = function(missionId) {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.CANCEL_NOTIFICATION + "/" + missionId;
-    };
-    constructor.inviteUrl = function(missionId) {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.INVITE + "/" + missionId;
-    };
-    constructor.shareMissionUrl = function(missionId, shareToken) {
-        return live4api.Api3MissionUrls._MISSIONS + "/" + missionId + "?" + live4api.Api3MissionUrls.MISSION_SHARE_PARAM + "=" + shareToken;
-    };
-    constructor.getUserByMissionToken = function(token) {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.BY_MISSION_TOKEN + "/" + token;
-    };
-    constructor.checkTokenUrl = function(token) {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.IS_TOKEN_VALID + "/" + token;
-    };
-}, {}, {});
-stjs.ns("live4api");
-live4api.TimeInterval = function(startTime, endTime) {
-    this.start = startTime;
-    this.end = endTime;
-};
-live4api.TimeInterval = stjs.extend(live4api.TimeInterval, null, [], function(constructor, prototype) {
-    prototype.start = null;
-    prototype.end = null;
-    prototype.contains = function(d) {
-        var stime = this.start.getTime();
-        var etime = this.end.getTime();
-        var time = d.getTime();
-        return stime <= time && time <= etime;
-    };
-    prototype.overlaps = function(that) {
-        return this.contains(that.start) || this.contains(that.end);
-    };
-}, {start: "Date", end: "Date"}, {});
-stjs.ns("live4api");
-live4api.Api3Urls = function() {};
-live4api.Api3Urls = stjs.extend(live4api.Api3Urls, null, [], function(constructor, prototype) {
-    constructor.WSVIDEO = "/api/3/wsvideo";
-    constructor.API_3_WSPUSHVIDEO = "/api/3/wspushvideo";
-    constructor.API_3_ORG_STORAGE_UPLOAD = "/api/3/orgstorage/upload";
-    constructor.API_3_ORG_STORAGE_GET = "/api/3/orgstorage/get";
-    constructor.API_3_HWLOG = "/api/3/hwlog";
-    constructor.API_3_LOGIN = "/api/3/login";
-    constructor.API_3_RESETPASSWORD = "/api/3/resetpassword";
-    constructor.API_3_WSUPDATES = "/api/3/wsupdates";
-    constructor.API_3_LOCATIONS = "/api/3/locations";
-    constructor.wsVideo = function(streamId) {
-        return live4api.Api3Urls.WSVIDEO + "/" + streamId;
-    };
-    constructor.wsPushVideo = function(streamId) {
-        return live4api.Api3Urls.API_3_WSPUSHVIDEO + "/" + streamId;
-    };
-    constructor.locationsUrl = function(streamId) {
-        return live4api.Api3Urls.API_3_LOCATIONS + "/" + streamId;
-    };
-}, {}, {});
-stjs.ns("live4api");
-live4api.LiveMessage = function() {};
-live4api.LiveMessage = stjs.extend(live4api.LiveMessage, null, [], function(constructor, prototype) {
-    prototype.streamId = null;
-    prototype.stream = null;
-    prototype.nearby = null;
-    prototype.durationHLS = null;
-    prototype.durationDash = null;
-    prototype.map = null;
-    prototype.action = null;
-    prototype.calendar = null;
-    prototype.org = null;
-    prototype.hardware = null;
-    prototype.mission = null;
-    prototype.user = null;
-    prototype.hasMap = function() {
-        return this.map != null;
-    };
-    prototype.hasDuration = function() {
-        return this.durationDash != null || this.durationHLS != null;
-    };
-    prototype.hasNearby = function() {
-        return this.nearby != null;
-    };
-    prototype.hasStream = function() {
-        return this.stream != null;
-    };
-    constructor.subscribeStream = function(sid) {
-        var tm = new live4api.LiveMessage();
-        tm.action = "stream/subscribe";
-        tm.streamId = sid;
-        return tm;
-    };
-    constructor.unsubscribeStream = function(sid) {
-        var tm = new live4api.LiveMessage();
-        tm.action = "stream/unsubscribe";
-        tm.streamId = sid;
-        return tm;
-    };
-    constructor.subscribe = function(what) {
-        var tm = new live4api.LiveMessage();
-        tm.action = what + "/subscribe";
-        return tm;
-    };
-}, {stream: "live4api.StreamResponse", nearby: {name: "Array", arguments: ["live4api.DataSegment"]}, map: {name: "Array", arguments: ["live4api.DataSegment"]}, calendar: "live4api.Calendar", org: "live4api.Organization", hardware: "live4api.Hardware", mission: "live4api.Mission", user: "live4api.User"}, {});
-stjs.ns("live4api");
-live4api.Api2Urls = function() {};
-live4api.Api2Urls = stjs.extend(live4api.Api2Urls, null, [], function(constructor, prototype) {
-    constructor.API_2_START = "/api/2/start";
-    constructor.API_2_BEST = "/api/2/best";
-    constructor.API_2_STREAM_UPDATE_TITLE = "/api/2/streamUpdateTitle";
-    constructor.API_2_STREAM = "/api/2/stream";
-    constructor.API_2_UPLOAD_LOCATION = "/api/2/upload/location";
-    constructor.API_2_UPLOAD_LOG = "/api/2/upload/log";
-    constructor.API_2_UPLOAD_AV = "/api/2/upload/av";
-    constructor.API_2_NOTIFY_REGISTER = "/api/2/notify/register";
-    constructor.API_2_MYSTREAMS = "/api/2/mystreams";
-    constructor.API_2_CLOSE = "/api/2/close";
-    constructor.API_2_END = "/api/2/end";
-    constructor.API_2_USER = "/api/2/user";
-    constructor.API_2_SEARCH = "/api/2/search";
-    constructor.API_2_EXPLORE = "/api/2/explore";
-    constructor.API_2_LOGIN = "/api/2/login";
-    constructor.API_2_LIKE = "/api/2/like";
-    constructor.API_2_ACTIVITY = "/api/2/activity";
-    constructor.API_2_COMMENT = "/api/2/comment";
-    constructor.API_2_REPORT = "/api/2/report";
-    constructor.updateStreamTitleUrl = function(streamId) {
-        return live4api.Api2Urls.API_2_STREAM_UPDATE_TITLE + "/" + streamId;
-    };
-}, {}, {});
-stjs.ns("live4api");
-live4api.LoginType = stjs.enumeration("Facebook", "Twitter", "Email");
-stjs.ns("live4api");
-live4api.UserProfile = function() {};
-live4api.UserProfile = stjs.extend(live4api.UserProfile, null, [], function(constructor, prototype) {
-    prototype.department = null;
-    prototype.title = null;
-    prototype.phone = null;
-    prototype.notes = null;
-    prototype.role = null;
-    prototype.active = false;
-}, {role: {name: "Enum", arguments: ["live4api.UserRole"]}}, {});
-stjs.ns("live4api");
-live4api.AccessToken = function(token, secret, expires) {
-    this.access_token = token;
-    this.secret = secret;
-    this.expires = expires;
-};
-live4api.AccessToken = stjs.extend(live4api.AccessToken, null, [], function(constructor, prototype) {
-    prototype.secret = null;
-    prototype.access_token = null;
-    prototype.expires = 0;
-}, {}, {});
-stjs.ns("live4api");
-live4api.GeocoderGeometry = function() {};
-live4api.GeocoderGeometry = stjs.extend(live4api.GeocoderGeometry, null, [], function(constructor, prototype) {
-    prototype.location = null;
-    prototype.locationType = null;
-    prototype.viewport = null;
-    prototype.bounds = null;
-}, {location: "google.maps.LatLng", locationType: {name: "Enum", arguments: ["google.maps.GeocoderLocationType"]}, viewport: "google.maps.LatLngBounds", bounds: "google.maps.LatLngBounds"}, {});
-stjs.ns("live4api");
-live4api.LoginRequestData = function(login, pass) {
-    this.l = login;
-    this.p = pass;
-};
-live4api.LoginRequestData = stjs.extend(live4api.LoginRequestData, null, [], function(constructor, prototype) {
-    prototype.l = null;
-    prototype.p = null;
-    prototype.t = null;
-}, {}, {});
-stjs.ns("live4api");
-live4api.Api1StreamUrls = function() {};
-live4api.Api1StreamUrls = stjs.extend(live4api.Api1StreamUrls, null, [], function(constructor, prototype) {
-    constructor.API_STREAM = "/api/stream";
-    constructor.createUrl = function() {
-        return live4api.Api1StreamUrls.API_STREAM;
-    };
-    constructor.listUrl = function() {
-        return live4api.Api1StreamUrls.API_STREAM;
-    };
-    constructor.getUrl = function(id) {
-        return live4api.Api1StreamUrls.API_STREAM + "/" + id;
-    };
-}, {}, {});
-stjs.ns("live4api");
-live4api.GeocoderAddressComponent = function() {};
-live4api.GeocoderAddressComponent = stjs.extend(live4api.GeocoderAddressComponent, null, [], function(constructor, prototype) {
-    prototype.longName = null;
-    prototype.shortName = null;
-    prototype.types = null;
-}, {types: {name: "Array", arguments: [null]}}, {});
-stjs.ns("live4api");
-live4api.Like = function() {};
-live4api.Like = stjs.extend(live4api.Like, null, [], function(constructor, prototype) {
-    prototype.uuid = null;
-    prototype.streamId = null;
-    prototype.sid = null;
-    prototype.user = null;
-    prototype.startMsec = 0;
-    prototype.ctime = 0;
-    prototype.getId = function() {
-        return this.uuid;
-    };
-    prototype.toString = function() {
-        var userid = null;
-        if (this.user != null) {
-            userid = this.user.id;
-        }
-        return "<Like: streamId=" + this.streamId + "; from=" + userid + "; startMsec=" + this.startMsec + ">";
-    };
-}, {sid: "live4api.StreamId", user: "live4api.UserResponse"}, {});
-var ReadOnly = function() {};
-ReadOnly = stjs.extend(ReadOnly, null, [], null, {}, {});
-var ReadWrite = function() {};
-ReadWrite = stjs.extend(ReadWrite, null, [], null, {}, {});
-stjs.ns("live4api");
-live4api.Dimension = function(w, h) {
-    this.width = w;
-    this.height = h;
-};
-live4api.Dimension = stjs.extend(live4api.Dimension, null, [], function(constructor, prototype) {
-    prototype.width = 0;
-    prototype.height = 0;
-}, {}, {});
-stjs.ns("live4api");
-live4api.Api3UserUrls = function() {};
-live4api.Api3UserUrls = stjs.extend(live4api.Api3UserUrls, null, [], function(constructor, prototype) {
-    constructor.API_3_USER = "/api/3/users";
-    constructor.BYEMAIL = "/byemail";
-    constructor.OBJECT = "/object";
-    constructor.LIST = "/list";
-    constructor.CHECK = "/check";
-    constructor.ISTEMP = "/istemp";
-    constructor.createUrl = function() {
-        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.OBJECT;
-    };
-    constructor.updateUrl = function() {
-        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.OBJECT;
-    };
-    constructor.getUrl = function(id) {
-        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.OBJECT + "/" + id;
-    };
-    constructor.listUrl = function(orgId) {
-        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.LIST + "/" + orgId;
-    };
-    constructor.byEmailUrl = function(email) {
-        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.BYEMAIL + "/" + email;
-    };
-    constructor.checkUserByEmail = function(email) {
-        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.CHECK + "/" + email;
-    };
-    constructor.isUserTemp = function(email) {
-        return live4api.Api3UserUrls.API_3_USER + live4api.Api3UserUrls.ISTEMP + "/" + email;
-    };
-}, {}, {});
-stjs.ns("live4api");
-live4api.Api3HwUrls = function() {};
-live4api.Api3HwUrls = stjs.extend(live4api.Api3HwUrls, null, [], function(constructor, prototype) {
-    constructor.API_3_HW = "/api/3/hardware";
-    constructor.FIND_BY_PORT = "/findByPort";
-    constructor.RELEASE = "/release";
-    constructor.OBJECT = "/object";
-    constructor.LIST = "/list";
-    constructor.createUrl = function() {
-        return live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.OBJECT;
-    };
-    constructor.getUrl = function(id) {
-        return live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.OBJECT + "/" + id;
-    };
-    constructor.listUrl = function(orgId) {
-        return live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.LIST + "/" + orgId;
-    };
-    constructor.findByPortUrl = function(port) {
-        return live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.FIND_BY_PORT + "/" + port;
-    };
-    constructor.releaseUrl = function(id) {
-        return live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.RELEASE + "/" + id;
-    };
-}, {}, {});
-stjs.ns("live4api");
-live4api.StreamPermissions = function() {};
-live4api.StreamPermissions = stjs.extend(live4api.StreamPermissions, null, [], function(constructor, prototype) {
-    constructor.canUpdateStreamById = function(sid, user) {
-        if (sid == null || user == null) {
-            return false;
-        }
-        return live4api.StreamPermissions.userOwnsStream(sid, user);
-    };
-    constructor.userOwnsStream = function(sid, user) {
-        return user.isSuperAdmin() || sid.userId.equals(user.getId());
-    };
-    constructor.canGetStreamById = function(sid, user) {
-        if (sid == null || user == null) {
-            return false;
-        }
-        return live4api.StreamPermissions.userOwnsStream(sid, user);
-    };
-    constructor.canGetStream = function(stream, user) {
-        if (stream == null || user == null) {
-            return false;
-        }
-        return live4api.StreamPermissions.userOwnsStream(stream.sid(), user) || !live4api.Privacy.PRIVATE.equals(stream.getPrivacy());
-    };
-}, {}, {});
-stjs.ns("live4api");
-live4api.StreamLocation = function(timestamp) {
-    this.timestamp = timestamp;
-};
-live4api.StreamLocation = stjs.extend(live4api.StreamLocation, null, [], function(constructor, prototype) {
-    constructor.speedLocation = function(timestamp, speed) {
-        var l = new live4api.StreamLocation(timestamp);
-        l.speed = speed;
-        return l;
-    };
-    constructor.latLng = function(timestamp, latitude, longitude) {
-        var l = new live4api.StreamLocation(timestamp);
-        l.latitude = latitude;
-        l.longitude = longitude;
-        return l;
-    };
-    constructor.sortByTime = function(h1, h2) {
-        if (h1 != null && h2 != null) {
-            return stjs.trunc((h1.getTime() - h2.getTime()));
-        }
-        if (h1 == null && h2 == null) {
-            return 0;
-        }
-        if (h1 != null) {
-            return 1;
-        }
-        return -1;
-    };
-    prototype.hashCode = function() {
-        return this.timestamp == null ? -42 : this.timestamp.hashCode();
-    };
-    prototype.altitude = null;
-    prototype.course = null;
-    prototype.horizontalAccuracy = null;
-    prototype.latitude = null;
-    prototype.longitude = null;
-    prototype.speed = null;
-    prototype.timestamp = null;
-    prototype.verticalAccuracy = null;
-    prototype.playerTime = null;
-    prototype.streamId = null;
-    prototype.getSpeed = function() {
-        return this.speed;
-    };
-    prototype.getTimestamp = function() {
-        return this.timestamp;
-    };
-    prototype.timeMsec = 0;
-    constructor.accurateLocations = function(l) {
-        return l.speed >= 5 || l.horizontalAccuracy <= 20;
-    };
-    prototype.getTime = function() {
-        if (this.timeMsec == 0) {
-            if (Internal.isJava) {
-                this.timeMsec = Internal.tryParseDate(this.timestamp);
-            } else {
-                return stjs.trunc(new Date(this.timestamp).getTime());
-            }
-        }
-        return this.timeMsec;
-    };
-    prototype.lalo = function() {
-        return this.latitude + "," + this.longitude;
-    };
-}, {sortByTime: {name: "SortFunction", arguments: ["live4api.StreamLocation"]}, accurateLocations: {name: "Function1", arguments: ["live4api.StreamLocation", null]}}, {});
-stjs.ns("live4api");
-live4api.Comment = function() {};
-live4api.Comment = stjs.extend(live4api.Comment, null, [], function(constructor, prototype) {
-    prototype.uuid = null;
-    prototype.sid = null;
-    prototype.streamId = null;
-    prototype.user = null;
-    prototype.body = null;
-    prototype.startMsec = 0;
-    prototype.stopMsec = 0;
-    prototype.ctime = 0;
-    prototype.mtime = 0;
-    prototype.getId = function() {
-        return this.uuid;
-    };
-    prototype.getBody = function() {
-        return Internal.defaultString(this.body, "");
-    };
-    prototype.setBody = function(body) {
-        this.body = body;
-        this.mtime = Internal.currentTimeMillis();
-    };
-}, {sid: "live4api.StreamId", user: "live4api.UserResponse"}, {});
-stjs.ns("live4api");
-live4api.Calendar = function() {};
-live4api.Calendar = stjs.extend(live4api.Calendar, null, [live4api.Doc], function(constructor, prototype) {
-    prototype._rev = 0;
-    prototype.id = null;
-    prototype.intervals = null;
-    prototype.getId = function() {
-        return this.id;
-    };
-    prototype.setId = function(id) {
-        this.id = id;
-    };
-    prototype.isActive = function() {
-        return true;
-    };
-    prototype.isBusyAt = function(interval) {
-        if (interval == null) {
-            return false;
-        }
-        return Internal.mapValues(this.intervals).some(function(ti, i, a) {
-            return ti != null && ti.overlaps(interval);
+BaseAsyncDao = stjs.extend(BaseAsyncDao, null, [], function(constructor, prototype) {
+    prototype.cls = null;
+    prototype._wsrx = null;
+    prototype.requests = null;
+    prototype.get = function(id) {
+        return this._get(this.getItemUrl(id));
+    };
+    prototype.clarifyGet = function(id, clarifyId) {
+        return this._get(this.getItemForMission(id, clarifyId));
+    };
+    prototype.getItemUrl = function(id) {};
+    prototype.getItemForMission = function(id, clarifyId) {
+        return null;
+    };
+    prototype.createItemUrl = function() {};
+    prototype.listUrl = function(orgId) {};
+    prototype.create = function(item) {
+        return this._post(this.createItemUrl(), item);
+    };
+    prototype.update = function(item) {
+        return this._put(this.createItemUrl(), item);
+    };
+    /**
+     * get latest revision of object, apply transformer and then update; 
+     */
+    prototype.getAndUpdate = function(id, transformer) {
+        return this.get(id).concatMap(stjs.bind(this, function(item) {
+            transformer(item);
+            return this._put(this.createItemUrl(), item);
+        })).retryWhen(function(observable) {
+            return observable.delay(1000);
         });
     };
-}, {intervals: {name: "Map", arguments: [null, "live4api.TimeInterval"]}}, {});
-stjs.ns("live4api");
-live4api.Address = function() {};
-live4api.Address = stjs.extend(live4api.Address, null, [], function(constructor, prototype) {
-    prototype.line1 = null;
-    prototype.line2 = null;
-    prototype.city = null;
-    prototype.state = null;
-    prototype.zip = null;
-    prototype.country = null;
-    prototype.asOneLine = function() {
-        var state_zip = Internal.defaultString(this.state, "") + " " + Internal.defaultString(this.zip, "");
-        return [this.line1, this.line2, this.city, state_zip, this.country].filter(function(s, aLong, strings) {
-            return Internal.isNotBlank(s);
-        }).join(",");
+    prototype.remove = function(id) {
+        return this._delete(this.getItemUrl(id));
     };
-}, {}, {});
-stjs.ns("live4api");
-live4api.Hardware = function(name, type) {
-    this.name = name;
-    this.type = type;
-    this.active = true;
+    prototype.list = function(orgId) {
+        return this._list(this.listUrl(orgId));
+    };
+    prototype._list = function(url) {
+        return this.requests.get(url).map(stjs.bind(this, "parseArray"));
+    };
+    prototype._delete = function(url) {
+        return this.requests.deleteRequest(url).map(stjs.bind(this, "parse"));
+    };
+    prototype._put = function(url, item) {
+        return this.requests.putAsJson(url, item).map(stjs.bind(this, "parse"));
+    };
+    prototype._post = function(url, item) {
+        return this.requests.postAsJson(url, item).map(stjs.bind(this, "parse"));
+    };
+    prototype._get = function(url) {
+        return this.requests.get(url).map(stjs.bind(this, "parse"));
+    };
+    prototype.parse = function(response) {
+        var parse = JSON.parse(response);
+        return live4api.Typefy.typefy(parse, this.cls);
+    };
+    prototype.parseArray = function(response) {
+        var parse = JSON.parse(response);
+        return live4api.Typefy.typefyArray(parse, this.cls);
+    };
+    prototype.updates = function() {
+        return this._wsrx;
+    };
+}, {cls: {name: "Class", arguments: ["T"]}, _wsrx: {name: "Rx.Observable", arguments: ["T"]}, requests: "live4api.Requests"}, {});
+var OverlayApi = function(requests) {
+    this.requests = requests;
 };
-live4api.Hardware = stjs.extend(live4api.Hardware, null, [live4api.Doc], function(constructor, prototype) {
-    constructor.TYPE_MC_BOX = "MC_BOX";
-    constructor.TYPE_DRONE = "DRONE";
-    constructor.TYPE_ANDROID = "ANDROID";
-    prototype.id = null;
-    prototype._rev = 0;
-    prototype.name = null;
-    prototype.type = null;
-    prototype.manufacturer = null;
-    prototype.model = null;
-    prototype.orgId = null;
-    prototype.active = false;
-    prototype.port = 0;
-    prototype.externalId = null;
-    prototype.endpoint = null;
-    constructor.sortByNameAvailableFirst = function(h1, h2) {
-        var diff = live4api.Hardware.statusLabel(h1._availability).compareTo(live4api.Hardware.statusLabel(h2._availability));
-        return diff != 0 ? diff : h1.name.compareTo(h2.name);
+OverlayApi = stjs.extend(OverlayApi, null, [], function(constructor, prototype) {
+    prototype.requests = null;
+    prototype.getOverlay = function(id) {
+        return (this.requests.get(live4api.Api3Urls.API_3_OVERLAY + live4api.Api3Urls.OVERLAY_OBJECT + "/" + id));
     };
-    prototype._availability = null;
-    prototype._calendar = null;
-    prototype._orgName = null;
-    constructor.isValidPortNumber = function(port) {
-        return port > 1024 && port < 65536;
+    prototype.createOverlay = function(orgId, url) {
+        return this.requests.request(live4api.Api3Urls.API_3_OVERLAY + live4api.Api3Urls.OVERLAY_OBJECT + "/", "id=" + orgId + "&url=" + url, "POST", {"Content-Type": "application/x-www-form-urlencoded"});
     };
-    prototype.isMCBox = function() {
-        return this.type.equals(live4api.Hardware.TYPE_MC_BOX);
+    prototype.deleteOverlay = function(id) {
+        return this.requests.deleteRequest(live4api.Api3Urls.API_3_OVERLAY + live4api.Api3Urls.OVERLAY_OBJECT + "/" + id);
     };
-    prototype.isDrone = function() {
-        return this.type.equals(live4api.Hardware.TYPE_DRONE);
-    };
-    constructor.MCBox = function(name) {
-        return new live4api.Hardware(name, live4api.Hardware.TYPE_MC_BOX);
-    };
-    constructor.drone = function(name) {
-        return new live4api.Hardware(name, live4api.Hardware.TYPE_DRONE);
-    };
-    constructor.android = function(name) {
-        return new live4api.Hardware(name, live4api.Hardware.TYPE_ANDROID);
-    };
-    prototype.isAvailable = function() {
-        return !this.isScheduled();
-    };
-    prototype.isScheduled = function() {
-        return this._availability == live4api.Hardware.Availability.SCHEDULED || this._availability == live4api.Hardware.Availability.INUSE;
-    };
-    prototype.setPort = function(port) {
-        this.port = port;
-        return this;
-    };
-    prototype.belongsToOrg = function(orgId) {
-        return !Internal.isBlank(orgId) && orgId.equals(this.orgId);
-    };
-    constructor.Availability = stjs.enumeration("AVAILABLE", "SCHEDULED", "INUSE");
-    prototype.isAssigned = function() {
-        return this.orgId != null;
-    };
-    constructor.statusLabel = function(s) {
-        if (s == live4api.Hardware.Availability.AVAILABLE) {
-            return "Available";
-        } else if (s == live4api.Hardware.Availability.SCHEDULED) {
-            return "Scheduled";
-        } else if (s == live4api.Hardware.Availability.INUSE) {
-            return "In use";
-        }
-        return "Unknown";
-    };
-    prototype.getId = function() {
-        return this.id;
-    };
-    prototype.isActive = function() {
-        return this.active;
-    };
-    prototype.setId = function(id) {
-        this.id = id;
-    };
-    prototype.getAvailabilityFor = function(ti) {
-        if (this._calendar == null) 
-            return live4api.Hardware.Availability.AVAILABLE;
-        return this._calendar.isBusyAt(ti) ? live4api.Hardware.Availability.SCHEDULED : live4api.Hardware.Availability.AVAILABLE;
-    };
-}, {sortByNameAvailableFirst: {name: "SortFunction", arguments: ["live4api.Hardware"]}, _availability: {name: "Enum", arguments: ["live4api.Hardware.Availability"]}, _calendar: "live4api.Calendar"}, {});
+}, {requests: "live4api.Requests"}, {});
 stjs.ns("live4api");
 live4api.Stream = function() {};
 live4api.Stream = stjs.extend(live4api.Stream, null, [live4api.Doc], function(constructor, prototype) {
@@ -2062,16 +2176,249 @@ live4api.Stream = stjs.extend(live4api.Stream, null, [live4api.Doc], function(co
     };
 }, {startGeoCoder: {name: "Array", arguments: ["live4api.GeocoderResult"]}, startLocation: "live4api.StreamLocation", status: {name: "Enum", arguments: ["live4api.LiveStatus"]}, privacy: {name: "Enum", arguments: ["live4api.Privacy"]}, tags2: {name: "Array", arguments: ["live4api.Tag"]}}, {});
 stjs.ns("live4api");
+live4api.StreamPermissions = function() {};
+live4api.StreamPermissions = stjs.extend(live4api.StreamPermissions, null, [], function(constructor, prototype) {
+    constructor.canUpdateStreamById = function(sid, user) {
+        if (sid == null || user == null) {
+            return false;
+        }
+        return live4api.StreamPermissions.userOwnsStream(sid, user);
+    };
+    constructor.userOwnsStream = function(sid, user) {
+        return user.isSuperAdmin() || sid.userId.equals(user.getId());
+    };
+    constructor.canGetStreamById = function(sid, user) {
+        if (sid == null || user == null) {
+            return false;
+        }
+        return live4api.StreamPermissions.userOwnsStream(sid, user);
+    };
+    constructor.canGetStream = function(stream, user) {
+        if (stream == null || user == null) {
+            return false;
+        }
+        return live4api.StreamPermissions.userOwnsStream(stream.sid(), user) || !live4api.Privacy.PRIVATE.equals(stream.getPrivacy());
+    };
+}, {}, {});
+stjs.ns("live4api");
+live4api.HWStatus = function() {};
+live4api.HWStatus = stjs.extend(live4api.HWStatus, null, [live4api.Doc], function(constructor, prototype) {
+    prototype.id = null;
+    constructor.API_HWSTATUS = "/api/3/hwstatus";
+    constructor.OBJECT = "/object";
+    constructor.LIST = "/list";
+    prototype.hwId = null;
+    prototype.status = null;
+    prototype.mtime = 0;
+    prototype.getId = function() {
+        return this.id;
+    };
+    prototype.isActive = function() {
+        return !live4api.HwState.CLOSED.equals(this.status);
+    };
+    prototype.setId = function(id) {
+        this.id = id;
+    };
+    constructor.newStatus = function(hwid, status) {
+        var hws = new live4api.HWStatus();
+        hws.hwId = hwid;
+        hws.status = status;
+        return hws;
+    };
+}, {status: {name: "Enum", arguments: ["live4api.HwState"]}}, {});
+var WSLive = function(url) {
+    this.subs = [];
+    this._ws = new Rx.ReplaySubject(1);
+    this.errorSubject = new Rx.Subject();
+    this._liveMessages = live4api.WRX.webSocket(url, stjs.bind(this, function(ws, e) {
+        this.subs.forEach(function(sub) {
+            ws.send(sub);
+        });
+        this._ws.onNext(ws);
+    })).doOnError(stjs.bind(this, function(e) {
+        this.errorSubject.onNext(e);
+    })).repeatWhen(function(e) {
+        return e.delay(1000);
+    }).retryWhen(function(e) {
+        return e.delay(1000);
+    }).map(function(json) {
+        return Internal.typefyJson(json, live4api.LiveMessage);
+    }).share();
+};
+WSLive = stjs.extend(WSLive, null, [], function(constructor, prototype) {
+    prototype._ws = null;
+    prototype._liveMessages = null;
+    prototype.errorSubject = null;
+    prototype.subs = null;
+    prototype.onError = function() {
+        return this.errorSubject;
+    };
+    prototype.streamUpdates = function(sid) {
+        this._subscribe(live4api.LiveMessage.subscribeStream(sid));
+        return this._liveMessages.filter(function(lm) {
+            return Internal.eq(sid, lm.streamId);
+        });
+    };
+    prototype.locationUpdates = function(sid) {
+        return this.streamUpdates(sid).filter(function(lm) {
+            return lm.hasMap();
+        }).concatMap(function(lm) {
+            return Rx.Observable.from(lm.map).map(function(d) {
+                d.location.streamId = sid;
+                return d.location;
+            });
+        });
+    };
+    prototype._subscribe = function(msg) {
+        var json = JSON.stringify(msg);
+        if (this.subs.indexOf(json) < 0) {
+            console.log("subscribe", json, this.subs);
+            this._ws.take(1).subscribe(function(ws) {
+                return ws.send(json);
+            });
+            this.subs.push(json);
+        }
+    };
+    prototype.calendarUpdates = function() {
+        this._subscribe(live4api.LiveMessage.subscribe("calendar"));
+        return this._liveMessages.filter(function(lm) {
+            return lm.calendar != null;
+        }).map(function(lm) {
+            return lm.calendar;
+        });
+    };
+    prototype.userUpdates = function() {
+        this._subscribe(live4api.LiveMessage.subscribe("user"));
+        return this._liveMessages.filter(function(lm) {
+            return lm.user != null;
+        }).map(function(lm) {
+            return lm.user;
+        });
+    };
+    prototype.missionUpdates = function() {
+        this._subscribe(live4api.LiveMessage.subscribe("mission"));
+        return this._liveMessages.filter(function(lm) {
+            return lm.mission != null;
+        }).map(function(lm) {
+            return lm.mission;
+        });
+    };
+    prototype.hwUpdates = function() {
+        this._subscribe(live4api.LiveMessage.subscribe("hardware"));
+        return this._liveMessages.filter(function(lm) {
+            return lm.hardware != null;
+        }).map(function(lm) {
+            return lm.hardware;
+        });
+    };
+    prototype.orgUpdates = function() {
+        this._subscribe(live4api.LiveMessage.subscribe("org"));
+        return this._liveMessages.filter(function(lm) {
+            return lm.org != null;
+        }).map(function(lm) {
+            return lm.org;
+        });
+    };
+    prototype.hwStatusUpdates = function() {
+        this._subscribe(live4api.LiveMessage.subscribe("hwstatus"));
+        return this._liveMessages.filter(function(lm) {
+            return lm.hwStatus != null;
+        }).map(function(lm) {
+            return lm.hwStatus;
+        });
+    };
+}, {_ws: {name: "Rx.ReplaySubject", arguments: ["WebSocket"]}, _liveMessages: {name: "Rx.Observable", arguments: ["live4api.LiveMessage"]}, errorSubject: {name: "Rx.Subject", arguments: ["Error"]}, subs: {name: "Array", arguments: [null]}}, {});
+stjs.ns("live4api");
+live4api.Comment = function() {};
+live4api.Comment = stjs.extend(live4api.Comment, null, [], function(constructor, prototype) {
+    prototype.uuid = null;
+    prototype.sid = null;
+    prototype.streamId = null;
+    prototype.user = null;
+    prototype.body = null;
+    prototype.startMsec = 0;
+    prototype.stopMsec = 0;
+    prototype.ctime = 0;
+    prototype.mtime = 0;
+    prototype.getId = function() {
+        return this.uuid;
+    };
+    prototype.getBody = function() {
+        return Internal.defaultString(this.body, "");
+    };
+    prototype.setBody = function(body) {
+        this.body = body;
+        this.mtime = Internal.currentTimeMillis();
+    };
+}, {sid: "live4api.StreamId", user: "live4api.UserResponse"}, {});
+stjs.ns("live4api");
+live4api.StreamLocation = function(timestamp) {
+    this.timestamp = timestamp;
+};
+live4api.StreamLocation = stjs.extend(live4api.StreamLocation, null, [], function(constructor, prototype) {
+    constructor.speedLocation = function(timestamp, speed) {
+        var l = new live4api.StreamLocation(timestamp);
+        l.speed = speed;
+        return l;
+    };
+    constructor.latLng = function(timestamp, latitude, longitude) {
+        var l = new live4api.StreamLocation(timestamp);
+        l.latitude = latitude;
+        l.longitude = longitude;
+        return l;
+    };
+    constructor.sortByTime = function(h1, h2) {
+        if (h1 != null && h2 != null) {
+            return stjs.trunc((h1.getTime() - h2.getTime()));
+        }
+        if (h1 == null && h2 == null) {
+            return 0;
+        }
+        if (h1 != null) {
+            return 1;
+        }
+        return -1;
+    };
+    prototype.hashCode = function() {
+        return this.timestamp == null ? -42 : this.timestamp.hashCode();
+    };
+    prototype.altitude = null;
+    prototype.course = null;
+    prototype.horizontalAccuracy = null;
+    prototype.latitude = null;
+    prototype.longitude = null;
+    prototype.speed = null;
+    prototype.timestamp = null;
+    prototype.verticalAccuracy = null;
+    prototype.playerTime = null;
+    prototype.streamId = null;
+    prototype.getSpeed = function() {
+        return this.speed;
+    };
+    prototype.getTimestamp = function() {
+        return this.timestamp;
+    };
+    prototype.timeMsec = 0;
+    constructor.accurateLocations = function(l) {
+        return l.speed >= 5 || l.horizontalAccuracy <= 20;
+    };
+    prototype.getTime = function() {
+        if (this.timeMsec == 0) {
+            if (Internal.isJava) {
+                this.timeMsec = Internal.tryParseDate(this.timestamp);
+            } else {
+                return stjs.trunc(new Date(this.timestamp).getTime());
+            }
+        }
+        return this.timeMsec;
+    };
+    prototype.lalo = function() {
+        return this.latitude + "," + this.longitude;
+    };
+}, {sortByTime: {name: "SortFunction", arguments: ["live4api.StreamLocation"]}, accurateLocations: {name: "Function1", arguments: ["live4api.StreamLocation", null]}}, {});
+stjs.ns("live4api");
 live4api.Mission = function() {};
 live4api.Mission = stjs.extend(live4api.Mission, null, [live4api.Doc], function(constructor, prototype) {
-    constructor.State = stjs.enumeration("PENDING", "STARTED", "CANCELLED", "ENDED");
-    constructor.ShareToken = function() {};
-    constructor.ShareToken = stjs.extend(constructor.ShareToken, null, [], function(constructor, prototype) {
-        prototype.token = null;
-        prototype.missionId = null;
-        prototype.userId = null;
-        prototype.invitedId = null;
-    }, {}, {});
     prototype._rev = 0;
     prototype.id = null;
     prototype.createdByUserId = null;
@@ -2093,7 +2440,7 @@ live4api.Mission = stjs.extend(live4api.Mission, null, [live4api.Doc], function(
         return this.id;
     };
     prototype.isActive = function() {
-        return this.state == live4api.Mission.State.PENDING || this.state == live4api.Mission.State.STARTED;
+        return this.state == live4api.MissionState.PENDING || this.state == live4api.MissionState.STARTED;
     };
     prototype.setId = function(id) {
         this.id = id;
@@ -2169,13 +2516,13 @@ live4api.Mission = stjs.extend(live4api.Mission, null, [live4api.Doc], function(
         return count;
     };
     prototype.isLive = function() {
-        return live4api.Mission.State.STARTED.equals(this.state);
+        return live4api.MissionState.STARTED.equals(this.state);
     };
     prototype.isScheduled = function() {
-        return live4api.Mission.State.PENDING.equals(this.state);
+        return live4api.MissionState.PENDING.equals(this.state);
     };
     prototype.isCompleted = function() {
-        return live4api.Mission.State.ENDED.equals(this.state);
+        return live4api.MissionState.ENDED.equals(this.state);
     };
     prototype.addHardware = function(h) {
         var hw = Internal.defaultArray(this.hardware);
@@ -2206,7 +2553,296 @@ live4api.Mission = stjs.extend(live4api.Mission, null, [live4api.Doc], function(
     constructor.isScheduler = function(u, m) {
         return Internal.eq(m.createdByUserId, u.id);
     };
-}, {startTime: "Date", endTime: "Date", streamIds: {name: "Array", arguments: [null]}, roles: {name: "Map", arguments: [null, {name: "Enum", arguments: ["live4api.MissionRole"]}]}, pilots: {name: "Map", arguments: [null, null]}, joined: {name: "Map", arguments: [null, "Date"]}, hardware: {name: "Array", arguments: ["live4api.Hardware"]}, state: {name: "Enum", arguments: ["live4api.Mission.State"]}}, {});
+}, {startTime: "Date", endTime: "Date", streamIds: {name: "Array", arguments: [null]}, roles: {name: "Map", arguments: [null, {name: "Enum", arguments: ["live4api.MissionRole"]}]}, pilots: {name: "Map", arguments: [null, null]}, joined: {name: "Map", arguments: [null, "Date"]}, hardware: {name: "Array", arguments: ["live4api.Hardware"]}, state: {name: "Enum", arguments: ["live4api.MissionState"]}}, {});
+stjs.ns("live4api");
+live4api.Calendar = function() {};
+live4api.Calendar = stjs.extend(live4api.Calendar, null, [live4api.Doc], function(constructor, prototype) {
+    prototype._rev = 0;
+    prototype.id = null;
+    prototype.intervals = null;
+    prototype.getId = function() {
+        return this.id;
+    };
+    prototype.setId = function(id) {
+        this.id = id;
+    };
+    prototype.isActive = function() {
+        return true;
+    };
+    prototype.isBusyAt = function(interval) {
+        if (interval == null) {
+            return false;
+        }
+        return Internal.mapValues(this.intervals).some(function(ti, i, a) {
+            return ti != null && ti.overlaps(interval);
+        });
+    };
+}, {intervals: {name: "Map", arguments: [null, "live4api.TimeInterval"]}}, {});
+stjs.ns("live4api");
+live4api.Address = function() {};
+live4api.Address = stjs.extend(live4api.Address, null, [], function(constructor, prototype) {
+    prototype.line1 = null;
+    prototype.line2 = null;
+    prototype.city = null;
+    prototype.state = null;
+    prototype.zip = null;
+    prototype.country = null;
+    prototype.asOneLine = function() {
+        var state_zip = Internal.defaultString(this.state, "") + " " + Internal.defaultString(this.zip, "");
+        return [this.line1, this.line2, this.city, state_zip, this.country].filter(function(s, aLong, strings) {
+            return Internal.isNotBlank(s);
+        }).join(",");
+    };
+}, {}, {});
+stjs.ns("live4api");
+live4api.Requests = function(serverUrl) {
+    this.serverUrl = serverUrl == null ? "" : serverUrl;
+};
+live4api.Requests = stjs.extend(live4api.Requests, null, [], function(constructor, prototype) {
+    prototype.serverUrl = null;
+    prototype.postAsJson = function(url, o) {
+        return this.request(url, JSON.stringify(o), "POST", {"Content-type": "application/json"});
+    };
+    prototype.putAsJson = function(url, o) {
+        return this.request(url, JSON.stringify(o), "PUT", {"Content-type": "application/json"});
+    };
+    prototype.get = function(url) {
+        return this.request(url, null, "GET", null);
+    };
+    prototype.deleteRequest = function(url) {
+        return this.request(url, null, "DELETE", null);
+    };
+    prototype.getJson = function(url) {
+        return this.request(url, null, "GET", null).filter(function(response) {
+            return !Internal.eq(response, "");
+        }).map(function(jsonResponse) {
+            return JSON.parse(jsonResponse);
+        });
+    };
+    prototype.request = function(url, data, method, headers) {
+        var _url = this.serverUrl + url;
+        var o = Rx.Observable.create(function(observer) {
+            var requestObserver = new live4api.Requests.RequestObserver(_url, data, headers, null, method, observer).invoke();
+            var loaded = requestObserver.getLoaded();
+            var http = requestObserver.getHttp();
+            return function() {
+                if (!loaded.value) {
+                    if (http.readyState != 4) {
+                        live4api.Requests.dbg("abort " + method + " " + _url);
+                        http.abort();
+                    }
+                }
+            };
+        });
+        return o;
+    };
+    prototype.formPost = function(url, data) {
+        var _url = this.serverUrl + url;
+        var o = Rx.Observable.create(function(observer) {
+            var requestObserver = new live4api.Requests.RequestObserver(_url, null, null, data, "POST", observer).invoke();
+            var loaded = requestObserver.getLoaded();
+            var http = requestObserver.getHttp();
+            return function() {
+                if (!loaded.value) {
+                    if (http.readyState != 4) {
+                        live4api.Requests.dbg("abort FORMPOST " + _url);
+                        http.abort();
+                    }
+                }
+            };
+        });
+        return o;
+    };
+    constructor.debug = true;
+    constructor.dbg = function(msg) {
+        if (live4api.Requests.debug) {
+            console.log(msg);
+        }
+    };
+    prototype.getArrayBuffer = function(url) {
+        var _url = this.serverUrl + url;
+        var o = Rx.Observable.create(function(observer) {
+            var http = new XMLHttpRequest();
+            http.open("GET", _url, true);
+            http.responseType = "arraybuffer";
+            http.onreadystatechange = function() {
+                if (http.readyState == 4) {
+                    if (http.status == 200) {
+                        observer.onNext(http.response);
+                        observer.onCompleted();
+                    } else {
+                        observer.onError(http);
+                    }
+                }
+            };
+            http.send();
+        });
+        return o;
+    };
+    prototype._delete = function(url) {
+        return this.request(url, null, "DELETE", null);
+    };
+    constructor.RequestObserver = function(url, data, headers, form, method, observer) {
+        this.url = url;
+        this.data = data;
+        this.headers = headers == null ? {} : headers;
+        this.form = form;
+        this.method = method;
+        this.observer = observer;
+    };
+    constructor.RequestObserver = stjs.extend(constructor.RequestObserver, null, [], function(constructor, prototype) {
+        prototype.url = null;
+        prototype.data = null;
+        prototype.form = null;
+        prototype.method = null;
+        prototype.observer = null;
+        prototype.http = null;
+        prototype.loaded = null;
+        prototype.headers = null;
+        prototype.getHttp = function() {
+            return this.http;
+        };
+        prototype.getLoaded = function() {
+            return this.loaded;
+        };
+        prototype.invoke = function() {
+            this.http = new XMLHttpRequest();
+            this.http.open(this.method, this.url);
+            Internal.keys(this.headers).forEach(stjs.bind(this, function(h) {
+                return this.http.setRequestHeader(h, this.headers[h]);
+            }));
+            console.log(this.method, this.url);
+            this.loaded = new MutableBoolean(false);
+            this.http.onreadystatechange = stjs.bind(this, function() {
+                if (this.http.readyState == 1) {
+                    Internal.keys(this.headers).forEach(stjs.bind(this, function(h) {
+                        return this.http.setRequestHeader(h, this.headers[h]);
+                    }));
+                }
+            });
+            this.http.onload = stjs.bind(this, function() {
+                this.loaded.value = true;
+                if (this.http.status == 204) {
+                    this.observer.onNext(null);
+                    this.observer.onCompleted();
+                }
+                if (this.http.status >= 200 && this.http.status < 400) {
+                    if (Internal.isBlank(this.http.responseText)) {
+                        this.observer.onError(this.http);
+                    } else {
+                        this.observer.onNext(this.http.responseText);
+                        this.observer.onCompleted();
+                    }
+                }
+                if (this.http.status >= 400) {
+                    live4api.Requests.dbg("error " + this.http.status + " " + this.method + " " + this.url);
+                    this.observer.onError(this.http);
+                }
+                if (this.http.status == 0) {
+                    live4api.Requests.dbg("error " + this.http.status + " " + this.method + " " + this.url);
+                    this.observer.onError(this.http);
+                }
+            });
+            this.http.onerror = stjs.bind(this, function(e) {
+                live4api.Requests.dbg("error " + this.http.status + " " + this.method + " " + this.url);
+                this.observer.onError(e);
+            });
+            if (this.data == null) {
+                this.http.send(this.form);
+            } else {
+                this.http.send(this.data);
+            }
+            return this;
+        };
+    }, {form: "FormData", observer: {name: "Rx.Observer", arguments: [null]}, http: "XMLHttpRequest", loaded: "MutableBoolean", headers: {name: "Map", arguments: [null, null]}}, {});
+}, {}, {});
+stjs.ns("live4api");
+live4api.Hardware = function(name, type) {
+    this.name = name;
+    this.type = type;
+    this.active = true;
+};
+live4api.Hardware = stjs.extend(live4api.Hardware, null, [live4api.Doc], function(constructor, prototype) {
+    constructor.TYPE_MC_BOX = "MC_BOX";
+    constructor.TYPE_DRONE = "DRONE";
+    constructor.TYPE_ANDROID = "ANDROID";
+    prototype.id = null;
+    prototype._rev = 0;
+    prototype.name = null;
+    prototype.type = null;
+    prototype.manufacturer = null;
+    prototype.model = null;
+    prototype.orgId = null;
+    prototype.active = false;
+    prototype.port = 0;
+    prototype.externalId = null;
+    prototype.endpoint = null;
+    constructor.sortByNameAvailableFirst = function(h1, h2) {
+        var diff = live4api.Hardware.statusLabel(h1._availability).compareTo(live4api.Hardware.statusLabel(h2._availability));
+        return diff != 0 ? diff : h1.name.compareTo(h2.name);
+    };
+    prototype._availability = null;
+    prototype._calendar = null;
+    prototype._orgName = null;
+    constructor.isValidPortNumber = function(port) {
+        return port > 1024 && port < 65536;
+    };
+    prototype.isMCBox = function() {
+        return this.type.equals(live4api.Hardware.TYPE_MC_BOX);
+    };
+    prototype.isDrone = function() {
+        return this.type.equals(live4api.Hardware.TYPE_DRONE);
+    };
+    constructor.MCBox = function(name) {
+        return new live4api.Hardware(name, live4api.Hardware.TYPE_MC_BOX);
+    };
+    constructor.drone = function(name) {
+        return new live4api.Hardware(name, live4api.Hardware.TYPE_DRONE);
+    };
+    constructor.android = function(name) {
+        return new live4api.Hardware(name, live4api.Hardware.TYPE_ANDROID);
+    };
+    prototype.isAvailable = function() {
+        return !this.isScheduled();
+    };
+    prototype.isScheduled = function() {
+        return this._availability == live4api.HwAvailability.SCHEDULED || this._availability == live4api.HwAvailability.INUSE;
+    };
+    prototype.setPort = function(port) {
+        this.port = port;
+        return this;
+    };
+    prototype.belongsToOrg = function(orgId) {
+        return !Internal.isBlank(orgId) && orgId.equals(this.orgId);
+    };
+    prototype.isAssigned = function() {
+        return this.orgId != null;
+    };
+    constructor.statusLabel = function(s) {
+        if (s == live4api.HwAvailability.AVAILABLE) {
+            return "Available";
+        } else if (s == live4api.HwAvailability.SCHEDULED) {
+            return "Scheduled";
+        } else if (s == live4api.HwAvailability.INUSE) {
+            return "In use";
+        }
+        return "Unknown";
+    };
+    prototype.getId = function() {
+        return this.id;
+    };
+    prototype.isActive = function() {
+        return this.active;
+    };
+    prototype.setId = function(id) {
+        this.id = id;
+    };
+    prototype.getAvailabilityFor = function(ti) {
+        if (this._calendar == null) 
+            return live4api.HwAvailability.AVAILABLE;
+        return this._calendar.isBusyAt(ti) ? live4api.HwAvailability.SCHEDULED : live4api.HwAvailability.AVAILABLE;
+    };
+}, {sortByNameAvailableFirst: {name: "SortFunction", arguments: ["live4api.Hardware"]}, _availability: {name: "Enum", arguments: ["live4api.HwAvailability"]}, _calendar: "live4api.Calendar"}, {});
 stjs.ns("live4api");
 live4api.User = function(id, name, userpic, created, social, email) {
     this.id = id;
@@ -2393,6 +3029,191 @@ live4api.User = stjs.extend(live4api.User, null, [live4api.Doc], function(constr
     };
 }, {type: {name: "Enum", arguments: ["live4api.LoginType"]}, session: "live4api.AccessToken", profiles: {name: "Map", arguments: [null, "live4api.UserProfile"]}}, {});
 stjs.ns("live4api");
+live4api.StreamResponse = function() {
+    live4api.Stream.call(this);
+};
+live4api.StreamResponse = stjs.extend(live4api.StreamResponse, live4api.Stream, [], function(constructor, prototype) {
+    prototype.streamId = null;
+    prototype.user = null;
+    prototype.tags = null;
+    prototype.durationMsec = 0;
+    prototype.nearby = null;
+    prototype.embedUrl = null;
+    prototype.landUrl = null;
+    prototype.city = null;
+    prototype.likes = null;
+    prototype.comments = null;
+    prototype.hostUrl = null;
+    prototype.flash = null;
+    prototype.getHostUrl = function() {
+        return this.hostUrl;
+    };
+    prototype.getFlash = function() {
+        return this.flash;
+    };
+    prototype.userpic = function() {
+        return this.user != null ? this.user.userpic : null;
+    };
+    prototype.username = function() {
+        return this.user != null ? this.user.name : null;
+    };
+    prototype.isoDate = function() {
+        return new Date(this.ctime).toISOString();
+    };
+}, {user: "live4api.UserResponse", tags: {name: "Array", arguments: ["live4api.Tag"]}, likes: "live4api.LikeResponse", comments: "live4api.CommentResponse", startGeoCoder: {name: "Array", arguments: ["live4api.GeocoderResult"]}, startLocation: "live4api.StreamLocation", status: {name: "Enum", arguments: ["live4api.LiveStatus"]}, privacy: {name: "Enum", arguments: ["live4api.Privacy"]}, tags2: {name: "Array", arguments: ["live4api.Tag"]}}, {});
+var HWStatusApi = function(requests, updates) {
+    BaseAsyncDao.call(this, live4api.HWStatus, updates, requests);
+};
+HWStatusApi = stjs.extend(HWStatusApi, BaseAsyncDao, [], function(constructor, prototype) {
+    prototype.getItemUrl = function(id) {
+        return live4api.HWStatus.API_HWSTATUS + live4api.HWStatus.OBJECT + "/" + id;
+    };
+    prototype.createItemUrl = function() {
+        return null;
+    };
+    prototype.listUrl = function(orgId) {
+        return live4api.HWStatus.API_HWSTATUS + live4api.HWStatus.LIST + "/" + orgId;
+    };
+}, {cls: {name: "Class", arguments: ["T"]}, _wsrx: {name: "Rx.Observable", arguments: ["T"]}, requests: "live4api.Requests"}, {});
+var MissionApi = function(requests, updates) {
+    BaseAsyncDao.call(this, live4api.Mission, updates, requests);
+};
+MissionApi = stjs.extend(MissionApi, BaseAsyncDao, [], function(constructor, prototype) {
+    prototype.getShareToken = function(missionId) {
+        return this.requests.get(live4api.Api3MissionUrls.tokenUrl(missionId)).map(function(json) {
+            return Internal.typefyJson(json, live4api.MissionShareToken).token;
+        });
+    };
+    prototype.shareMission = function(mission, toEmail) {
+        var url = live4api.Api3MissionUrls.shareUrl(mission.id) + "?" + live4api.Api3MissionUrls.SHARE_TO_EMAIL_PARAM + "=" + toEmail;
+        return this.requests.get(url).map(function(str) {
+            return true;
+        });
+    };
+    prototype.unshareMission = function(mission, toEmail) {
+        var url = live4api.Api3MissionUrls.unshareUrl(mission.id) + "?" + live4api.Api3MissionUrls.SHARE_TO_EMAIL_PARAM + "=" + toEmail;
+        return this.requests.get(url).map(function(str) {
+            return true;
+        });
+    };
+    prototype.getItemUrl = function(id) {
+        return live4api.Api3MissionUrls.getUrl(id);
+    };
+    prototype.createItemUrl = function() {
+        return live4api.Api3MissionUrls.createUrl();
+    };
+    prototype.listUrl = function(orgId) {
+        return live4api.Api3MissionUrls.listUrl(orgId);
+    };
+    prototype.splitStreamsOnMissionEnd = function(mid) {
+        return this.requests.get(live4api.Api3MissionUrls.API_3_MISSION + "/split/" + mid);
+    };
+}, {cls: {name: "Class", arguments: ["T"]}, _wsrx: {name: "Rx.Observable", arguments: ["T"]}, requests: "live4api.Requests"}, {});
+stjs.ns("live4api");
+live4api.MissionPermissions = function() {};
+live4api.MissionPermissions = stjs.extend(live4api.MissionPermissions, null, [], function(constructor, prototype) {
+    constructor.canEditMisson = function(u, m) {
+        return m.hasOwnerPermissions(u);
+    };
+    constructor.canEditStream = function(u, m) {
+        return m.hasOwnerPermissions(u);
+    };
+    constructor.canAddUser = function(u, m) {
+        return m.hasOwnerPermissions(u);
+    };
+    constructor.canEndMission = function(u, m) {
+        return m.hasOwnerPermissions(u);
+    };
+    constructor.canEditLocations = function(u, m) {
+        return m.hasOwnerPermissions(u);
+    };
+    constructor.canAssignPilot = function(u, m) {
+        return m.hasPilotPermissions(u);
+    };
+    constructor.canUseChat = function(u, m) {
+        return m.hasParticipantPermisisons(u);
+    };
+    constructor.canAddSources = function(u, m) {
+        return m.hasParticipantPermisisons(u);
+    };
+    constructor.hasOneOwner = function(m) {
+        return m.countOwners() == 1;
+    };
+    constructor.canViewCompletedMission = function(u, m) {
+        return (live4api.MissionState.ENDED == m.state) && (Internal.containsKey(m.roles, u.id) || live4api.Mission.isOrgAdmin(u, m));
+    };
+    constructor.canShareMission = function(user, mission) {
+        if (mission == null || user == null) 
+            return false;
+        if (user.isSuperAdmin()) {
+            return true;
+        }
+        if (null == user.getRole(mission.orgId) || live4api.UserRole.EXTERNAL == user.getRole(mission.orgId)) {
+            return false;
+        }
+        var role = Internal.defaultMap(mission.roles)[user.id];
+        if (live4api.MissionRole.UNKNOWN == role || null == role) {
+            return false;
+        }
+        if (!user.belongsToOrg(mission.orgId)) {
+            return false;
+        }
+        return true;
+    };
+    constructor.canRemoveUser = function(mission, me, you) {
+        var meId = me.id;
+        var youId = you.id;
+        if (mission == null || meId == null || youId == null) 
+            return false;
+        var notRemovingMyself = !Internal.eq(youId, meId);
+        var notRemovingOwnerOfMission = !live4api.Mission.isOwner(you, mission);
+        return mission.hasOwnerPermissions(me) && notRemovingMyself && notRemovingOwnerOfMission;
+    };
+    constructor.canJoinMission = function(mission, userId) {
+        return live4api.MissionPermissions.canPreviewMission(mission) && mission.hasUser(userId);
+    };
+    constructor.canPreviewMission = function(mission) {
+        return mission != null && mission.state != live4api.MissionState.CANCELLED;
+    };
+    constructor.canViewMission = function(mission, user) {
+        var bool = live4api.MissionPermissions.canPreviewMission(mission);
+        return (bool && mission.hasUser(user.id)) || (bool && live4api.Mission.isOrgAdmin(user, mission) && !mission.hasUser(user.id));
+    };
+    constructor.canStartMission = function(u, m) {
+        return live4api.Mission.isScheduler(u, m) || live4api.Mission.isOrgAdmin(u, m) || live4api.Mission.isOwner(u, m);
+    };
+    constructor.userRemoved = function(oldMisison, newMission, me) {
+        return oldMisison != null && oldMisison.roles[me.getId()] != null && newMission.roles[me.getId()] == null;
+    };
+}, {}, {});
+var CalendarApi = function(requests, updates) {
+    BaseAsyncDao.call(this, live4api.Calendar, updates, requests);
+};
+CalendarApi = stjs.extend(CalendarApi, BaseAsyncDao, [], function(constructor, prototype) {
+    prototype.get = function(id) {
+        return BaseAsyncDao.prototype.get.call(this, id).flatMapObserver(function(c, _i) {
+            return Rx.Observable.just(c);
+        }, function(err) {
+            console.log("err", (typeof err), err);
+            if (404 == (err).status) {
+                return Rx.Observable.just(new live4api.Calendar());
+            }
+            return Rx.Observable.throw(err);
+        }, function() {
+            return Rx.Observable.empty();
+        });
+    };
+    prototype.getItemUrl = function(id) {
+        return live4api.Api3CalendarUrls.getUrl(id);
+    };
+    prototype.createItemUrl = function() {
+        return live4api.Api3CalendarUrls.createUrl();
+    };
+    prototype.listUrl = function(orgId) {
+        return live4api.Api3CalendarUrls.listUrl(orgId);
+    };
+}, {cls: {name: "Class", arguments: ["T"]}, _wsrx: {name: "Rx.Observable", arguments: ["T"]}, requests: "live4api.Requests"}, {});
+stjs.ns("live4api");
 live4api.Organization = function(name, orgAdminUserId) {
     this.name = name;
     this.ctime = stjs.trunc(new Date().getTime());
@@ -2493,116 +3314,254 @@ live4api.Organization = stjs.extend(live4api.Organization, null, [live4api.Doc],
         return this.orgAdminUserIds.length == 1;
     };
 }, {orgAdminUserIds: {name: "Array", arguments: [null]}, userIds: {name: "Array", arguments: [null]}, address: "live4api.Address", hardwareIds: {name: "Array", arguments: [null]}, missionIds: {name: "Array", arguments: [null]}, billingInfo: "live4api.BillingInfo", _orgAdmins: {name: "Array", arguments: ["live4api.User"]}}, {});
-stjs.ns("live4api");
-live4api.StreamResponse = function() {
-    live4api.Stream.call(this);
+var HardwareApi = function(requests, updates) {
+    BaseAsyncDao.call(this, live4api.Hardware, updates, requests);
 };
-live4api.StreamResponse = stjs.extend(live4api.StreamResponse, live4api.Stream, [], function(constructor, prototype) {
-    prototype.streamId = null;
-    prototype.user = null;
-    prototype.tags = null;
-    prototype.durationMsec = 0;
-    prototype.nearby = null;
-    prototype.embedUrl = null;
-    prototype.landUrl = null;
-    prototype.city = null;
-    prototype.likes = null;
-    prototype.comments = null;
-    prototype.hostUrl = null;
-    prototype.flash = null;
-    prototype.getHostUrl = function() {
-        return this.hostUrl;
+HardwareApi = stjs.extend(HardwareApi, BaseAsyncDao, [], function(constructor, prototype) {
+    prototype.findByPort = function(port) {
+        return this.requests.get(live4api.Api3HwUrls.findByPortUrl(port)).map(stjs.bind(this, "parse"));
     };
-    prototype.getFlash = function() {
-        return this.flash;
+    prototype.releaseHardwares = function(removedHws, mId) {
+        return this.requests.postAsJson(live4api.Api3HwUrls.releaseUrl(mId), removedHws);
     };
-    prototype.userpic = function() {
-        return this.user != null ? this.user.userpic : null;
+    prototype.reassignHardware = function(orgId, hwId) {
+        return this.requests.get(live4api.Api3HwUrls.API_3_HW + live4api.Api3HwUrls.REASSIGN + "/" + hwId + "/" + orgId);
     };
-    prototype.username = function() {
-        return this.user != null ? this.user.name : null;
+    prototype.getItemForMission = function(id, mid) {
+        return live4api.Api3HwUrls.getUrl(id) + "/" + mid;
     };
-    prototype.isoDate = function() {
-        return new Date(this.ctime).toISOString();
+    prototype.getItemUrl = function(id) {
+        return live4api.Api3HwUrls.getUrl(id);
     };
-}, {user: "live4api.UserResponse", tags: {name: "Array", arguments: ["live4api.Tag"]}, likes: "live4api.LikeResponse", comments: "live4api.CommentResponse", startGeoCoder: {name: "Array", arguments: ["live4api.GeocoderResult"]}, startLocation: "live4api.StreamLocation", status: {name: "Enum", arguments: ["live4api.LiveStatus"]}, privacy: {name: "Enum", arguments: ["live4api.Privacy"]}, tags2: {name: "Array", arguments: ["live4api.Tag"]}}, {});
+    prototype.createItemUrl = function() {
+        return live4api.Api3HwUrls.createUrl();
+    };
+    prototype.listUrl = function(orgId) {
+        return live4api.Api3HwUrls.listUrl(orgId);
+    };
+    prototype.logList = function(hwId) {
+        return this.requests.get(live4api.Api3Urls.API_3_HWLOG + "/" + hwId).map(function(response) {
+            return live4api.Typefy.typefyArray(JSON.parse(response), live4api.HWLogEntry);
+        });
+    };
+}, {cls: {name: "Class", arguments: ["T"]}, _wsrx: {name: "Rx.Observable", arguments: ["T"]}, requests: "live4api.Requests"}, {});
+var UserApi = function(requests, updates) {
+    BaseAsyncDao.call(this, live4api.User, updates, requests);
+};
+UserApi = stjs.extend(UserApi, BaseAsyncDao, [], function(constructor, prototype) {
+    prototype.createOrUpdate = function(user) {
+        return user.id == null ? this.create(user) : this.forceUpdate(user);
+    };
+    prototype.getItemUrl = function(id) {
+        return live4api.Api3UserUrls.getUrl(id);
+    };
+    prototype.createItemUrl = function() {
+        return live4api.Api3UserUrls.createUrl();
+    };
+    prototype.listUrl = function(orgId) {
+        return live4api.Api3UserUrls.listUrl(orgId);
+    };
+    prototype.forceUpdate = function(user) {
+        return this.getAndUpdate(user.id, function(u) {
+            u.profiles = user.profiles;
+            u.name = user.name;
+            u.lastname = user.lastname;
+            u.setAvatarUrl(user.getAvatarUrl());
+        });
+    };
+    prototype.inviteToMission = function(user, missionId) {
+        return this._post(live4api.Api3MissionUrls.inviteUrl(missionId), user);
+    };
+    prototype.allUsersUpdates = function(orgId) {
+        var existingUsers = this.list(orgId).concatMap(function(arr) {
+            return Rx.Observable.from(arr);
+        });
+        var userUpdates = this.updates();
+        return Rx.Observable.concat([existingUsers, userUpdates]);
+    };
+    prototype.sendCancelNotification = function(user, missionId) {
+        return this._post(live4api.Api3MissionUrls.cancelNotificationUrl(missionId), user);
+    };
+    prototype.join = function(user, missionId) {
+        return this._post(live4api.Api3MissionUrls.joinUrl(missionId), user);
+    };
+    prototype.getUserByEmail = function(email) {
+        return this.requests.getJson(live4api.Api3UserUrls.byEmailUrl(email)).map(function(obj) {
+            return live4api.Typefy.typefy(obj, live4api.User);
+        });
+    };
+    prototype.isUserExists = function(email) {
+        return this.requests.getJson(live4api.Api3UserUrls.checkUserByEmail(email)).map(function(obj) {
+            return obj;
+        });
+    };
+    prototype.isTempUser = function(email) {
+        return this.requests.getJson(live4api.Api3UserUrls.isUserTemp(email)).map(function(obj) {
+            return obj;
+        });
+    };
+}, {cls: {name: "Class", arguments: ["T"]}, _wsrx: {name: "Rx.Observable", arguments: ["T"]}, requests: "live4api.Requests"}, {});
+var StreamApi = function(requests, wsLive) {
+    BaseAsyncDao.call(this, live4api.StreamResponse, Rx.Observable.empty(), requests);
+    this.wsLive = wsLive;
+};
+StreamApi = stjs.extend(StreamApi, BaseAsyncDao, [], function(constructor, prototype) {
+    prototype.wsLive = null;
+    prototype.getItemUrl = function(id) {
+        return live4api.Api1StreamUrls.getUrl(id);
+    };
+    prototype.createItemUrl = function() {
+        return live4api.Api1StreamUrls.createUrl();
+    };
+    prototype.listUrl = function(orgId) {
+        return live4api.Api1StreamUrls.listUrl();
+    };
+    prototype.locationUpdates = function(sid) {
+        return this.wsLive.locationUpdates(sid);
+    };
+    prototype.liveMessages = function(sid) {
+        return this.wsLive.streamUpdates(sid);
+    };
+    prototype.updateTitle = function(sid, newTitle) {
+        var sr = new live4api.Stream();
+        sr.setId(sid);
+        sr.title = newTitle;
+        return this.requests.putAsJson(live4api.Api2Urls.API_2_STREAM_UPDATE_TITLE + "/" + sr.sid().toString(), sr).map(function(json) {
+            return Internal.typefyJson(json, live4api.StreamResponse);
+        });
+    };
+}, {wsLive: "WSLive", cls: {name: "Class", arguments: ["T"]}, _wsrx: {name: "Rx.Observable", arguments: ["T"]}, requests: "live4api.Requests"}, {});
+var OrgApi = function(requests, updates) {
+    BaseAsyncDao.call(this, live4api.Organization, updates, requests);
+};
+OrgApi = stjs.extend(OrgApi, BaseAsyncDao, [], function(constructor, prototype) {
+    prototype.getItemUrl = function(orgId) {
+        return live4api.Api3OrgUrls.getUrl(orgId);
+    };
+    prototype.createItemUrl = function() {
+        return live4api.Api3OrgUrls.createUrl();
+    };
+    prototype.listUrl = function(orgId) {
+        return live4api.Api3OrgUrls.listUrl("su");
+    };
+}, {cls: {name: "Class", arguments: ["T"]}, _wsrx: {name: "Rx.Observable", arguments: ["T"]}, requests: "live4api.Requests"}, {});
 stjs.ns("live4api");
-live4api.MissionPermissions = function() {};
-live4api.MissionPermissions = stjs.extend(live4api.MissionPermissions, null, [], function(constructor, prototype) {
-    constructor.canEditMisson = function(u, m) {
-        return m.hasOwnerPermissions(u);
+live4api.JSApiClient = function(requests) {
+    this.requests = requests;
+};
+live4api.JSApiClient = stjs.extend(live4api.JSApiClient, null, [], function(constructor, prototype) {
+    prototype.streams = null;
+    prototype.missions = null;
+    prototype.users = null;
+    prototype.orgs = null;
+    prototype.calendars = null;
+    prototype.hw = null;
+    prototype.hwStatus = null;
+    prototype.overlays = null;
+    prototype.requests = null;
+    prototype.wsLive = null;
+    constructor.createApiClient = function(serverUrl) {
+        var requests = new live4api.Requests(serverUrl);
+        var wsurl = live4api.JSApiClient.wsUrl(serverUrl);
+        var b = new live4api.JSApiClient(requests);
+        b.wsLive = new WSLive(wsurl);
+        b.missions = new MissionApi(requests, b.wsLive.missionUpdates());
+        b.orgs = new OrgApi(requests, b.wsLive.orgUpdates());
+        b.users = new UserApi(requests, b.wsLive.userUpdates());
+        b.hw = new HardwareApi(requests, b.wsLive.hwUpdates());
+        b.calendars = new CalendarApi(requests, b.wsLive.calendarUpdates());
+        b.streams = new StreamApi(requests, b.wsLive);
+        b.hwStatus = new HWStatusApi(requests, b.wsLive.hwStatusUpdates());
+        b.overlays = new OverlayApi(requests);
+        return b;
     };
-    constructor.canEditStream = function(u, m) {
-        return m.hasOwnerPermissions(u);
-    };
-    constructor.canAddUser = function(u, m) {
-        return m.hasOwnerPermissions(u);
-    };
-    constructor.canEndMission = function(u, m) {
-        return m.hasOwnerPermissions(u);
-    };
-    constructor.canEditLocations = function(u, m) {
-        return m.hasOwnerPermissions(u);
-    };
-    constructor.canAssignPilot = function(u, m) {
-        return m.hasPilotPermissions(u);
-    };
-    constructor.canUseChat = function(u, m) {
-        return m.hasParticipantPermisisons(u);
-    };
-    constructor.canAddSources = function(u, m) {
-        return m.hasParticipantPermisisons(u);
-    };
-    constructor.hasOneOwner = function(m) {
-        return m.countOwners() == 1;
-    };
-    constructor.canViewCompletedMission = function(u, m) {
-        return (live4api.Mission.State.ENDED == m.state) && (Internal.containsKey(m.roles, u.id) || live4api.Mission.isOrgAdmin(u, m));
-    };
-    constructor.canShareMission = function(user, mission) {
-        if (mission == null || user == null) 
-            return false;
-        if (user.isSuperAdmin()) {
-            return true;
+    constructor.wsUrl = function(serverUrl) {
+        if (Internal.isBlank(serverUrl)) {
+            serverUrl = window.location.protocol + "//" + window.location.host;
         }
-        if (null == user.getRole(mission.orgId) || live4api.UserRole.EXTERNAL == user.getRole(mission.orgId)) {
-            return false;
-        }
-        var role = Internal.defaultMap(mission.roles)[user.id];
-        if (live4api.MissionRole.UNKNOWN == role || null == role) {
-            return false;
-        }
-        if (!user.belongsToOrg(mission.orgId)) {
-            return false;
-        }
-        return true;
+        return serverUrl.replaceFirst("http", "ws").replaceAll("/$", "") + live4api.Api3Urls.API_3_WSUPDATES + "/";
     };
-    constructor.canRemoveUser = function(mission, me, you) {
-        var meId = me.id;
-        var youId = you.id;
-        if (mission == null || meId == null || youId == null) 
-            return false;
-        var notRemovingMyself = !Internal.eq(youId, meId);
-        var notRemovingOwnerOfMission = !live4api.Mission.isOwner(you, mission);
-        return mission.hasOwnerPermissions(me) && notRemovingMyself && notRemovingOwnerOfMission;
+    prototype.liveErrors = function() {
+        return this.wsLive.onError();
     };
-    constructor.canJoinMission = function(mission, userId) {
-        return live4api.MissionPermissions.canPreviewMission(mission) && mission.hasUser(userId);
+    prototype.hardwareRx = function(orgId) {
+        var hwrx = live4api.JSApiClient.rxFor(this.hw, orgId).merge(this.calendars.updates().concatMap(stjs.bind(this, function(c) {
+            return this.hw.get(c.id);
+        })).filter(function(h) {
+            return h != null;
+        }));
+        return hwrx.concatMap(stjs.bind(this, function(h) {
+            var calRx = this.calendars.get(h.id);
+            var flatMapObserver = calRx.flatMapObserver(function(cal, i) {
+                h._calendar = cal;
+                if (cal == null) {
+                    h._calendar = new live4api.Calendar();
+                }
+                return Rx.Observable.just(h);
+            }, function(err) {
+                console.log("err", (typeof err), err);
+                h._calendar = new live4api.Calendar();
+                return Rx.Observable.just(h);
+            }, function() {
+                return Rx.Observable.empty();
+            });
+            var hardwareObservable = flatMapObserver.concatMap(function(hw) {
+                var timeInterval = new live4api.TimeInterval(new Date(), new Date());
+                h._availability = h.getAvailabilityFor(timeInterval);
+                return Rx.Observable.just(h);
+            });
+            return hardwareObservable.flatMap(stjs.bind(this, function(hardware) {
+                if (!Internal.isBlank(hardware.orgId)) {
+                    return this.orgs.get(hardware.orgId).flatMap(function(organization) {
+                        hardware._orgName = organization.name;
+                        return Rx.Observable.just(hardware);
+                    });
+                }
+                return Rx.Observable.just(hardware);
+            }));
+        }));
     };
-    constructor.canPreviewMission = function(mission) {
-        return mission != null && mission.state != live4api.Mission.State.CANCELLED;
+    prototype.createOrgFull = function(org, admin, userProfile) {
+        return this.requests.postAsJson(live4api.Api3OrgUrls.createWithAdminUrl(), new live4api.NewOrgAdminProfile(org, admin, userProfile)).map(function(json) {
+            return Internal.typefyJson(json, live4api.Organization);
+        });
     };
-    constructor.canViewMission = function(mission, user) {
-        var bool = live4api.MissionPermissions.canPreviewMission(mission);
-        return (bool && mission.hasUser(user.id)) || (bool && live4api.Mission.isOrgAdmin(user, mission) && !mission.hasUser(user.id));
+    prototype.resetPassword = function(loginData) {
+        return this.requests.postAsJson(live4api.Api3Urls.API_3_RESETPASSWORD, loginData).map(function(json) {
+            return live4api.Typefy.typefy(JSON.parse(json), live4api.User);
+        });
     };
-    constructor.canStartMission = function(u, m) {
-        return live4api.Mission.isScheduler(u, m) || live4api.Mission.isOrgAdmin(u, m) || live4api.Mission.isOwner(u, m);
+    prototype.logout = function() {
+        return this.requests.get(live4api.Api3Urls.API_3_LOGOUT);
     };
-    constructor.userRemoved = function(oldMisison, newMission, me) {
-        return oldMisison != null && oldMisison.roles[me.getId()] != null && newMission.roles[me.getId()] == null;
+    prototype.login = function(loginData) {
+        return this.requests.postAsJson(live4api.Api3Urls.API_3_LOGIN, loginData).map(function(json) {
+            return live4api.Typefy.typefy(JSON.parse(json), live4api.User);
+        });
     };
-}, {}, {});
+    constructor.mapHardwareWithCalendar = function(be, hardware) {
+        return Rx.Observable.of(hardware).concatMap(function(h) {
+            return be.calendars.get(h.id).flatMapObserver(function(cal, i) {
+                h._calendar = cal;
+                if (cal == null) {
+                    h._calendar = new live4api.Calendar();
+                }
+                return Rx.Observable.just(h);
+            }, function(err) {
+                console.log("err", (typeof err), err);
+                h._calendar = new live4api.Calendar();
+                return Rx.Observable.just(h);
+            }, function() {
+                return Rx.Observable.empty();
+            });
+        });
+    };
+    constructor.rxFor = function(dao, orgId) {
+        var existing = dao.list(orgId).concatMap(Rx.Observable.from);
+        var updates = dao.updates();
+        return Rx.Observable.concat([existing, updates]);
+    };
+}, {streams: "StreamApi", missions: "MissionApi", users: "UserApi", orgs: "OrgApi", calendars: "CalendarApi", hw: "HardwareApi", hwStatus: "HWStatusApi", overlays: "OverlayApi", requests: "live4api.Requests", wsLive: "WSLive"}, {});
 //# sourceMappingURL=live4api3.map
 
 module.exports = live4api;

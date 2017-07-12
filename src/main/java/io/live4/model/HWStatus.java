@@ -9,12 +9,8 @@ public class HWStatus implements Doc{
     public static final String OBJECT = "/object";
     public static final String LIST = "/list";
 
-    public enum Status {
-        CLOSED, OPEN, DATA_RECEIVED, DATA_PARSED, BAD_DATA
-    }
-
     public String hwId;
-    public Status status;
+    public HwState status;
     public long mtime;
 
     @Override
@@ -24,7 +20,7 @@ public class HWStatus implements Doc{
 
     @Override
     public boolean isActive() {
-        return !Status.CLOSED.equals(this.status);
+        return !HwState.CLOSED.equals(this.status);
     }
 
     @Override
@@ -32,7 +28,7 @@ public class HWStatus implements Doc{
         this.id = id;
     }
 
-    public static HWStatus newStatus(String hwid, Status status) {
+    public static HWStatus newStatus(String hwid, HwState status) {
         HWStatus hws = new HWStatus();
         hws.hwId = hwid;
         hws.status = status;
