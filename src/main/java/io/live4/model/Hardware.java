@@ -14,6 +14,7 @@ public class Hardware implements Doc {
     public static final String TYPE_MC_BOX = "MC_BOX";
     public static final String TYPE_DRONE = "DRONE";
     public static final String TYPE_ANDROID = "ANDROID";
+    public static final String TYPE_IOS = "IOS";
 
     public String id;
     public long _rev;
@@ -59,6 +60,10 @@ public class Hardware implements Doc {
     
     public static Hardware android(String name) {
         return new Hardware(name, TYPE_ANDROID);
+    }
+
+    public static Hardware ios(String name) {
+        return new Hardware(name, TYPE_IOS);
     }
 
     public boolean isAvailable() {
