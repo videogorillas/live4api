@@ -32,9 +32,9 @@ export class Calendar implements Doc {
     intervals: {[id: string]: TimeInterval};
 
     getId(): string;
+    isBusyAt(interval: TimeInterval): boolean;
     setId(id: string);
     isActive(): boolean;
-    isBusyAt(interval: TimeInterval): boolean;
 }
 export class CameraFile  {
     constructor(file: string, original: string);
@@ -276,8 +276,6 @@ export class Mission implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    setId(id: string);
-    isActive(): boolean;
     addStream(streamId: string);
     hasStreamId(streamId: string): boolean;
     hasOwnerPermissions(u: User): boolean;
@@ -300,6 +298,8 @@ export class Mission implements Doc {
     getTimeInterval(): TimeInterval;
     isRunningNow(): boolean;
     static isScheduler(u: User, m: Mission): boolean;
+    setId(id: string);
+    isActive(): boolean;
     isScheduled(): boolean;
 }
 export class MissionPermissions  {
@@ -359,8 +359,6 @@ export class Organization implements Doc {
     _orgAdmins: User[];
 
     getId(): string;
-    setId(id: string);
-    isActive(): boolean;
     removeUser(userId: string);
     addUser(userId: string);
     addHardware(hardwareId: string);
@@ -374,6 +372,8 @@ export class Organization implements Doc {
     listHardwareIds(): string[];
     getStatus(): string;
     hasOnlyOneAdmin(): boolean;
+    setId(id: string);
+    isActive(): boolean;
 }
 export enum Privacy { PUBLIC, PRIVATE, UNLISTED }
 export class Stream implements Doc {
@@ -408,10 +408,7 @@ export class Stream implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    sid(): StreamId;
     isClosed(): boolean;
-    setId(id: string);
-    isActive(): boolean;
     getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
@@ -424,6 +421,9 @@ export class Stream implements Doc {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
+    setId(id: string);
+    isActive(): boolean;
+    sid(): StreamId;
     isScheduled(): boolean;
 }
 export class StreamId  {
@@ -452,11 +452,11 @@ export class StreamLocation  {
     static accurateLocations: (arg: StreamLocation) => boolean;
 
     hashCode(): number;
-    getTimestamp(): string;
     static speedLocation(timestamp: string, speed: number): StreamLocation;
     static latLng(timestamp: string, latitude: number, longitude: number): StreamLocation;
     getSpeed(): number;
     lalo(): string;
+    getTimestamp(): string;
     getTime(): number;
 }
 export class StreamPermissions  {
@@ -507,17 +507,14 @@ export class StreamResponse  {
     thumb: string;
     md: string;
 
-    getFlash(): string;
     getHostUrl(): string;
+    getFlash(): string;
     userpic(): string;
     username(): string;
     isoDate(): string;
     getId(): string;
     isLive(): boolean;
-    sid(): StreamId;
     isClosed(): boolean;
-    setId(id: string);
-    isActive(): boolean;
     getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
@@ -530,6 +527,9 @@ export class StreamResponse  {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
+    setId(id: string);
+    isActive(): boolean;
+    sid(): StreamId;
     isScheduled(): boolean;
 }
 export class Tag  {
@@ -597,10 +597,11 @@ export class User implements Doc {
     getName(): string;
     getId(): string;
     getType(): LoginType;
-    setId(id: string);
     isOrgAdmin(orgId: string): boolean;
     getRole(orgId: string): UserRole;
     isSuperAdmin(): boolean;
+    setId(id: string);
+    belongsToOrg(orgId: string): boolean;
     created(): number;
     isUserActiveInAnyOrg(): boolean;
     isUserActiveInOrg(orgId: string): boolean;
@@ -630,7 +631,6 @@ export class User implements Doc {
     setOrgPhone(orgId: string, phone: string);
     getOrgNotes(orgId: string): string;
     setOrgNotes(orgId: string, notes: string);
-    belongsToOrg(orgId: string): boolean;
 }
 export class UserActivityResponse  {
     thumb: string;
