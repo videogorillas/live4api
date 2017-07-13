@@ -33,5 +33,8 @@
     "grunt-contrib-watch": "0.6.1",
     "grunt-fontoptim": "0.1.1",
     "grunt-webpack": "1.0.14"
+  },
+  "dependencies": {
+    "rx": "4.1.0"
   }
 }

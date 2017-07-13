@@ -1,6 +1,6 @@
 /*global module:false*/
 module.exports = function(grunt) {
-    var jsFiles = [ "target/classes/stjs.js","src/main/js/ns.js", "target/classes/live4api3.js", "src/main/js/export.js"];
+    var jsFiles = [ "src/main/js/deps.js", "target/classes/stjs.js","src/main/js/ns.js", "target/classes/live4api3.js", "src/main/js/export.js"];
 
     grunt
             .initConfig({
