@@ -45,8 +45,8 @@ public class ServerUrl {
         return buildUrl;
     }
 
-    public String uploadLog(long now) {
-        return serverUrl + API_2_UPLOAD_LOG + "/" + now;
+    public String uploadLog(String filename) {
+        return serverUrl + API_2_UPLOAD_LOG + "/" + filename;
     }
 
     public String wsPushVideo(StreamId id) {

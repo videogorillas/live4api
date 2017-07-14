@@ -65,7 +65,11 @@ public class ApiRequest {
 
     public Request uploadLogs(String logs) {
         Builder builder = new Builder().header(LAST_MODIFIED, httpDateFormat(new Date().getTime()));
-        builder.url(serverUrl.uploadLog(System.currentTimeMillis())).post(RequestBody.create(HttpUtils.OCTET_STREAM, logs));
+        try {
+            builder.url(serverUrl.uploadLog(System.currentTimeMillis() + ".log.gz")).post(RequestBody.create(HttpUtils.OCTET_STREAM, gzip(logs)));
+        } catch (IOException e) {
+            builder.url(serverUrl.uploadLog(System.currentTimeMillis() + ".log")).post(RequestBody.create(HttpUtils.OCTET_STREAM, logs));
+        }
         return builder.build();
     }
 
