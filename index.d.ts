@@ -32,9 +32,9 @@ export class Calendar implements Doc {
     intervals: {[id: string]: TimeInterval};
 
     getId(): string;
-    isBusyAt(interval: TimeInterval): boolean;
     setId(id: string);
     isActive(): boolean;
+    isBusyAt(interval: TimeInterval): boolean;
 }
 export class CameraFile  {
     constructor(file: string, original: string);
@@ -152,8 +152,6 @@ export class Hardware implements Doc {
     _orgName: string;
 
     getId(): string;
-    setId(id: string);
-    isActive(): boolean;
     static isValidPortNumber(port: number): boolean;
     isMCBox(): boolean;
     isDrone(): boolean;
@@ -167,6 +165,8 @@ export class Hardware implements Doc {
     isAssigned(): boolean;
     static statusLabel(s: HwAvailability): string;
     getAvailabilityFor(ti: TimeInterval): HwAvailability;
+    setId(id: string);
+    isActive(): boolean;
 }
 export enum HwAvailability { AVAILABLE, SCHEDULED, INUSE }
 export class HWLogEntry  {
@@ -276,6 +276,7 @@ export class Mission implements Doc {
 
     getId(): string;
     isLive(): boolean;
+    isScheduled(): boolean;
     addStream(streamId: string);
     hasStreamId(streamId: string): boolean;
     hasOwnerPermissions(u: User): boolean;
@@ -300,7 +301,6 @@ export class Mission implements Doc {
     static isScheduler(u: User, m: Mission): boolean;
     setId(id: string);
     isActive(): boolean;
-    isScheduled(): boolean;
 }
 export class MissionPermissions  {
 
@@ -359,9 +359,6 @@ export class Organization implements Doc {
     _orgAdmins: User[];
 
     getId(): string;
-    removeUser(userId: string);
-    addUser(userId: string);
-    addHardware(hardwareId: string);
     getTheBestOrgAdminId(): string;
     addUserOrgAdmin(userId: string);
     addOrgAdmin(userId: string);
@@ -372,6 +369,9 @@ export class Organization implements Doc {
     listHardwareIds(): string[];
     getStatus(): string;
     hasOnlyOneAdmin(): boolean;
+    removeUser(userId: string);
+    addUser(userId: string);
+    addHardware(hardwareId: string);
     setId(id: string);
     isActive(): boolean;
 }
@@ -408,8 +408,7 @@ export class Stream implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    isClosed(): boolean;
-    getStatus(): LiveStatus;
+    isScheduled(): boolean;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -421,10 +420,11 @@ export class Stream implements Doc {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
+    isClosed(): boolean;
+    getStatus(): LiveStatus;
     setId(id: string);
     isActive(): boolean;
     sid(): StreamId;
-    isScheduled(): boolean;
 }
 export class StreamId  {
     constructor(userId: string, streamId: string);
@@ -456,8 +456,8 @@ export class StreamLocation  {
     static latLng(timestamp: string, latitude: number, longitude: number): StreamLocation;
     getSpeed(): number;
     lalo(): string;
-    getTimestamp(): string;
     getTime(): number;
+    getTimestamp(): string;
 }
 export class StreamPermissions  {
 
@@ -514,8 +514,7 @@ export class StreamResponse  {
     isoDate(): string;
     getId(): string;
     isLive(): boolean;
-    isClosed(): boolean;
-    getStatus(): LiveStatus;
+    isScheduled(): boolean;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -527,10 +526,11 @@ export class StreamResponse  {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
+    isClosed(): boolean;
+    getStatus(): LiveStatus;
     setId(id: string);
     isActive(): boolean;
     sid(): StreamId;
-    isScheduled(): boolean;
 }
 export class Tag  {
     constructor(id: string, name: string);
@@ -597,10 +597,6 @@ export class User implements Doc {
     getName(): string;
     getId(): string;
     getType(): LoginType;
-    isOrgAdmin(orgId: string): boolean;
-    getRole(orgId: string): UserRole;
-    isSuperAdmin(): boolean;
-    setId(id: string);
     belongsToOrg(orgId: string): boolean;
     created(): number;
     isUserActiveInAnyOrg(): boolean;
@@ -631,6 +627,10 @@ export class User implements Doc {
     setOrgPhone(orgId: string, phone: string);
     getOrgNotes(orgId: string): string;
     setOrgNotes(orgId: string, notes: string);
+    isOrgAdmin(orgId: string): boolean;
+    getRole(orgId: string): UserRole;
+    isSuperAdmin(): boolean;
+    setId(id: string);
 }
 export class UserActivityResponse  {
     thumb: string;
