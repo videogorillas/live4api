@@ -32,9 +32,9 @@ export class Calendar implements Doc {
     intervals: {[id: string]: TimeInterval};
 
     getId(): string;
+    isBusyAt(interval: TimeInterval): boolean;
     setId(id: string);
     isActive(): boolean;
-    isBusyAt(interval: TimeInterval): boolean;
 }
 export class CameraFile  {
     constructor(file: string, original: string);
@@ -152,6 +152,8 @@ export class Hardware implements Doc {
     _orgName: string;
 
     getId(): string;
+    setId(id: string);
+    isActive(): boolean;
     static isValidPortNumber(port: number): boolean;
     isMCBox(): boolean;
     isDrone(): boolean;
@@ -165,8 +167,6 @@ export class Hardware implements Doc {
     isAssigned(): boolean;
     static statusLabel(s: HwAvailability): string;
     getAvailabilityFor(ti: TimeInterval): HwAvailability;
-    setId(id: string);
-    isActive(): boolean;
 }
 export enum HwAvailability { AVAILABLE, SCHEDULED, INUSE }
 export class HWLogEntry  {
@@ -276,6 +276,8 @@ export class Mission implements Doc {
 
     getId(): string;
     isLive(): boolean;
+    setId(id: string);
+    isActive(): boolean;
     isScheduled(): boolean;
     addStream(streamId: string);
     hasStreamId(streamId: string): boolean;
@@ -299,8 +301,6 @@ export class Mission implements Doc {
     getTimeInterval(): TimeInterval;
     isRunningNow(): boolean;
     static isScheduler(u: User, m: Mission): boolean;
-    setId(id: string);
-    isActive(): boolean;
 }
 export class MissionPermissions  {
 
@@ -359,6 +359,8 @@ export class Organization implements Doc {
     _orgAdmins: User[];
 
     getId(): string;
+    setId(id: string);
+    isActive(): boolean;
     getTheBestOrgAdminId(): string;
     addUserOrgAdmin(userId: string);
     addOrgAdmin(userId: string);
@@ -372,8 +374,6 @@ export class Organization implements Doc {
     removeUser(userId: string);
     addUser(userId: string);
     addHardware(hardwareId: string);
-    setId(id: string);
-    isActive(): boolean;
 }
 export enum Privacy { PUBLIC, PRIVATE, UNLISTED }
 export class Stream implements Doc {
@@ -408,7 +408,11 @@ export class Stream implements Doc {
 
     getId(): string;
     isLive(): boolean;
+    setId(id: string);
+    isActive(): boolean;
+    sid(): StreamId;
     isScheduled(): boolean;
+    getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -421,10 +425,6 @@ export class Stream implements Doc {
     getThumb(): string;
     getM3u8(): string;
     isClosed(): boolean;
-    getStatus(): LiveStatus;
-    setId(id: string);
-    isActive(): boolean;
-    sid(): StreamId;
 }
 export class StreamId  {
     constructor(userId: string, streamId: string);
@@ -514,7 +514,11 @@ export class StreamResponse  {
     isoDate(): string;
     getId(): string;
     isLive(): boolean;
+    setId(id: string);
+    isActive(): boolean;
+    sid(): StreamId;
     isScheduled(): boolean;
+    getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -527,10 +531,6 @@ export class StreamResponse  {
     getThumb(): string;
     getM3u8(): string;
     isClosed(): boolean;
-    getStatus(): LiveStatus;
-    setId(id: string);
-    isActive(): boolean;
-    sid(): StreamId;
 }
 export class Tag  {
     constructor(id: string, name: string);
@@ -597,7 +597,10 @@ export class User implements Doc {
     getName(): string;
     getId(): string;
     getType(): LoginType;
+    setId(id: string);
     belongsToOrg(orgId: string): boolean;
+    isSuperAdmin(): boolean;
+    getRole(orgId: string): UserRole;
     created(): number;
     isUserActiveInAnyOrg(): boolean;
     isUserActiveInOrg(orgId: string): boolean;
@@ -628,9 +631,6 @@ export class User implements Doc {
     getOrgNotes(orgId: string): string;
     setOrgNotes(orgId: string, notes: string);
     isOrgAdmin(orgId: string): boolean;
-    getRole(orgId: string): UserRole;
-    isSuperAdmin(): boolean;
-    setId(id: string);
 }
 export class UserActivityResponse  {
     thumb: string;
@@ -701,6 +701,7 @@ export class JSApiClient  {
     hwStatus: HWStatusApi;
     overlays: OverlayApi;
 
+    login(loginData: LoginRequest): Observable<User>;
     static createApiClient(serverUrl: string): JSApiClient;
     liveErrors(): Observable<Error>;
     hardwareRx(orgId: string): Observable<Hardware>;
@@ -708,7 +709,6 @@ export class JSApiClient  {
     resetPassword(loginData: LoginRequest): Observable<User>;
     logout(): Observable<string>;
     static mapHardwareWithCalendar(be: JSApiClient, hardware: Hardware): Observable<Hardware>;
-    login(loginData: LoginRequest): Observable<User>;
 }
 export class MissionApi  {
 
