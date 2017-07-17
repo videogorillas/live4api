@@ -225,6 +225,10 @@ public class RxApiClient {
         });
     }
 
+    public Observable<String> getServerApiVersion() {
+        return requestObject(request.getServerApiVersion(), String.class);
+    }
+
     private void error(Object msg) {
         System.err.println(msg);
     }

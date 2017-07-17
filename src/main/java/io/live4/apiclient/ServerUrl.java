@@ -2,6 +2,7 @@ package io.live4.apiclient;
 
 import com.squareup.okhttp.HttpUrl;
 
+import static io.live4.ApiUrls.API_VERSION;
 import static io.live4.api2.Api2Urls.API_2_UPLOAD_AV;
 import static io.live4.api2.Api2Urls.API_2_UPLOAD_LOG;
 import static io.live4.api3.Api3Urls.API_3_ORG_STORAGE_GET;
@@ -136,5 +137,9 @@ public class ServerUrl {
 
     public String userAvatarUrl(User user) {
         return serverUrl + API_3_ORG_STORAGE_GET + user.getAvatarUrl();
+    }
+
+    public String getServerApiVersionUrl() {
+        return serverUrl + API_VERSION;
     }
 }

@@ -161,4 +161,8 @@ public class ApiRequest {
         return putAsJsonRequest(serverUrl.updateStreamTitleUrl(streamId), gsonToString(sr));
     }
 
+    public Request getServerApiVersion() {
+        return GET(serverUrl.getServerApiVersionUrl());
+    }
+
 }
