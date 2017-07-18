@@ -32,9 +32,9 @@ export class Calendar implements Doc {
     intervals: {[id: string]: TimeInterval};
 
     getId(): string;
-    isBusyAt(interval: TimeInterval): boolean;
     setId(id: string);
     isActive(): boolean;
+    isBusyAt(interval: TimeInterval): boolean;
 }
 export class CameraFile  {
     constructor(file: string, original: string);
@@ -82,9 +82,9 @@ export class DataSegment  {
 
     toString(): string;
     scale(i: number);
+    getTime(): number;
     setWidth(width: number);
     setLeft(left: number);
-    getTime(): number;
 }
 export class Dimension  {
     constructor(w: number, h: number);
@@ -198,9 +198,9 @@ export class HWStatus implements Doc {
     mtime: number;
 
     getId(): string;
-    static newStatus(hwid: string, status: HwState): HWStatus;
     setId(id: string);
     isActive(): boolean;
+    static newStatus(hwid: string, status: HwState): HWStatus;
 }
 export class Like  {
     uuid: string;
@@ -361,6 +361,9 @@ export class Organization implements Doc {
     getId(): string;
     setId(id: string);
     isActive(): boolean;
+    removeUser(userId: string);
+    addUser(userId: string);
+    addHardware(hardwareId: string);
     getTheBestOrgAdminId(): string;
     addUserOrgAdmin(userId: string);
     addOrgAdmin(userId: string);
@@ -371,9 +374,6 @@ export class Organization implements Doc {
     listHardwareIds(): string[];
     getStatus(): string;
     hasOnlyOneAdmin(): boolean;
-    removeUser(userId: string);
-    addUser(userId: string);
-    addHardware(hardwareId: string);
 }
 export enum Privacy { PUBLIC, PRIVATE, UNLISTED }
 export class Stream implements Doc {
@@ -408,11 +408,7 @@ export class Stream implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    setId(id: string);
-    isActive(): boolean;
-    sid(): StreamId;
-    isScheduled(): boolean;
-    getStatus(): LiveStatus;
+    isClosed(): boolean;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -424,7 +420,11 @@ export class Stream implements Doc {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
-    isClosed(): boolean;
+    setId(id: string);
+    isActive(): boolean;
+    sid(): StreamId;
+    isScheduled(): boolean;
+    getStatus(): LiveStatus;
 }
 export class StreamId  {
     constructor(userId: string, streamId: string);
@@ -452,12 +452,12 @@ export class StreamLocation  {
     static accurateLocations: (arg: StreamLocation) => boolean;
 
     hashCode(): number;
+    getTimestamp(): string;
+    getTime(): number;
     static speedLocation(timestamp: string, speed: number): StreamLocation;
     static latLng(timestamp: string, latitude: number, longitude: number): StreamLocation;
     getSpeed(): number;
     lalo(): string;
-    getTime(): number;
-    getTimestamp(): string;
 }
 export class StreamPermissions  {
 
@@ -514,11 +514,7 @@ export class StreamResponse  {
     isoDate(): string;
     getId(): string;
     isLive(): boolean;
-    setId(id: string);
-    isActive(): boolean;
-    sid(): StreamId;
-    isScheduled(): boolean;
-    getStatus(): LiveStatus;
+    isClosed(): boolean;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -530,7 +526,11 @@ export class StreamResponse  {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
-    isClosed(): boolean;
+    setId(id: string);
+    isActive(): boolean;
+    sid(): StreamId;
+    isScheduled(): boolean;
+    getStatus(): LiveStatus;
 }
 export class Tag  {
     constructor(id: string, name: string);
@@ -563,12 +563,12 @@ export class TSFile  {
     getVideoDuration(): number;
     getVideoDurationMsec(): number;
     getVideoDurationSec(): number;
-    getMseq(): number;
     getFilename(): string;
     getFilesize(): number;
     getStartTimeMsec(): number;
     getStartTime(): number;
     getCtime(): number;
+    getMseq(): number;
     getTimescale(): number;
     setVideoDuration(videoDuration: number);
 }
@@ -598,9 +598,6 @@ export class User implements Doc {
     getId(): string;
     getType(): LoginType;
     setId(id: string);
-    belongsToOrg(orgId: string): boolean;
-    isSuperAdmin(): boolean;
-    getRole(orgId: string): UserRole;
     created(): number;
     isUserActiveInAnyOrg(): boolean;
     isUserActiveInOrg(orgId: string): boolean;
@@ -630,7 +627,10 @@ export class User implements Doc {
     setOrgPhone(orgId: string, phone: string);
     getOrgNotes(orgId: string): string;
     setOrgNotes(orgId: string, notes: string);
+    belongsToOrg(orgId: string): boolean;
     isOrgAdmin(orgId: string): boolean;
+    getRole(orgId: string): UserRole;
+    isSuperAdmin(): boolean;
 }
 export class UserActivityResponse  {
     thumb: string;
@@ -753,14 +753,14 @@ export class StreamApi  {
 export class UserApi  {
 
     join(user: User, missionId: string): Observable<User>;
+    createOrUpdate(user: User): Observable<User>;
+    forceUpdate(user: User): Observable<User>;
+    inviteToMission(user: User, missionId: string): Observable<User>;
     allUsersUpdates(orgId: string): Observable<User>;
     sendCancelNotification(user: User, missionId: string): Observable<User>;
     getUserByEmail(email: string): Observable<User>;
     isUserExists(email: string): Observable<boolean>;
     isTempUser(email: string): Observable<boolean>;
-    createOrUpdate(user: User): Observable<User>;
-    forceUpdate(user: User): Observable<User>;
-    inviteToMission(user: User, missionId: string): Observable<User>;
     remove(id: string): Observable<User>;
     get(id: string): Observable<User>;
     create(item: User): Observable<User>;

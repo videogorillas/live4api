@@ -7,6 +7,7 @@ import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import io.live4.api3.Api3Urls;
 import io.live4.apiclient.internal.RxWebSocket;
+import io.live4.apiclient.internal.UnhandledResponseException;
 import io.live4.model.*;
 import rx.Observable;
 import rx.Subscription;
@@ -226,7 +227,14 @@ public class RxApiClient {
     }
 
     public Observable<String> getServerApiVersion() {
-        return requestObject(request.getServerApiVersion(), String.class);
+        return requestObject(request.getServerApiVersion(), String.class)
+                .onErrorResumeNext(err -> {
+                    if (err instanceof UnhandledResponseException && ((UnhandledResponseException) err).getResponse().code() == 404) {
+                        return Observable.just("3.4.1");
+                    } else {
+                        return Observable.error(err);
+                    }
+                });
     }
 
     private void error(Object msg) {
