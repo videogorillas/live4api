@@ -66,6 +66,10 @@ public class ServerUrl {
         return serverUrl + Api3UserUrls.getUrl(userId);
     }
 
+    public String joinMissionByToken(String missionId) {
+        return serverUrl + Api3MissionUrls.joinByTokenUrl(missionId);
+    }
+
     public String inviteToMission(String missionId) {
         return serverUrl + Api3MissionUrls.inviteUrl(missionId);
     }
