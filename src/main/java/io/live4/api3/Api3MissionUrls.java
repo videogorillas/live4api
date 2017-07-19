@@ -7,7 +7,7 @@ public class Api3MissionUrls {
     public static final String API_3_MISSION = "/api/3/mission";
     public static final String TOKEN = "/token";
     public static final String SHARE = "/share";
-    public static final String JOIN_BY_TOKEN = "/join";
+    public static final String JOIN_BY_TOKEN = "/joinByToken";
     public static final String UNSHARE = "/unshare";
     public static final String CANCEL_NOTIFICATION = "/cancelNotification";
     public static final String INVITE = "/invite";
@@ -55,11 +55,11 @@ public class Api3MissionUrls {
         return API_3_MISSION + UNSHARE + "/" + missionId;
     }
 
-    public static String joinByTokenUrl(String missionId) {
-        return API_3_MISSION + JOIN_BY_TOKEN + "/" + missionId;
+    public static String joinByTokenUrl(String token) {
+        return API_3_MISSION + JOIN_BY_TOKEN + "/" + token;
     }
 
-    public static String baseJoinUrl() {
+    public static String baseJoinByTokenUrl() {
         return API_3_MISSION + JOIN_BY_TOKEN;
     }
 

@@ -116,8 +116,8 @@ public class RxApiClient {
         return requestObject(request.createLoggedExternalUserByMissionToken(token, email, name), User.class);
     }
 
-    public Observable<User> joinMissionByToken(User user, String missionId) {
-        return requestObject(request.joinMissionByToken(user, missionId), User.class);
+    public Observable<User> joinMissionByToken(User user, String token) {
+        return requestObject(request.joinMissionByToken(user, token), User.class);
     }
 
     public Observable<User> inviteToMission(User user, String missionId) {

@@ -61,8 +61,8 @@ public class UserApi extends BaseAsyncDao<User> {
         return _post(cancelNotificationUrl(missionId), user);
     }
 
-    public Observable<User> join(User user, String missionId) {
-        return _post(joinByTokenUrl(missionId), user);
+    public Observable<User> joinByMissionToken(User user, String token) {
+        return _post(joinByTokenUrl(token), user);
     }
 
     public Rx.Observable<User> getUserByEmail(String email) {

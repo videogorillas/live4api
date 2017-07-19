@@ -1449,7 +1449,7 @@ live4api.Api3MissionUrls = stjs.extend(live4api.Api3MissionUrls, null, [], funct
     constructor.API_3_MISSION = "/api/3/mission";
     constructor.TOKEN = "/token";
     constructor.SHARE = "/share";
-    constructor.JOIN_BY_TOKEN = "/join";
+    constructor.JOIN_BY_TOKEN = "/joinByToken";
     constructor.UNSHARE = "/unshare";
     constructor.CANCEL_NOTIFICATION = "/cancelNotification";
     constructor.INVITE = "/invite";
@@ -1485,10 +1485,10 @@ live4api.Api3MissionUrls = stjs.extend(live4api.Api3MissionUrls, null, [], funct
     constructor.unshareUrl = function(missionId) {
         return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.UNSHARE + "/" + missionId;
     };
-    constructor.joinByTokenUrl = function(missionId) {
-        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.JOIN_BY_TOKEN + "/" + missionId;
+    constructor.joinByTokenUrl = function(token) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.JOIN_BY_TOKEN + "/" + token;
     };
-    constructor.baseJoinUrl = function() {
+    constructor.baseJoinByTokenUrl = function() {
         return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.JOIN_BY_TOKEN;
     };
     constructor.cancelNotificationUrl = function(missionId) {
@@ -3181,8 +3181,8 @@ UserApi = stjs.extend(UserApi, BaseAsyncDao, [], function(constructor, prototype
     prototype.sendCancelNotification = function(user, missionId) {
         return this._post(live4api.Api3MissionUrls.cancelNotificationUrl(missionId), user);
     };
-    prototype.join = function(user, missionId) {
-        return this._post(live4api.Api3MissionUrls.joinByTokenUrl(missionId), user);
+    prototype.joinByMissionToken = function(user, token) {
+        return this._post(live4api.Api3MissionUrls.joinByTokenUrl(token), user);
     };
     prototype.getUserByEmail = function(email) {
         return this.requests.getJson(live4api.Api3UserUrls.byEmailUrl(email)).map(function(obj) {
