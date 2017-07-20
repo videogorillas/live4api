@@ -136,7 +136,11 @@ public class ServerUrl {
     }
 
     public String userAvatarUrl(User user) {
-        return serverUrl + API_3_ORG_STORAGE_GET + user.getAvatarUrl();
+        if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
+            return serverUrl + API_3_ORG_STORAGE_GET + user.getAvatarUrl();
+        } else {
+            return null;
+        }
     }
 
     public String getServerApiVersionUrl() {
