@@ -8,7 +8,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <stjs.version>3.3.2</stjs.version>
         <stjs.plugin.version>3.3.2</stjs.plugin.version>
-        <retrolambda.plugin.version>2.3.0</retrolambda.plugin.version>
+        <retrolambda.plugin.version>2.5.1</retrolambda.plugin.version>
     </properties>
     <scm>
         <url>https://github.com/videogorillas/live4api</url>
