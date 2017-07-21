@@ -1,7 +1,7 @@
 package io.live4.js;
 
 import static io.live4.api3.Api3MissionUrls.cancelNotificationUrl;
-import static io.live4.api3.Api3MissionUrls.joinUrl;
+import static io.live4.api3.Api3MissionUrls.joinByTokenUrl;
 import static io.live4.js.internal.Typefy.typefy;
 import static org.stjs.javascript.JSCollections.$array;
 
@@ -61,8 +61,8 @@ public class UserApi extends BaseAsyncDao<User> {
         return _post(cancelNotificationUrl(missionId), user);
     }
 
-    public Observable<User> join(User user, String missionId) {
-        return _post(joinUrl(missionId), user);
+    public Observable<User> joinByMissionToken(User user, String token) {
+        return _post(joinByTokenUrl(token), user);
     }
 
     public Rx.Observable<User> getUserByEmail(String email) {

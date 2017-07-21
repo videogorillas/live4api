@@ -87,8 +87,13 @@ public class ApiRequest {
         return GET(serverUrl.getUser(userId));
     }
 
-    public Request getUserByMissionToken(String token) {
-        return GET(serverUrl + Api3MissionUrls.getUserByMissionToken(token));
+    public Request createLoggedExternalUserByMissionToken(String token, String email, String name) {
+        NameEmail obj = new NameEmail(email, name);
+        return postAsJsonRequest(serverUrl + Api3MissionUrls.createLoggedExternalUserByMissionToken(token), gsonToString(obj));
+    }
+
+    public Request joinMissionByToken(User user, String token) {
+        return postAsJsonRequest(serverUrl.joinMissionByToken(token), gsonToString(user));
     }
 
     public Request inviteToMission(User user, String missionId) {
