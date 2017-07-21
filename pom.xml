@@ -3,12 +3,12 @@
     <groupId>io.live4</groupId>
     <artifactId>live4api3</artifactId>
     <!-- READ THIS BEFORE UPDATING VERSION http://semver.org/ -->
-    <version>3.5.0-beta13-SNAPSHOT</version>
+    <version>3.5.0-beta14-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <stjs.version>3.3.2</stjs.version>
         <stjs.plugin.version>3.3.2</stjs.plugin.version>
-        <retrolambda.plugin.version>2.3.0</retrolambda.plugin.version>
+        <retrolambda.plugin.version>2.5.1</retrolambda.plugin.version>
     </properties>
     <scm>
         <url>https://github.com/videogorillas/live4api</url>

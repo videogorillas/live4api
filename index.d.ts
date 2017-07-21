@@ -82,9 +82,9 @@ export class DataSegment  {
 
     toString(): string;
     scale(i: number);
-    getTime(): number;
     setWidth(width: number);
     setLeft(left: number);
+    getTime(): number;
 }
 export class Dimension  {
     constructor(w: number, h: number);
@@ -152,8 +152,6 @@ export class Hardware implements Doc {
     _orgName: string;
 
     getId(): string;
-    setId(id: string);
-    isActive(): boolean;
     static isValidPortNumber(port: number): boolean;
     isMCBox(): boolean;
     isDrone(): boolean;
@@ -167,6 +165,8 @@ export class Hardware implements Doc {
     isAssigned(): boolean;
     static statusLabel(s: HwAvailability): string;
     getAvailabilityFor(ti: TimeInterval): HwAvailability;
+    setId(id: string);
+    isActive(): boolean;
 }
 export enum HwAvailability { AVAILABLE, SCHEDULED, INUSE }
 export class HWLogEntry  {
@@ -198,9 +198,9 @@ export class HWStatus implements Doc {
     mtime: number;
 
     getId(): string;
+    static newStatus(hwid: string, status: HwState): HWStatus;
     setId(id: string);
     isActive(): boolean;
-    static newStatus(hwid: string, status: HwState): HWStatus;
 }
 export class Like  {
     uuid: string;
@@ -276,8 +276,6 @@ export class Mission implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    setId(id: string);
-    isActive(): boolean;
     isScheduled(): boolean;
     addStream(streamId: string);
     hasStreamId(streamId: string): boolean;
@@ -301,6 +299,8 @@ export class Mission implements Doc {
     getTimeInterval(): TimeInterval;
     isRunningNow(): boolean;
     static isScheduler(u: User, m: Mission): boolean;
+    setId(id: string);
+    isActive(): boolean;
 }
 export class MissionPermissions  {
 
@@ -359,8 +359,6 @@ export class Organization implements Doc {
     _orgAdmins: User[];
 
     getId(): string;
-    setId(id: string);
-    isActive(): boolean;
     removeUser(userId: string);
     addUser(userId: string);
     addHardware(hardwareId: string);
@@ -374,6 +372,8 @@ export class Organization implements Doc {
     listHardwareIds(): string[];
     getStatus(): string;
     hasOnlyOneAdmin(): boolean;
+    setId(id: string);
+    isActive(): boolean;
 }
 export enum Privacy { PUBLIC, PRIVATE, UNLISTED }
 export class Stream implements Doc {
@@ -408,7 +408,8 @@ export class Stream implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    isClosed(): boolean;
+    isScheduled(): boolean;
+    getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -423,8 +424,7 @@ export class Stream implements Doc {
     setId(id: string);
     isActive(): boolean;
     sid(): StreamId;
-    isScheduled(): boolean;
-    getStatus(): LiveStatus;
+    isClosed(): boolean;
 }
 export class StreamId  {
     constructor(userId: string, streamId: string);
@@ -452,12 +452,12 @@ export class StreamLocation  {
     static accurateLocations: (arg: StreamLocation) => boolean;
 
     hashCode(): number;
-    getTimestamp(): string;
-    getTime(): number;
     static speedLocation(timestamp: string, speed: number): StreamLocation;
     static latLng(timestamp: string, latitude: number, longitude: number): StreamLocation;
     getSpeed(): number;
     lalo(): string;
+    getTime(): number;
+    getTimestamp(): string;
 }
 export class StreamPermissions  {
 
@@ -514,7 +514,8 @@ export class StreamResponse  {
     isoDate(): string;
     getId(): string;
     isLive(): boolean;
-    isClosed(): boolean;
+    isScheduled(): boolean;
+    getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -529,8 +530,7 @@ export class StreamResponse  {
     setId(id: string);
     isActive(): boolean;
     sid(): StreamId;
-    isScheduled(): boolean;
-    getStatus(): LiveStatus;
+    isClosed(): boolean;
 }
 export class Tag  {
     constructor(id: string, name: string);
@@ -560,6 +560,8 @@ export class TSFile  {
 
     equals(obj: Object): boolean;
     hashCode(): number;
+    getCtime(): number;
+    getMseq(): number;
     getVideoDuration(): number;
     getVideoDurationMsec(): number;
     getVideoDurationSec(): number;
@@ -567,8 +569,6 @@ export class TSFile  {
     getFilesize(): number;
     getStartTimeMsec(): number;
     getStartTime(): number;
-    getCtime(): number;
-    getMseq(): number;
     getTimescale(): number;
     setVideoDuration(videoDuration: number);
 }
@@ -597,7 +597,10 @@ export class User implements Doc {
     getName(): string;
     getId(): string;
     getType(): LoginType;
-    setId(id: string);
+    belongsToOrg(orgId: string): boolean;
+    isOrgAdmin(orgId: string): boolean;
+    getRole(orgId: string): UserRole;
+    isSuperAdmin(): boolean;
     created(): number;
     isUserActiveInAnyOrg(): boolean;
     isUserActiveInOrg(orgId: string): boolean;
@@ -627,10 +630,7 @@ export class User implements Doc {
     setOrgPhone(orgId: string, phone: string);
     getOrgNotes(orgId: string): string;
     setOrgNotes(orgId: string, notes: string);
-    belongsToOrg(orgId: string): boolean;
-    isOrgAdmin(orgId: string): boolean;
-    getRole(orgId: string): UserRole;
-    isSuperAdmin(): boolean;
+    setId(id: string);
 }
 export class UserActivityResponse  {
     thumb: string;
@@ -701,7 +701,6 @@ export class JSApiClient  {
     hwStatus: HWStatusApi;
     overlays: OverlayApi;
 
-    login(loginData: LoginRequest): Observable<User>;
     static createApiClient(serverUrl: string): JSApiClient;
     liveErrors(): Observable<Error>;
     hardwareRx(orgId: string): Observable<Hardware>;
@@ -709,6 +708,7 @@ export class JSApiClient  {
     resetPassword(loginData: LoginRequest): Observable<User>;
     logout(): Observable<string>;
     static mapHardwareWithCalendar(be: JSApiClient, hardware: Hardware): Observable<Hardware>;
+    login(loginData: LoginRequest): Observable<User>;
 }
 export class MissionApi  {
 
@@ -753,14 +753,14 @@ export class StreamApi  {
 export class UserApi  {
 
     join(user: User, missionId: string): Observable<User>;
-    createOrUpdate(user: User): Observable<User>;
-    forceUpdate(user: User): Observable<User>;
-    inviteToMission(user: User, missionId: string): Observable<User>;
     allUsersUpdates(orgId: string): Observable<User>;
     sendCancelNotification(user: User, missionId: string): Observable<User>;
     getUserByEmail(email: string): Observable<User>;
     isUserExists(email: string): Observable<boolean>;
     isTempUser(email: string): Observable<boolean>;
+    createOrUpdate(user: User): Observable<User>;
+    forceUpdate(user: User): Observable<User>;
+    inviteToMission(user: User, missionId: string): Observable<User>;
     remove(id: string): Observable<User>;
     get(id: string): Observable<User>;
     create(item: User): Observable<User>;
