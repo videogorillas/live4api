@@ -3397,7 +3397,7 @@ StreamApi = stjs.extend(StreamApi, BaseAsyncDao, [], function(constructor, proto
         return live4api.Api1StreamUrls.getUrl(id);
     };
     prototype.createItemUrl = function() {
-        return live4api.Api1StreamUrls.createUrl();
+        return live4api.Api3StreamUrls.createUrl();
     };
     prototype.listUrl = function(orgId) {
         return live4api.Api1StreamUrls.listUrl();
