@@ -32,9 +32,9 @@ export class Calendar implements Doc {
     intervals: {[id: string]: TimeInterval};
 
     getId(): string;
+    setId(id: string);
     isActive(): boolean;
     isBusyAt(interval: TimeInterval): boolean;
-    setId(id: string);
 }
 export class CameraFile  {
     constructor(file: string, original: string);
@@ -96,8 +96,8 @@ export class Dimension  {
 export interface Doc  {
 
     getId(): string;
-    isActive(): boolean;
     setId(id: string);
+    isActive(): boolean;
 }
 export class EndOfStream  {
     files: CameraFile[];
@@ -136,13 +136,13 @@ export class Hardware implements Doc {
     static android(name: string): Hardware;
     isAvailable(): boolean;
     isScheduled(): boolean;
+    setPort(port: number): Hardware;
     belongsToOrg(orgId: string): boolean;
     isAssigned(): boolean;
     static statusLabel(s: HwAvailability): string;
     getAvailabilityFor(ti: TimeInterval): HwAvailability;
-    isActive(): boolean;
     setId(id: string);
-    setPort(port: number): Hardware;
+    isActive(): boolean;
 }
 export enum HwAvailability { AVAILABLE, SCHEDULED, INUSE }
 export class HWLogEntry  {
@@ -175,8 +175,8 @@ export class HWStatus implements Doc {
 
     getId(): string;
     static newStatus(hwid: string, status: HwState): HWStatus;
-    isActive(): boolean;
     setId(id: string);
+    isActive(): boolean;
 }
 export class Like  {
     uuid: string;
@@ -252,7 +252,6 @@ export class Mission implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    isScheduled(): boolean;
     addStream(streamId: string);
     hasStreamId(streamId: string): boolean;
     hasOwnerPermissions(u: User): boolean;
@@ -273,10 +272,11 @@ export class Mission implements Doc {
     isCompleted(): boolean;
     addHardware(h: Hardware);
     getTimeInterval(): TimeInterval;
-    isActive(): boolean;
-    setId(id: string);
     isRunningNow(): boolean;
     static isScheduler(u: User, m: Mission): boolean;
+    isScheduled(): boolean;
+    setId(id: string);
+    isActive(): boolean;
 }
 export class MissionPermissions  {
 
@@ -342,6 +342,9 @@ export class Organization implements Doc {
     _orgAdmins: User[];
 
     getId(): string;
+    removeUser(userId: string);
+    addUser(userId: string);
+    addHardware(hardwareId: string);
     getTheBestOrgAdminId(): string;
     addUserOrgAdmin(userId: string);
     addOrgAdmin(userId: string);
@@ -350,13 +353,10 @@ export class Organization implements Doc {
     containsHardware(hwId: string): boolean;
     removeHardware(hardwareId: string);
     listHardwareIds(): string[];
-    hasOnlyOneAdmin(): boolean;
-    removeUser(userId: string);
-    addUser(userId: string);
-    addHardware(hardwareId: string);
     getStatus(): string;
-    isActive(): boolean;
+    hasOnlyOneAdmin(): boolean;
     setId(id: string);
+    isActive(): boolean;
 }
 export enum Privacy { PUBLIC, PRIVATE, UNLISTED }
 export class Stream implements Doc {
@@ -392,8 +392,10 @@ export class Stream implements Doc {
 
     getId(): string;
     isLive(): boolean;
+    isClosed(): boolean;
     sid(): StreamId;
     isScheduled(): boolean;
+    getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -405,10 +407,8 @@ export class Stream implements Doc {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
-    getStatus(): LiveStatus;
-    isActive(): boolean;
     setId(id: string);
-    isClosed(): boolean;
+    isActive(): boolean;
 }
 export class StreamId  {
     constructor(userId: string, streamId: string);
@@ -497,8 +497,10 @@ export class StreamResponse  {
     isoDate(): string;
     getId(): string;
     isLive(): boolean;
+    isClosed(): boolean;
     sid(): StreamId;
     isScheduled(): boolean;
+    getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -510,10 +512,8 @@ export class StreamResponse  {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
-    getStatus(): LiveStatus;
-    isActive(): boolean;
     setId(id: string);
-    isClosed(): boolean;
+    isActive(): boolean;
 }
 export class Tag  {
     constructor(id: string, name: string);
@@ -580,6 +580,10 @@ export class User implements Doc {
     getName(): string;
     getId(): string;
     getType(): LoginType;
+    isOrgAdmin(orgId: string): boolean;
+    getRole(orgId: string): UserRole;
+    isSuperAdmin(): boolean;
+    created(): number;
     isUserActiveInAnyOrg(): boolean;
     isUserActiveInOrg(orgId: string): boolean;
     getProfile(orgId: string): UserProfile;
@@ -609,11 +613,7 @@ export class User implements Doc {
     getOrgNotes(orgId: string): string;
     setOrgNotes(orgId: string, notes: string);
     belongsToOrg(orgId: string): boolean;
-    isOrgAdmin(orgId: string): boolean;
     setId(id: string);
-    isSuperAdmin(): boolean;
-    getRole(orgId: string): UserRole;
-    created(): number;
 }
 export class UserActivityResponse  {
     thumb: string;
@@ -654,10 +654,10 @@ export class CalendarApi  {
 }
 export class HardwareApi  {
 
+    logList(hwId: string): Observable<HWLogEntry[]>;
     findByPort(port: number): Observable<Hardware>;
     releaseHardwares(removedHws: string[], mId: string): Observable<string>;
     reassignHardware(orgId: string, hwId: string): Observable<string>;
-    logList(hwId: string): Observable<HWLogEntry[]>;
     remove(id: string): Observable<Hardware>;
     get(id: string): Observable<Hardware>;
     create(item: Hardware): Observable<Hardware>;
@@ -735,9 +735,9 @@ export class StreamApi  {
 }
 export class UserApi  {
 
+    createOrUpdate(user: User): Observable<User>;
     forceUpdate(user: User): Observable<User>;
     inviteToMission(user: User, missionId: string): Observable<User>;
-    createOrUpdate(user: User): Observable<User>;
     allUsersUpdates(orgId: string): Observable<User>;
     sendCancelNotification(user: User, missionId: string): Observable<User>;
     joinByMissionToken(user: User, token: string): Observable<User>;
