@@ -25,7 +25,6 @@ public class Stream implements Doc {
 
     public String startAddress; // TODO: move to StreamLocation object
 
-    public Array<GeocoderResult> startGeoCoder; // TODO: move to StreamLocation object
     public StreamLocation startLocation;
 
     public boolean onCdn;
@@ -66,6 +65,8 @@ public class Stream implements Doc {
     public String mp4;
     public String thumb;
     public String md;
+    public String nearby;
+    public String city;
 
     public StreamId sid() {
         return new StreamId(userId, filename);

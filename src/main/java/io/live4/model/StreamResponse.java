@@ -13,11 +13,8 @@ public class StreamResponse extends Stream {
     public Array<Tag> tags;
     public long durationMsec;
 
-    public String nearby;
     public String embedUrl;
     public String landUrl;
-
-    public String city;
 
     public LikeResponse likes;
     public CommentResponse comments;
