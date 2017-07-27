@@ -5,6 +5,7 @@ import static io.live4.api2.Api2Urls.API_2_STREAM_UPDATE_TITLE;
 import com.vg.js.bridge.Rx.Observable;
 
 import io.live4.api1.Api1StreamUrls;
+import io.live4.api3.Api3StreamUrls;
 import io.live4.js.internal.Requests;
 import io.live4.js.internal.WSLive;
 import io.live4.model.Internal;
@@ -29,7 +30,7 @@ public class StreamApi extends BaseAsyncDao<StreamResponse> {
 
     @Override
     protected String createItemUrl() {
-        return Api1StreamUrls.createUrl();
+        return Api3StreamUrls.createUrl();
     }
 
     @Override
