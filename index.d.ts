@@ -82,9 +82,9 @@ export class DataSegment  {
 
     toString(): string;
     scale(i: number);
+    getTime(): number;
     setWidth(width: number);
     setLeft(left: number);
-    getTime(): number;
 }
 export class Dimension  {
     constructor(w: number, h: number);
@@ -128,10 +128,12 @@ export class Hardware implements Doc {
     _orgName: string;
 
     getId(): string;
-    isDrone(): boolean;
-    isMCBox(): boolean;
-    static MCBox(name: string): Hardware;
+    setId(id: string);
+    isActive(): boolean;
     static isValidPortNumber(port: number): boolean;
+    isMCBox(): boolean;
+    isDrone(): boolean;
+    static MCBox(name: string): Hardware;
     static drone(name: string): Hardware;
     static android(name: string): Hardware;
     isAvailable(): boolean;
@@ -141,8 +143,6 @@ export class Hardware implements Doc {
     isAssigned(): boolean;
     static statusLabel(s: HwAvailability): string;
     getAvailabilityFor(ti: TimeInterval): HwAvailability;
-    setId(id: string);
-    isActive(): boolean;
 }
 export enum HwAvailability { AVAILABLE, SCHEDULED, INUSE }
 export class HWLogEntry  {
@@ -274,9 +274,9 @@ export class Mission implements Doc {
     getTimeInterval(): TimeInterval;
     isRunningNow(): boolean;
     static isScheduler(u: User, m: Mission): boolean;
-    isScheduled(): boolean;
     setId(id: string);
     isActive(): boolean;
+    isScheduled(): boolean;
 }
 export class MissionPermissions  {
 
@@ -405,10 +405,10 @@ export class Stream implements Doc {
     getThumb(): string;
     getM3u8(): string;
     isClosed(): boolean;
-    isScheduled(): boolean;
     setId(id: string);
     isActive(): boolean;
     sid(): StreamId;
+    isScheduled(): boolean;
 }
 export class StreamId  {
     constructor(userId: string, streamId: string);
@@ -510,10 +510,10 @@ export class StreamResponse  {
     getThumb(): string;
     getM3u8(): string;
     isClosed(): boolean;
-    isScheduled(): boolean;
     setId(id: string);
     isActive(): boolean;
     sid(): StreamId;
+    isScheduled(): boolean;
 }
 export class Tag  {
     constructor(id: string, name: string);
@@ -581,8 +581,8 @@ export class User implements Doc {
     getId(): string;
     getType(): LoginType;
     isOrgAdmin(orgId: string): boolean;
-    isSuperAdmin(): boolean;
     getRole(orgId: string): UserRole;
+    isSuperAdmin(): boolean;
     created(): number;
     isUserActiveInAnyOrg(): boolean;
     isUserActiveInOrg(orgId: string): boolean;
@@ -612,8 +612,8 @@ export class User implements Doc {
     setOrgPhone(orgId: string, phone: string);
     getOrgNotes(orgId: string): string;
     setOrgNotes(orgId: string, notes: string);
-    belongsToOrg(orgId: string): boolean;
     setId(id: string);
+    belongsToOrg(orgId: string): boolean;
 }
 export class UserActivityResponse  {
     thumb: string;
@@ -684,14 +684,14 @@ export class JSApiClient  {
     hwStatus: HWStatusApi;
     overlays: OverlayApi;
 
+    login(loginData: LoginRequest): Observable<User>;
+    logout(): Observable<string>;
     static createApiClient(serverUrl: string): JSApiClient;
     liveErrors(): Observable<Error>;
     hardwareRx(orgId: string): Observable<Hardware>;
     createOrgFull(org: Organization, admin: User, userProfile: UserProfile): Observable<Organization>;
     resetPassword(loginData: LoginRequest): Observable<User>;
-    logout(): Observable<string>;
     static mapHardwareWithCalendar(be: JSApiClient, hardware: Hardware): Observable<Hardware>;
-    login(loginData: LoginRequest): Observable<User>;
 }
 export class MissionApi  {
 

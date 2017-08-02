@@ -1433,6 +1433,8 @@ live4api.Api3MissionUrls = stjs.extend(live4api.Api3MissionUrls, null, [], funct
     constructor.CHAT_TOKEN = "/chatToken";
     constructor.AUDIO_CHAT_TOKEN = "/audioChatToken";
     constructor.USER_BY_MISSION_TOKEN = "/userByMissionToken";
+    constructor.ORG_ID_BY_MISSION_TOKEN = "/orgIdByMissionToken";
+    constructor.ADD_EXTERNAL_PROFILE_BY_MISSION_TOKEN = "/addExternalProfileByMissionToken";
     constructor.IS_TOKEN_VALID = "/isTokenValid";
     constructor.baseUrl = function() {
         return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.OBJECT;

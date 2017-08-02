@@ -20,6 +20,8 @@ public class Api3MissionUrls {
     public static final String CHAT_TOKEN = "/chatToken";
     public static final String AUDIO_CHAT_TOKEN = "/audioChatToken";
     public static final String USER_BY_MISSION_TOKEN = "/userByMissionToken";
+    public static final String ORG_ID_BY_MISSION_TOKEN = "/orgIdByMissionToken";
+    public static final String ADD_EXTERNAL_PROFILE_BY_MISSION_TOKEN = "/addExternalProfileByMissionToken";
     public static final String IS_TOKEN_VALID = "/isTokenValid";
 
 
