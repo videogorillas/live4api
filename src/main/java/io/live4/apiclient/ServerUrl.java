@@ -67,6 +67,18 @@ public class ServerUrl {
         return serverUrl + Api3UserUrls.getUrl(userId);
     }
 
+    public String createLoggedExternalUserByMissionToken(String token) {
+        return serverUrl + Api3MissionUrls.createLoggedExternalUserByMissionToken(token);
+    }
+
+    public String getOrgIdByMissionToken(String token) {
+        return serverUrl + Api3MissionUrls.getOrgIdByMissionToken(token);
+    }
+
+    public String addExternalProfileByMissionToken(String token) {
+        return serverUrl + Api3MissionUrls.addExternalProfileByMissionToken(token);
+    }
+
     public String joinMissionByToken(String token) {
         return serverUrl + Api3MissionUrls.joinByTokenUrl(token);
     }

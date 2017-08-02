@@ -81,6 +81,14 @@ public class Api3MissionUrls {
         return API_3_MISSION + USER_BY_MISSION_TOKEN + "/" + token;
     }
 
+    public static String getOrgIdByMissionToken(String token) {
+        return API_3_MISSION + ORG_ID_BY_MISSION_TOKEN + "/" + token;
+    }
+
+    public static String addExternalProfileByMissionToken(String token) {
+        return API_3_MISSION + ADD_EXTERNAL_PROFILE_BY_MISSION_TOKEN + "/" + token;
+    }
+
     public static String checkTokenUrl(String token) {
         return API_3_MISSION + IS_TOKEN_VALID + "/" + token;
     }

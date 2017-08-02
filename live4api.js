@@ -1478,6 +1478,12 @@ live4api.Api3MissionUrls = stjs.extend(live4api.Api3MissionUrls, null, [], funct
     constructor.createLoggedExternalUserByMissionToken = function(token) {
         return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.USER_BY_MISSION_TOKEN + "/" + token;
     };
+    constructor.getOrgIdByMissionToken = function(token) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.ORG_ID_BY_MISSION_TOKEN + "/" + token;
+    };
+    constructor.addExternalProfileByMissionToken = function(token) {
+        return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.ADD_EXTERNAL_PROFILE_BY_MISSION_TOKEN + "/" + token;
+    };
     constructor.checkTokenUrl = function(token) {
         return live4api.Api3MissionUrls.API_3_MISSION + live4api.Api3MissionUrls.IS_TOKEN_VALID + "/" + token;
     };
