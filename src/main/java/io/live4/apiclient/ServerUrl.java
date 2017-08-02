@@ -16,6 +16,7 @@ import io.live4.api3.Api3StreamUrls;
 import io.live4.api3.Api3Urls;
 import io.live4.api3.Api3UserUrls;
 import io.live4.model.MissionShareToken;
+import io.live4.model.Organization;
 import io.live4.model.StreamId;
 import io.live4.model.User;
 
@@ -142,6 +143,14 @@ public class ServerUrl {
     public String userAvatarUrl(User user) {
         if (user.getAvatarUrl() != null && !user.getAvatarUrl().isEmpty()) {
             return serverUrl + API_3_ORG_STORAGE_GET + user.getAvatarUrl();
+        } else {
+            return null;
+        }
+    }
+
+    public String orgLogoUrl(Organization org) {
+        if (org.logoUrl != null && !org.logoUrl.isEmpty()) {
+            return serverUrl + API_3_ORG_STORAGE_GET + org.logoUrl;
         } else {
             return null;
         }
