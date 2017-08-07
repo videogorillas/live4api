@@ -105,8 +105,8 @@ public class RxApiClient {
         return httpClient;
     }
 
-    public Observable<User> resetPassword(String email) {
-        return requestObject(request.resetPassword(email), User.class);
+    public Observable<User> resetPassword(LoginRequest loginRequest) {
+        return requestObject(request.resetPassword(loginRequest), User.class);
     }
 
     public Observable<User> getUser(String userId) {
