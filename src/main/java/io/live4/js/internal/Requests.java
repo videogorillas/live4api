@@ -1,9 +1,14 @@
 package io.live4.js.internal;
 
+import static io.live4.model.Internal.defaultMap;
+import static io.live4.model.Internal.defaultString;
 import static io.live4.model.Internal.eq;
 import static io.live4.model.Internal.isBlank;
+import static io.live4.model.Internal.isBrowser;
+import static io.live4.model.Internal.isNotBlank;
 import static io.live4.model.Internal.keys;
 import static org.stjs.javascript.Global.console;
+import static org.stjs.javascript.JSCollections.$castArray;
 import static org.stjs.javascript.JSCollections.$map;
 import static org.stjs.javascript.JSGlobal.JSON;
 
@@ -21,9 +26,12 @@ import com.vg.js.bridge.Rx.Observable;
 public class Requests {
 
     private String serverUrl;
+    
+    private Map<String, String> cookieJar;
 
     public Requests(String serverUrl) {
         this.serverUrl = serverUrl == null ? "" : serverUrl;
+        this.cookieJar = $map();
     }
 
     public Observable<String> postAsJson(String url, Object o) {
@@ -49,7 +57,7 @@ public class Requests {
     public Observable<String> request(String url, String data, String method, Map<String, String> headers) {
         String _url = serverUrl+url;
         Observable<String> o = Observable.$create(observer -> {
-            RequestObserver requestObserver = new RequestObserver(_url, data, headers, null, method, observer).invoke();
+            RequestObserver requestObserver = new RequestObserver(_url, data, headers, null, method, observer, cookieJar).invoke();
             MutableBoolean loaded = requestObserver.getLoaded();
             XMLHttpRequest http = requestObserver.getHttp();
 
@@ -68,7 +76,7 @@ public class Requests {
     public Observable<String> formPost(String url, FormData data) {
         String _url = serverUrl+url;
         Observable<String> o = Observable.$create(observer -> {
-            RequestObserver requestObserver = new RequestObserver(_url, null, null, data, "POST", observer).invoke();
+            RequestObserver requestObserver = new RequestObserver(_url, null, null, data, "POST", observer, cookieJar).invoke();
             MutableBoolean loaded = requestObserver.getLoaded();
             XMLHttpRequest http = requestObserver.getHttp();
 
@@ -84,7 +92,7 @@ public class Requests {
         return o;
     }
 
-    public static boolean debug = true;
+    public static boolean debug = isBrowser();
 
     static void dbg(String msg) {
         if (debug) {
@@ -126,10 +134,12 @@ public class Requests {
         private XMLHttpRequest http;
         private MutableBoolean loaded;
         private Map<String, String> headers;
+        private Map<String, String> _sessionId;
 
-        public RequestObserver(String url, String data, Map<String, String> headers, FormData form, String method, Rx.Observer<String> observer) {
+        public RequestObserver(String url, String data, Map<String, String> headers, FormData form, String method, Rx.Observer<String> observer, Map<String, String> cookieJar) {
             this.url = url;
             this.data = data;
+            _sessionId = defaultMap(cookieJar);
             this.headers = headers == null ? $map() : headers;
             this.form = form;
             this.method = method;
@@ -146,9 +156,11 @@ public class Requests {
 
         RequestObserver invoke() {
             http = new XMLHttpRequest();
-            http.open(method, url);
+            String sessionId = _sessionId.$get("sessionId");
+            String _url = isBrowser() || sessionId == null ? url : url + ";jsessionid=" + sessionId;
+            http.open(method, _url);
             keys(headers).$forEach(h -> http.setRequestHeader(h, headers.$get(h)));
-            console.log(method, url);
+            dbg(method + " " + _url);
             loaded = new MutableBoolean(false);
             http.onreadystatechange = () -> {
                 if (http.readyState == 1) {
@@ -169,6 +181,15 @@ public class Requests {
                     if (isBlank(http.responseText)) {
                         observer.onError(http);
                     } else {
+                        String cookie = http.getResponseHeader("Set-Cookie");
+                        if (!isBrowser() && isNotBlank(cookie)) {
+                            String newSessionId = $castArray(cookie.split(";"))
+                                    .filter((s, i, a) -> defaultString(s, "").toLowerCase().startsWith("jsessionid="))
+                                    .map((s, i, a) -> $castArray(s.split("=")).$get(1))
+                                    .$get(0);
+
+                            _sessionId.$put("sessionId", newSessionId);
+                        }
                         observer.onNext(http.responseText);
                         observer.onCompleted();
                     }

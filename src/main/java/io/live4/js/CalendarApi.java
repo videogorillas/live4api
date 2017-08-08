@@ -1,8 +1,5 @@
 package io.live4.js;
 
-import static org.stjs.javascript.Global.console;
-import static org.stjs.javascript.JSGlobal.typeof;
-
 import org.stjs.javascript.XMLHttpRequest;
 
 import com.vg.js.bridge.Rx.Observable;
@@ -22,7 +19,7 @@ public class CalendarApi extends BaseAsyncDao<Calendar> {
         return super.get(id).flatMapObserver((c, _i) -> {
             return Observable.just(c);
         }, err -> {
-            console.log("err", typeof(err), err);
+//            console.log("err", typeof(err), err);
             if (404 == ((XMLHttpRequest) err).status) {
                 // no calendar for this hw - it's ok, means nobody scheduled anything for this hw
                 return Observable.just(new Calendar());

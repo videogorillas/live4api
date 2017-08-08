@@ -14,6 +14,7 @@ import static org.stjs.javascript.JSGlobal.typeof;
 import org.stjs.javascript.Date;
 import org.stjs.javascript.Error;
 import org.stjs.javascript.annotation.Namespace;
+import org.stjs.javascript.annotation.Native;
 
 import com.vg.js.bridge.Rx;
 import com.vg.js.bridge.Rx.Observable;
@@ -80,6 +81,7 @@ public class JSApiClient {
         return wsLive.onError();
     }
 
+    @Deprecated
     public Observable<Hardware> hardwareRx(String orgId) {
         Observable<Hardware> hwrx = rxFor(hw, orgId).merge(calendars.updates().concatMap(c->hw.get(c.id)).filter(h->h!=null));
         return hwrx.concatMap(h -> {
@@ -92,7 +94,7 @@ public class JSApiClient {
                 }
                 return Observable.just(h);
             }, err -> {
-                console.log("err", typeof(err), err);
+//                console.log("err", typeof(err), err);
                 h._calendar = new Calendar();
                 return Observable.just(h);
             }, () -> Observable.empty());
@@ -145,7 +147,7 @@ public class JSApiClient {
                 }
                 return Observable.just(h);
             }, err -> {
-                console.log("err", typeof(err), err);
+//                console.log("err", typeof(err), err);
                 h._calendar = new Calendar();
                 return Observable.just(h);
             }, () -> Observable.empty());
