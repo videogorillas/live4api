@@ -32,8 +32,8 @@ export class Calendar implements Doc {
     intervals: {[id: string]: TimeInterval};
 
     getId(): string;
-    setId(id: string);
     isActive(): boolean;
+    setId(id: string);
     isBusyAt(interval: TimeInterval): boolean;
 }
 export class CameraFile  {
@@ -82,8 +82,8 @@ export class DataSegment  {
 
     toString(): string;
     scale(i: number);
-    setWidth(width: number);
     setLeft(left: number);
+    setWidth(width: number);
     getTime(): number;
 }
 export class Dimension  {
@@ -96,8 +96,8 @@ export class Dimension  {
 export interface Doc  {
 
     getId(): string;
-    setId(id: string);
     isActive(): boolean;
+    setId(id: string);
 }
 export class EndOfStream  {
     files: CameraFile[];
@@ -133,9 +133,9 @@ export class HWStatus implements Doc {
     mtime: number;
 
     getId(): string;
-    static newStatus(hwid: string, status: HwState): HWStatus;
-    setId(id: string);
     isActive(): boolean;
+    setId(id: string);
+    static newStatus(hwid: string, status: HwState): HWStatus;
 }
 export class Hardware implements Doc {
     constructor(name: string, type: string);
@@ -160,6 +160,8 @@ export class Hardware implements Doc {
     _orgName: string;
 
     getId(): string;
+    isActive(): boolean;
+    setId(id: string);
     static isValidPortNumber(port: number): boolean;
     isMCBox(): boolean;
     isDrone(): boolean;
@@ -173,8 +175,6 @@ export class Hardware implements Doc {
     isAssigned(): boolean;
     static statusLabel(s: HwAvailability): string;
     getAvailabilityFor(ti: TimeInterval): HwAvailability;
-    setId(id: string);
-    isActive(): boolean;
 }
 export enum HwAvailability { AVAILABLE, SCHEDULED, INUSE }
 export enum HwState { CLOSED, OPEN, DATA_RECEIVED, DATA_PARSED, BAD_DATA }
@@ -252,7 +252,6 @@ export class Mission implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    isScheduled(): boolean;
     addStream(streamId: string);
     hasStreamId(streamId: string): boolean;
     hasOwnerPermissions(u: User): boolean;
@@ -275,8 +274,9 @@ export class Mission implements Doc {
     getTimeInterval(): TimeInterval;
     isRunningNow(): boolean;
     static isScheduler(u: User, m: Mission): boolean;
-    setId(id: string);
     isActive(): boolean;
+    setId(id: string);
+    isScheduled(): boolean;
 }
 export class MissionPermissions  {
 
@@ -355,8 +355,8 @@ export class Organization implements Doc {
     listHardwareIds(): string[];
     getStatus(): string;
     hasOnlyOneAdmin(): boolean;
-    setId(id: string);
     isActive(): boolean;
+    setId(id: string);
 }
 export enum Privacy { PUBLIC, PRIVATE, UNLISTED }
 export class Stream implements Doc {
@@ -392,23 +392,23 @@ export class Stream implements Doc {
 
     getId(): string;
     isLive(): boolean;
+    isClosed(): boolean;
+    getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
     getPrivacy(): Privacy;
-    isScheduled(): boolean;
-    getMp4(): string;
     setPrivacy(privacy: Privacy);
     safeStreamId(): string;
     setStatus(status: LiveStatus);
     setClosed(closed: boolean);
+    getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
-    isClosed(): boolean;
-    getStatus(): LiveStatus;
-    setId(id: string);
     isActive(): boolean;
+    setId(id: string);
     sid(): StreamId;
+    isScheduled(): boolean;
 }
 export class StreamId  {
     constructor(userId: string, streamId: string);
@@ -436,12 +436,12 @@ export class StreamLocation  {
     static accurateLocations: (arg: StreamLocation) => boolean;
 
     hashCode(): number;
-    getTime(): number;
-    getTimestamp(): string;
+    static speedLocation(timestamp: string, speed: number): StreamLocation;
     static latLng(timestamp: string, latitude: number, longitude: number): StreamLocation;
     getSpeed(): number;
     lalo(): string;
-    static speedLocation(timestamp: string, speed: number): StreamLocation;
+    getTime(): number;
+    getTimestamp(): string;
 }
 export class StreamPermissions  {
 
@@ -497,23 +497,23 @@ export class StreamResponse  {
     isoDate(): string;
     getId(): string;
     isLive(): boolean;
+    isClosed(): boolean;
+    getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
     getPrivacy(): Privacy;
-    isScheduled(): boolean;
-    getMp4(): string;
     setPrivacy(privacy: Privacy);
     safeStreamId(): string;
     setStatus(status: LiveStatus);
     setClosed(closed: boolean);
+    getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
-    isClosed(): boolean;
-    getStatus(): LiveStatus;
-    setId(id: string);
     isActive(): boolean;
+    setId(id: string);
     sid(): StreamId;
+    isScheduled(): boolean;
 }
 export class TSFile  {
     filename: string;
@@ -580,7 +580,9 @@ export class User implements Doc {
     getName(): string;
     getId(): string;
     getType(): LoginType;
-    belongsToOrg(orgId: string): boolean;
+    isOrgAdmin(orgId: string): boolean;
+    getRole(orgId: string): UserRole;
+    isSuperAdmin(): boolean;
     created(): number;
     isUserActiveInAnyOrg(): boolean;
     isUserActiveInOrg(orgId: string): boolean;
@@ -610,10 +612,8 @@ export class User implements Doc {
     setOrgPhone(orgId: string, phone: string);
     getOrgNotes(orgId: string): string;
     setOrgNotes(orgId: string, notes: string);
-    isOrgAdmin(orgId: string): boolean;
-    getRole(orgId: string): UserRole;
-    isSuperAdmin(): boolean;
     setId(id: string);
+    belongsToOrg(orgId: string): boolean;
 }
 export class UserActivityResponse  {
     thumb: string;
@@ -663,10 +663,10 @@ export class HWStatusApi  {
 }
 export class HardwareApi  {
 
-    logList(hwId: string): Observable<HWLogEntry[]>;
     findByPort(port: number): Observable<Hardware>;
     releaseHardwares(removedHws: string[], mId: string): Observable<string>;
     reassignHardware(orgId: string, hwId: string): Observable<string>;
+    logList(hwId: string): Observable<HWLogEntry[]>;
     remove(id: string): Observable<Hardware>;
     get(id: string): Observable<Hardware>;
     create(item: Hardware): Observable<Hardware>;
@@ -684,13 +684,13 @@ export class JSApiClient  {
     hwStatus: HWStatusApi;
     overlays: OverlayApi;
 
+    login(loginData: LoginRequest): Observable<User>;
     static createApiClient(serverUrl: string): JSApiClient;
     liveErrors(): Observable<Error>;
     createOrgFull(org: Organization, admin: User, userProfile: UserProfile): Observable<Organization>;
     resetPassword(loginData: LoginRequest): Observable<User>;
     logout(): Observable<string>;
     static mapHardwareWithCalendar(be: JSApiClient, hardware: Hardware): Observable<Hardware>;
-    login(loginData: LoginRequest): Observable<User>;
 }
 export class MissionApi  {
 
