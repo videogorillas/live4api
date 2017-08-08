@@ -95,6 +95,7 @@
                         <include>io/live4/api2/**/*.java</include>
                         <include>io/live4/api3/**/*.java</include>
                         <include>io/live4/model/**/*.java</include>
+                        <include>io/live4/deeplinks/**/*.java</include>
                     </includes>
                 </configuration>
             </plugin>

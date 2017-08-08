@@ -1729,6 +1729,14 @@ live4api.Api3OrgUrls = stjs.extend(live4api.Api3OrgUrls, null, [], function(cons
 }, {}, {});
 var ReadOnly = function() {};
 ReadOnly = stjs.extend(ReadOnly, null, [], null, {}, {});
+var DeepLinks = function() {};
+DeepLinks = stjs.extend(DeepLinks, null, [], function(constructor, prototype) {
+    constructor.MISSIONS = "/missions";
+    constructor.LOGIN = "/login";
+    constructor.LOGIN_TOKEN_PARAM = "token";
+    constructor.LOGIN_USER_PARAM = "user";
+    constructor.LOGIN_RESETPASSWORD_PARAM = "resetpassword";
+}, {}, {});
 stjs.ns("live4api");
 live4api.LikeResponse = function(likes, has_liked) {
     if (likes != null) {
