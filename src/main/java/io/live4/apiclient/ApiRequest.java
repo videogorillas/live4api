@@ -78,9 +78,11 @@ public class ApiRequest {
         return postAsJsonRequest(serverUrl.login(), gsonToString(lrd));
     }
 
-    public Request resetPassword(String email) {
-        LoginRequest lrd = new LoginRequest(email, null);
-        return postAsJsonRequest(serverUrl.resetPassword(), gsonToString(lrd));
+    public Request resetPassword(String login, String password, String token) {
+        LoginRequest loginRequest = new LoginRequest(login, password);
+        loginRequest.t = token;
+
+        return postAsJsonRequest(serverUrl.resetPassword(), gsonToString(loginRequest));
     }
 
     public Request getUser(String userId) {
