@@ -1197,7 +1197,6 @@ live4api.Typefy = stjs.extend(live4api.Typefy, null, [], function(constructor, p
         if (Date == td || "Date" == td) {
             return new Date(json);
         }
-        console.log("td", (typeof td), td, json);
          throw new RuntimeException("dont know what to do");
     };
     constructor.typefyArray = function(obj, cls) {
@@ -2050,6 +2049,12 @@ Internal = stjs.extend(Internal, null, [], function(constructor, prototype) {
         }
         return null;
     };
+    constructor.isBrowser = function() {
+        try {
+            return window != null;
+        }catch (e) {}
+        return false;
+    };
 }, {}, {});
 stjs.ns("live4api");
 live4api.Stream = function() {};
@@ -2668,7 +2673,6 @@ WSLive = stjs.extend(WSLive, null, [], function(constructor, prototype) {
     prototype._subscribe = function(msg) {
         var json = JSON.stringify(msg);
         if (this.subs.indexOf(json) < 0) {
-            console.log("subscribe", json, this.subs);
             this._ws.take(1).subscribe(function(ws) {
                 return ws.send(json);
             });
@@ -2727,9 +2731,11 @@ WSLive = stjs.extend(WSLive, null, [], function(constructor, prototype) {
 stjs.ns("live4api");
 live4api.Requests = function(serverUrl) {
     this.serverUrl = serverUrl == null ? "" : serverUrl;
+    this.cookieJar = {};
 };
 live4api.Requests = stjs.extend(live4api.Requests, null, [], function(constructor, prototype) {
     prototype.serverUrl = null;
+    prototype.cookieJar = null;
     prototype.postAsJson = function(url, o) {
         return this.request(url, JSON.stringify(o), "POST", {"Content-type": "application/json"});
     };
@@ -2751,8 +2757,8 @@ live4api.Requests = stjs.extend(live4api.Requests, null, [], function(constructo
     };
     prototype.request = function(url, data, method, headers) {
         var _url = this.serverUrl + url;
-        var o = Rx.Observable.create(function(observer) {
-            var requestObserver = new live4api.Requests.RequestObserver(_url, data, headers, null, method, observer).invoke();
+        var o = Rx.Observable.create(stjs.bind(this, function(observer) {
+            var requestObserver = new live4api.Requests.RequestObserver(_url, data, headers, null, method, observer, this.cookieJar).invoke();
             var loaded = requestObserver.getLoaded();
             var http = requestObserver.getHttp();
             return function() {
@@ -2763,13 +2769,13 @@ live4api.Requests = stjs.extend(live4api.Requests, null, [], function(constructo
                     }
                 }
             };
-        });
+        }));
         return o;
     };
     prototype.formPost = function(url, data) {
         var _url = this.serverUrl + url;
-        var o = Rx.Observable.create(function(observer) {
-            var requestObserver = new live4api.Requests.RequestObserver(_url, null, null, data, "POST", observer).invoke();
+        var o = Rx.Observable.create(stjs.bind(this, function(observer) {
+            var requestObserver = new live4api.Requests.RequestObserver(_url, null, null, data, "POST", observer, this.cookieJar).invoke();
             var loaded = requestObserver.getLoaded();
             var http = requestObserver.getHttp();
             return function() {
@@ -2780,10 +2786,10 @@ live4api.Requests = stjs.extend(live4api.Requests, null, [], function(constructo
                     }
                 }
             };
-        });
+        }));
         return o;
     };
-    constructor.debug = true;
+    constructor.debug = Internal.isBrowser();
     constructor.dbg = function(msg) {
         if (live4api.Requests.debug) {
             console.log(msg);
@@ -2812,9 +2818,10 @@ live4api.Requests = stjs.extend(live4api.Requests, null, [], function(constructo
     prototype._delete = function(url) {
         return this.request(url, null, "DELETE", null);
     };
-    constructor.RequestObserver = function(url, data, headers, form, method, observer) {
+    constructor.RequestObserver = function(url, data, headers, form, method, observer, cookieJar) {
         this.url = url;
         this.data = data;
+        this._sessionId = Internal.defaultMap(cookieJar);
         this.headers = headers == null ? {} : headers;
         this.form = form;
         this.method = method;
@@ -2829,6 +2836,7 @@ live4api.Requests = stjs.extend(live4api.Requests, null, [], function(constructo
         prototype.http = null;
         prototype.loaded = null;
         prototype.headers = null;
+        prototype._sessionId = null;
         prototype.getHttp = function() {
             return this.http;
         };
@@ -2837,11 +2845,13 @@ live4api.Requests = stjs.extend(live4api.Requests, null, [], function(constructo
         };
         prototype.invoke = function() {
             this.http = new XMLHttpRequest();
-            this.http.open(this.method, this.url);
+            var sessionId = this._sessionId["sessionId"];
+            var _url = Internal.isBrowser() || sessionId == null ? this.url : this.url + ";jsessionid=" + sessionId;
+            this.http.open(this.method, _url);
             Internal.keys(this.headers).forEach(stjs.bind(this, function(h) {
                 return this.http.setRequestHeader(h, this.headers[h]);
             }));
-            console.log(this.method, this.url);
+            live4api.Requests.dbg(this.method + " " + _url);
             this.loaded = new MutableBoolean(false);
             this.http.onreadystatechange = stjs.bind(this, function() {
                 if (this.http.readyState == 1) {
@@ -2860,6 +2870,15 @@ live4api.Requests = stjs.extend(live4api.Requests, null, [], function(constructo
                     if (Internal.isBlank(this.http.responseText)) {
                         this.observer.onError(this.http);
                     } else {
+                        var cookie = this.http.getResponseHeader("Set-Cookie");
+                        if (!Internal.isBrowser() && Internal.isNotBlank(cookie)) {
+                            var newSessionId = (cookie.split(";")).filter(function(s, i, a) {
+                                return Internal.defaultString(s, "").toLowerCase().startsWith("jsessionid=");
+                            }).map(function(s, i, a) {
+                                return (s.split("="))[1];
+                            })[0];
+                            this._sessionId["sessionId"] = newSessionId;
+                        }
                         this.observer.onNext(this.http.responseText);
                         this.observer.onCompleted();
                     }
@@ -2884,8 +2903,8 @@ live4api.Requests = stjs.extend(live4api.Requests, null, [], function(constructo
             }
             return this;
         };
-    }, {form: "FormData", observer: {name: "Rx.Observer", arguments: [null]}, http: "XMLHttpRequest", loaded: "MutableBoolean", headers: {name: "Map", arguments: [null, null]}}, {});
-}, {}, {});
+    }, {form: "FormData", observer: {name: "Rx.Observer", arguments: [null]}, http: "XMLHttpRequest", loaded: "MutableBoolean", headers: {name: "Map", arguments: [null, null]}, _sessionId: {name: "Map", arguments: [null, null]}}, {});
+}, {cookieJar: {name: "Map", arguments: [null, null]}}, {});
 stjs.ns("live4api");
 live4api.Mission = function() {};
 live4api.Mission = stjs.extend(live4api.Mission, null, [live4api.Doc], function(constructor, prototype) {
@@ -3077,7 +3096,6 @@ CalendarApi = stjs.extend(CalendarApi, BaseAsyncDao, [], function(constructor, p
         return BaseAsyncDao.prototype.get.call(this, id).flatMapObserver(function(c, _i) {
             return Rx.Observable.just(c);
         }, function(err) {
-            console.log("err", (typeof err), err);
             if (404 == (err).status) {
                 return Rx.Observable.just(new live4api.Calendar());
             }
@@ -3407,8 +3425,11 @@ StreamApi = stjs.extend(StreamApi, BaseAsyncDao, [], function(constructor, proto
     prototype.createItemUrl = function() {
         return live4api.Api3StreamUrls.createUrl();
     };
-    prototype.listUrl = function(orgId) {
-        return live4api.Api1StreamUrls.listUrl();
+    prototype.listUrl = function(userId) {
+        return live4api.Api1StreamUrls.listUrl() + "/" + userId;
+    };
+    prototype.list = function(userId) {
+        return this._list(this.listUrl(userId));
     };
     prototype.locationUpdates = function(sid) {
         return this.wsLive.locationUpdates(sid);
@@ -3493,7 +3514,6 @@ live4api.JSApiClient = stjs.extend(live4api.JSApiClient, null, [], function(cons
                 }
                 return Rx.Observable.just(h);
             }, function(err) {
-                console.log("err", (typeof err), err);
                 h._calendar = new live4api.Calendar();
                 return Rx.Observable.just(h);
             }, function() {
@@ -3542,7 +3562,6 @@ live4api.JSApiClient = stjs.extend(live4api.JSApiClient, null, [], function(cons
                 }
                 return Rx.Observable.just(h);
             }, function(err) {
-                console.log("err", (typeof err), err);
                 h._calendar = new live4api.Calendar();
                 return Rx.Observable.just(h);
             }, function() {
