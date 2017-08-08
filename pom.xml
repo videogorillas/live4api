@@ -3,7 +3,7 @@
     <groupId>io.live4</groupId>
     <artifactId>live4api3</artifactId>
     <!-- READ THIS BEFORE UPDATING VERSION http://semver.org/ -->
-    <version>3.5.0-beta23-SNAPSHOT</version>
+    <version>3.5.0-beta24-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <stjs.version>3.3.2</stjs.version>
@@ -95,6 +95,7 @@
                         <include>io/live4/api2/**/*.java</include>
                         <include>io/live4/api3/**/*.java</include>
                         <include>io/live4/model/**/*.java</include>
+                        <include>io/live4/deeplinks/**/*.java</include>
                     </includes>
                 </configuration>
             </plugin>

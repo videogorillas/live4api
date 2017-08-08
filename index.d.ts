@@ -32,9 +32,9 @@ export class Calendar implements Doc {
     intervals: {[id: string]: TimeInterval};
 
     getId(): string;
-    setId(id: string);
     isActive(): boolean;
     isBusyAt(interval: TimeInterval): boolean;
+    setId(id: string);
 }
 export class CameraFile  {
     constructor(file: string, original: string);
@@ -96,8 +96,8 @@ export class Dimension  {
 export interface Doc  {
 
     getId(): string;
-    setId(id: string);
     isActive(): boolean;
+    setId(id: string);
 }
 export class EndOfStream  {
     files: CameraFile[];
@@ -133,8 +133,8 @@ export class HWStatus implements Doc {
     mtime: number;
 
     getId(): string;
-    setId(id: string);
     isActive(): boolean;
+    setId(id: string);
     static newStatus(hwid: string, status: HwState): HWStatus;
 }
 export class Hardware implements Doc {
@@ -160,11 +160,11 @@ export class Hardware implements Doc {
     _orgName: string;
 
     getId(): string;
-    setId(id: string);
     isActive(): boolean;
-    static isValidPortNumber(port: number): boolean;
+    setId(id: string);
     isMCBox(): boolean;
     isDrone(): boolean;
+    static isValidPortNumber(port: number): boolean;
     static MCBox(name: string): Hardware;
     static drone(name: string): Hardware;
     static android(name: string): Hardware;
@@ -252,9 +252,8 @@ export class Mission implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    setId(id: string);
     isActive(): boolean;
-    isScheduled(): boolean;
+    setId(id: string);
     addStream(streamId: string);
     hasStreamId(streamId: string): boolean;
     hasOwnerPermissions(u: User): boolean;
@@ -277,6 +276,7 @@ export class Mission implements Doc {
     getTimeInterval(): TimeInterval;
     isRunningNow(): boolean;
     static isScheduler(u: User, m: Mission): boolean;
+    isScheduled(): boolean;
 }
 export class MissionPermissions  {
 
@@ -342,11 +342,6 @@ export class Organization implements Doc {
     _orgAdmins: User[];
 
     getId(): string;
-    setId(id: string);
-    isActive(): boolean;
-    removeUser(userId: string);
-    addUser(userId: string);
-    addHardware(hardwareId: string);
     getTheBestOrgAdminId(): string;
     addUserOrgAdmin(userId: string);
     addOrgAdmin(userId: string);
@@ -357,6 +352,11 @@ export class Organization implements Doc {
     listHardwareIds(): string[];
     getStatus(): string;
     hasOnlyOneAdmin(): boolean;
+    isActive(): boolean;
+    setId(id: string);
+    removeUser(userId: string);
+    addUser(userId: string);
+    addHardware(hardwareId: string);
 }
 export enum Privacy { PUBLIC, PRIVATE, UNLISTED }
 export class Stream implements Doc {
@@ -392,11 +392,6 @@ export class Stream implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    setId(id: string);
-    isActive(): boolean;
-    isClosed(): boolean;
-    sid(): StreamId;
-    isScheduled(): boolean;
     getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
@@ -409,6 +404,11 @@ export class Stream implements Doc {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
+    isClosed(): boolean;
+    isActive(): boolean;
+    setId(id: string);
+    sid(): StreamId;
+    isScheduled(): boolean;
 }
 export class StreamId  {
     constructor(userId: string, streamId: string);
@@ -436,12 +436,12 @@ export class StreamLocation  {
     static accurateLocations: (arg: StreamLocation) => boolean;
 
     hashCode(): number;
+    getTime(): number;
     static speedLocation(timestamp: string, speed: number): StreamLocation;
     static latLng(timestamp: string, latitude: number, longitude: number): StreamLocation;
     getSpeed(): number;
     lalo(): string;
     getTimestamp(): string;
-    getTime(): number;
 }
 export class StreamPermissions  {
 
@@ -497,11 +497,6 @@ export class StreamResponse  {
     isoDate(): string;
     getId(): string;
     isLive(): boolean;
-    setId(id: string);
-    isActive(): boolean;
-    isClosed(): boolean;
-    sid(): StreamId;
-    isScheduled(): boolean;
     getStatus(): LiveStatus;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
@@ -514,6 +509,11 @@ export class StreamResponse  {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
+    isClosed(): boolean;
+    isActive(): boolean;
+    setId(id: string);
+    sid(): StreamId;
+    isScheduled(): boolean;
 }
 export class TSFile  {
     filename: string;
@@ -581,6 +581,10 @@ export class User implements Doc {
     getId(): string;
     getType(): LoginType;
     setId(id: string);
+    isOrgAdmin(orgId: string): boolean;
+    getRole(orgId: string): UserRole;
+    isSuperAdmin(): boolean;
+    belongsToOrg(orgId: string): boolean;
     created(): number;
     isUserActiveInAnyOrg(): boolean;
     isUserActiveInOrg(orgId: string): boolean;
@@ -610,10 +614,6 @@ export class User implements Doc {
     setOrgPhone(orgId: string, phone: string);
     getOrgNotes(orgId: string): string;
     setOrgNotes(orgId: string, notes: string);
-    belongsToOrg(orgId: string): boolean;
-    isOrgAdmin(orgId: string): boolean;
-    getRole(orgId: string): UserRole;
-    isSuperAdmin(): boolean;
 }
 export class UserActivityResponse  {
     thumb: string;
@@ -684,12 +684,12 @@ export class JSApiClient  {
     hwStatus: HWStatusApi;
     overlays: OverlayApi;
 
+    static createApiClient(serverUrl: string): JSApiClient;
     liveErrors(): Observable<Error>;
     createOrgFull(org: Organization, admin: User, userProfile: UserProfile): Observable<Organization>;
-    resetPassword(loginData: LoginRequest): Observable<User>;
     logout(): Observable<string>;
+    resetPassword(loginData: LoginRequest): Observable<User>;
     static mapHardwareWithCalendar(be: JSApiClient, hardware: Hardware): Observable<Hardware>;
-    static createApiClient(serverUrl: string): JSApiClient;
     login(loginData: LoginRequest): Observable<User>;
 }
 export class MissionApi  {
@@ -734,15 +734,15 @@ export class StreamApi  {
 }
 export class UserApi  {
 
+    createOrUpdate(user: User): Observable<User>;
+    forceUpdate(user: User): Observable<User>;
+    inviteToMission(user: User, missionId: string): Observable<User>;
     allUsersUpdates(orgId: string): Observable<User>;
     sendCancelNotification(user: User, missionId: string): Observable<User>;
     joinByMissionToken(user: User, token: string): Observable<User>;
     getUserByEmail(email: string): Observable<User>;
     isUserExists(email: string): Observable<boolean>;
     isTempUser(email: string): Observable<boolean>;
-    createOrUpdate(user: User): Observable<User>;
-    forceUpdate(user: User): Observable<User>;
-    inviteToMission(user: User, missionId: string): Observable<User>;
     remove(id: string): Observable<User>;
     get(id: string): Observable<User>;
     create(item: User): Observable<User>;
