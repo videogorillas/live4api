@@ -75,7 +75,7 @@ public class WSLive {
     private void _subscribe(LiveMessage msg) {
         String json = JSON.stringify(msg);
         if (subs.indexOf(json) < 0) {
-            console.log("subscribe", json, subs);
+//            console.log("subscribe", json, subs);
             _ws.take(1).subscribe(ws -> ws.send(json));
             subs.push(json);
         }

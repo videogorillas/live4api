@@ -77,7 +77,7 @@ public class Typefy {
         if (Date.class == td || "Date" == td) {
             return new Date((String) json);
         }
-        console.log("td", typeof(td), td, json);
+//        console.log("td", typeof(td), td, json);
         throw new RuntimeException("dont know what to do");
     }
 
