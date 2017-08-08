@@ -1,5 +1,8 @@
 package io.live4.deeplinks;
 
+import org.stjs.javascript.annotation.Namespace;
+
+@Namespace("live4api")
 public class DeepLinks {
     public static final String MISSIONS = "/missions";
     public static final String LOGIN = "/login";

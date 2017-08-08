@@ -1729,8 +1729,9 @@ live4api.Api3OrgUrls = stjs.extend(live4api.Api3OrgUrls, null, [], function(cons
 }, {}, {});
 var ReadOnly = function() {};
 ReadOnly = stjs.extend(ReadOnly, null, [], null, {}, {});
-var DeepLinks = function() {};
-DeepLinks = stjs.extend(DeepLinks, null, [], function(constructor, prototype) {
+stjs.ns("live4api");
+live4api.DeepLinks = function() {};
+live4api.DeepLinks = stjs.extend(live4api.DeepLinks, null, [], function(constructor, prototype) {
     constructor.MISSIONS = "/missions";
     constructor.LOGIN = "/login";
     constructor.LOGIN_TOKEN_PARAM = "token";
