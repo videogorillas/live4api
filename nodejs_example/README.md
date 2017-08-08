@@ -8,7 +8,7 @@ node index.js
 ```
 
 get stream mpd urls with hardware port numbers
-```ecmascript 6
+```javascript
 XMLHttpRequest = require('w3c-xmlhttprequest').XMLHttpRequest;
 let Rx = require("rx");
 let live4api = require("live4api");
