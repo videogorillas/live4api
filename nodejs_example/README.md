@@ -41,7 +41,7 @@ liveStreamsWithHw.concatMap(s => {
 
 outputs:
 
-```json
+```
 { port: 4242,
   mpd: 'https://qa.live4.io/gopro/anna.pogribnyak@gmail.com/6262babc-de8f-4bc2-972e-a623ec0eeafa/live.mpd' }
 { port: 4242,
