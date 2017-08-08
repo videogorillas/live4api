@@ -130,4 +130,12 @@ public class Internal {
         }
         return null;
     }
+
+    public static boolean isBrowser() {
+        try {
+            return window != null;
+        } catch (Exception e) {
+        }
+        return false;
+    }
 }
