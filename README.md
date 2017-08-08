@@ -207,8 +207,9 @@ NOTE: Live4 public API is based on [ReactiveX library](https://github.com/Reacti
 
 2. `mvn clean package`
 3. `grunt`
-4. `mvn release:prepare`
-4.1. Agree with questions
-5. `git push`
-6. `npm login`
-7. `npm publish`
+4. `git commit`
+5. `mvn release:prepare`
+5.1. Agree with questions
+6. `git push`
+7. `npm login`
+8. `npm publish`
