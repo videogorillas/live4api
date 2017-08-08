@@ -2,6 +2,9 @@ package io.live4.js;
 
 import static io.live4.api2.Api2Urls.API_2_STREAM_UPDATE_TITLE;
 
+import org.stjs.javascript.Array;
+
+import com.vg.js.bridge.Rx;
 import com.vg.js.bridge.Rx.Observable;
 
 import io.live4.api1.Api1StreamUrls;
@@ -34,8 +37,13 @@ public class StreamApi extends BaseAsyncDao<StreamResponse> {
     }
 
     @Override
-    protected String listUrl(String orgId) {
-        return Api1StreamUrls.listUrl();
+    protected String listUrl(String userId) {
+        return Api1StreamUrls.listUrl() + "/" + userId;
+    }
+    
+    @Override
+    public Rx.Observable<Array<StreamResponse>> list(String userId) {
+        return _list(listUrl(userId));
     }
 
     public Observable<StreamLocation> locationUpdates(String sid) {
