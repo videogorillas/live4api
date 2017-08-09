@@ -48,3 +48,21 @@ outputs:
   mpd: 'https://qa.live4.io/gopro/anna.pogribnyak@gmail.com/e2e9f0c5-d777-4522-9365-420f963a528e/live.mpd' }
 
 ```
+
+update user
+
+```javascript
+let api = JSApiClient.createApiClient("http://eha-vg.mx1ops.com:8642");
+let loginOk = api.login(new LoginRequest("doom@videogorillas.com", "PASSWORD_HERE"));
+
+loginOk.concatMap(user => {
+    let support = api.users.getAndUpdate("support@mx1-360.com", usr => {
+        usr.emailVerified = true;
+        usr.licenseAgreementAccepted = true;
+    });
+    return support;
+}).subscribe(x => {
+    console.log(x);
+});
+
+```
