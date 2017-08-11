@@ -15,6 +15,7 @@ export default class Hardware implements Doc {
     static TYPE_MC_BOX: string;
     static TYPE_DRONE: string;
     static TYPE_ANDROID: string;
+    static TYPE_IOS: string;
     id: string;
     _rev: number;
     name: string;
@@ -36,6 +37,8 @@ export default class Hardware implements Doc {
     static drone (name: string): Hardware;
 
     static android (name: string): Hardware;
+
+    static ios (name: string): Hardware;
 
     static  statusLabel (s: Availability): string;
 
