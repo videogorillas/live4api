@@ -181,8 +181,8 @@ public class Requests {
                     if (isBlank(http.responseText)) {
                         observer.onError(http);
                     } else {
-                        String cookie = http.getResponseHeader("Set-Cookie");
-                        if (!isBrowser() && isNotBlank(cookie)) {
+                        if (!isBrowser()) {
+                            String cookie = http.getResponseHeader("Set-Cookie");
                             String newSessionId = $castArray(cookie.split(";"))
                                     .filter((s, i, a) -> defaultString(s, "").toLowerCase().startsWith("jsessionid="))
                                     .map((s, i, a) -> $castArray(s.split("=")).$get(1))
