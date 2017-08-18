@@ -177,6 +177,10 @@ public class RxApiClient {
         return requestObject(request.accessToken(), TwilioToken.class);
     }
 
+    public Observable<TwilioToken> requestAudioChatToken() {
+        return requestObject(request.accessAudioToken(), TwilioToken.class);
+    }
+
     public <T> Observable<T> fromJsonRx(String json, Class<T> cls) {
         return Observable.fromCallable(() -> gson.fromJson(json, cls));
     }

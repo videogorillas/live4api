@@ -134,6 +134,10 @@ public class ApiRequest {
         return GET(serverUrl.chatToken());
     }
 
+    public Request accessAudioToken() {
+        return GET(serverUrl.audioChatToken());
+    }
+
     public Request listMissions(String orgId) {
         return GET(serverUrl.listMissions(orgId));
     }

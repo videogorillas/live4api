@@ -147,6 +147,10 @@ public class ServerUrl {
         return serverUrl + Api3MissionUrls.CHAT_TOKEN;
     }
 
+    public String audioChatToken() {
+        return serverUrl + Api3MissionUrls.AUDIO_CHAT_TOKEN;
+    }
+
     @Override
     public String toString() {
         return serverUrl;
