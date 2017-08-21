@@ -22,7 +22,6 @@
             <url>https://kote.videogorillas.com/m2repo/</url>
         </repository>
     </repositories>
-    
     <profiles>
         <profile>
             <id>jsbuild-dev</id>
