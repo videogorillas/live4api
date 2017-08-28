@@ -129,6 +129,8 @@ export class Hardware implements Doc {
     _orgName: string;
 
     getId(): string;
+    setId(id: string);
+    isActive(): boolean;
     static isValidPortNumber(port: number): boolean;
     isMCBox(): boolean;
     isDrone(): boolean;
@@ -143,8 +145,6 @@ export class Hardware implements Doc {
     isAssigned(): boolean;
     static statusLabel(s: HwAvailability): string;
     getAvailabilityFor(ti: TimeInterval): HwAvailability;
-    setId(id: string);
-    isActive(): boolean;
 }
 export enum HwAvailability { AVAILABLE, SCHEDULED, INUSE }
 export class HWLogEntry  {
@@ -176,9 +176,9 @@ export class HWStatus implements Doc {
     mtime: number;
 
     getId(): string;
-    static newStatus(hwid: string, status: HwState): HWStatus;
     setId(id: string);
     isActive(): boolean;
+    static newStatus(hwid: string, status: HwState): HWStatus;
 }
 export class Like  {
     uuid: string;
@@ -254,12 +254,14 @@ export class Mission implements Doc {
 
     getId(): string;
     isLive(): boolean;
+    setId(id: string);
+    isActive(): boolean;
     isScheduled(): boolean;
     addStream(streamId: string);
     hasStreamId(streamId: string): boolean;
     hasOwnerPermissions(u: User): boolean;
-    static isOrgAdmin(u: User, m: Mission): boolean;
     static isOwner(u: User, m: Mission): boolean;
+    static isOrgAdmin(u: User, m: Mission): boolean;
     hasPilotPermissions(u: User): boolean;
     hasParticipantPermisisons(u: User): boolean;
     removeUser(userId: string);
@@ -277,8 +279,6 @@ export class Mission implements Doc {
     getTimeInterval(): TimeInterval;
     isRunningNow(): boolean;
     static isScheduler(u: User, m: Mission): boolean;
-    setId(id: string);
-    isActive(): boolean;
 }
 export class MissionPermissions  {
 
@@ -344,6 +344,8 @@ export class Organization implements Doc {
     _orgAdmins: User[];
 
     getId(): string;
+    setId(id: string);
+    isActive(): boolean;
     removeUser(userId: string);
     addUser(userId: string);
     addHardware(hardwareId: string);
@@ -357,8 +359,6 @@ export class Organization implements Doc {
     listHardwareIds(): string[];
     getStatus(): string;
     hasOnlyOneAdmin(): boolean;
-    setId(id: string);
-    isActive(): boolean;
 }
 export enum Privacy { PUBLIC, PRIVATE, UNLISTED }
 export class Stream implements Doc {
@@ -394,9 +394,12 @@ export class Stream implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    isClosed(): boolean;
+    setId(id: string);
+    isActive(): boolean;
+    sid(): StreamId;
     isScheduled(): boolean;
     getStatus(): LiveStatus;
+    isClosed(): boolean;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -408,9 +411,6 @@ export class Stream implements Doc {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
-    setId(id: string);
-    isActive(): boolean;
-    sid(): StreamId;
 }
 export class StreamId  {
     constructor(userId: string, streamId: string);
@@ -442,8 +442,8 @@ export class StreamLocation  {
     static latLng(timestamp: string, latitude: number, longitude: number): StreamLocation;
     getSpeed(): number;
     lalo(): string;
-    getTimestamp(): string;
     getTime(): number;
+    getTimestamp(): string;
 }
 export class StreamPermissions  {
 
@@ -499,9 +499,12 @@ export class StreamResponse  {
     isoDate(): string;
     getId(): string;
     isLive(): boolean;
-    isClosed(): boolean;
+    setId(id: string);
+    isActive(): boolean;
+    sid(): StreamId;
     isScheduled(): boolean;
     getStatus(): LiveStatus;
+    isClosed(): boolean;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
     isUploading(): boolean;
     isRecorded(): boolean;
@@ -513,9 +516,6 @@ export class StreamResponse  {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
-    setId(id: string);
-    isActive(): boolean;
-    sid(): StreamId;
 }
 export class Tag  {
     constructor(id: string, name: string);
@@ -582,11 +582,6 @@ export class User implements Doc {
     getName(): string;
     getId(): string;
     getType(): LoginType;
-    belongsToOrg(orgId: string): boolean;
-    isOrgAdmin(orgId: string): boolean;
-    getRole(orgId: string): UserRole;
-    isSuperAdmin(): boolean;
-    setId(id: string);
     created(): number;
     isUserActiveInAnyOrg(): boolean;
     isUserActiveInOrg(orgId: string): boolean;
@@ -616,6 +611,11 @@ export class User implements Doc {
     setOrgPhone(orgId: string, phone: string);
     getOrgNotes(orgId: string): string;
     setOrgNotes(orgId: string, notes: string);
+    setId(id: string);
+    belongsToOrg(orgId: string): boolean;
+    isOrgAdmin(orgId: string): boolean;
+    getRole(orgId: string): UserRole;
+    isSuperAdmin(): boolean;
 }
 export class UserActivityResponse  {
     thumb: string;
@@ -719,16 +719,16 @@ export class OrgApi  {
 export class OverlayApi  {
 
     getOverlay(id: string): Observable<string>;
-    deleteOverlay(id: string): Observable<string>;
     createOverlay(orgId: string, url: string): Observable<string>;
+    deleteOverlay(id: string): Observable<string>;
 }
 export class StreamApi  {
 
     list(userId: string): Observable<StreamResponse[]>;
+    locationUpdates(sid: string): Observable<StreamLocation>;
     locations(sid: string): Observable<StreamLocation[]>;
     liveMessages(sid: string): Observable<LiveMessage>;
     updateTitle(sid: string, newTitle: string): Observable<StreamResponse>;
-    locationUpdates(sid: string): Observable<StreamLocation>;
     remove(id: string): Observable<StreamResponse>;
     get(id: string): Observable<StreamResponse>;
     create(item: StreamResponse): Observable<StreamResponse>;
