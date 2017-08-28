@@ -1,14 +1,15 @@
 package io.live4.model;
 
+import static org.stjs.javascript.JSCollections.$castArray;
+
 import org.stjs.javascript.Array;
 import org.stjs.javascript.Date;
 import org.stjs.javascript.annotation.Namespace;
-import org.stjs.javascript.annotation.ServerSide;
-
-import com.google.code.geocoder.model.GeocoderResult;
 
 @Namespace("live4api")
-public class Stream {
+@ReadOnly //all fields can only be updated by super admin except marked with @ReadWrite
+public class Stream implements Doc {
+    public long _rev;
 
     public static Stream createStream(StreamId sid, Privacy privacy) {
         Stream s = new Stream();
@@ -24,8 +25,6 @@ public class Stream {
 
     public String startAddress; // TODO: move to StreamLocation object
 
-    @ServerSide
-    public Array<GeocoderResult> startGeoCoder; // TODO: move to StreamLocation object
     public StreamLocation startLocation;
 
     public boolean onCdn;
@@ -39,22 +38,35 @@ public class Stream {
     //when user started recording
     public long startTimeMsec;
 
-    public String title;
-
-    private Privacy privacy;
-    public boolean locationHidden;
+    //these fields can be updated by owner of this stream via API
+    @ReadWrite public String title;
+    @ReadWrite private Privacy privacy;
+    @ReadWrite public boolean locationHidden;
+    @ReadWrite public Array<Tag> tags2;
 
     public int avgSpeed;
     public int maxSpeed;
     public int maxAlt;
 
-    public Array<Tag> tags2;
     public int width = -1;
     public int height = -1;
 
     public String hardwareId;
     
     public String liveCodecs;
+
+    boolean closed = false;
+
+    public String m3u8;
+    public String mpd;
+    @Deprecated
+    public String dash;
+    public String webm;
+    public String mp4;
+    public String thumb;
+    public String md;
+    public String nearby;
+    public String city;
 
     public StreamId sid() {
         return new StreamId(userId, filename);
@@ -101,8 +113,6 @@ public class Stream {
         this.status = status;
     }
 
-    boolean closed = false;
-
     //TODO: client explicitly called api close to mark upload finished for ALL files of this stream
     public boolean isClosed() {
         return closed;
@@ -110,6 +120,35 @@ public class Stream {
 
     public void setClosed(boolean closed) {
         this.closed = closed;
+    }
+
+    public String getMp4() {
+        return mp4;
+    }
+
+    public String getThumb() {
+        return thumb;
+    }
+
+    public String getM3u8() {
+        return m3u8;
+    }
+
+    @Override
+    public String getId() {
+        return sid().toString();
+    }
+
+    @Override
+    public void setId(String id) {
+        Array<String> split = $castArray(id.split("/"));
+        userId = split.$get(0);
+        filename = split.$get(1);
+    }
+
+    @Override
+    public boolean isActive() {
+        return true;
     }
 
 }

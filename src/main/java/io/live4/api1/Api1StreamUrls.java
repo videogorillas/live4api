@@ -6,6 +6,7 @@ import org.stjs.javascript.annotation.Namespace;
 public class Api1StreamUrls {
     public static final String API_STREAM = "/api/stream";
 
+    @Deprecated
     public static final String createUrl() {
         return API_STREAM;
     }

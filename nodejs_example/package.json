@@ -1,0 +1,16 @@
+{
+  "name": "streamsbyhw",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "live4api": "3.5.0-beta20",
+    "rx": "4.1.0",
+    "w3c-xmlhttprequest": "2.1.2"
+  }
+}

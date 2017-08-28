@@ -30,4 +30,6 @@ public class Api3HwUrls {
     public static String releaseUrl(String id) {
         return API_3_HW + RELEASE + "/" + id;
     }
+
+    public final static String REASSIGN = "/reassign";
 }

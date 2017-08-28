@@ -20,6 +20,8 @@ public class LiveMessage {
     public Mission mission;
     public User user;
 
+    public HWStatus hwStatus;
+
     public boolean hasMap() {
         return this.map != null;
     }

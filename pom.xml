@@ -1,16 +1,27 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.live4</groupId>
     <artifactId>live4api3</artifactId>
-    <!-- READ THISE BEFORE UPDATING VERSION http://semver.org/ -->
-    <version>3.4.2</version>
+    <!-- READ THIS BEFORE UPDATING VERSION http://semver.org/ -->
+    <version>3.5.0-beta31-SNAPSHOT</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <stjs.version>3.3.2</stjs.version>
         <stjs.plugin.version>3.3.2</stjs.plugin.version>
-        <retrolambda.plugin.version>2.3.0</retrolambda.plugin.version>
+        <retrolambda.plugin.version>2.5.1</retrolambda.plugin.version>
     </properties>
+    <scm>
+        <url>https://github.com/videogorillas/live4api</url>
+        <connection>scm:git:https://github.com/videogorillas/live4api.git</connection>
+        <developerConnection>scm:git:https://github.com/videogorillas/live4api.git</developerConnection>
+        <tag>live4api3-3.5.0-beta28</tag>
+    </scm>
+    <repositories>
+        <repository>
+            <id>vg-corporate-repo</id>
+            <url>https://kote.videogorillas.com/m2repo/</url>
+        </repository>
+    </repositories>
     <profiles>
         <profile>
             <id>jsbuild-dev</id>
@@ -78,10 +89,12 @@
                 </executions>
                 <configuration>
                     <includes>
+                        <include>io/live4/js/**/*.java</include>
                         <include>io/live4/api1/**/*.java</include>
                         <include>io/live4/api2/**/*.java</include>
                         <include>io/live4/api3/**/*.java</include>
                         <include>io/live4/model/**/*.java</include>
+                        <include>io/live4/deeplinks/**/*.java</include>
                     </includes>
                 </configuration>
             </plugin>
@@ -124,6 +137,16 @@
                     <target>1.8</target>
                     <meminitial>1024m</meminitial>
                     <maxmem>2048m</maxmem>
+                    <compilerArgument>-parameters</compilerArgument>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+                <configuration>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
+                    <localCheckout>true</localCheckout>
                 </configuration>
             </plugin>
             <plugin>
@@ -167,8 +190,7 @@
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>uberjar</shadedClassifierName>
                             <transformers>
-                                <transformer
-                                        implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                             </transformers>
                             <filters>
                                 <filter>
@@ -313,7 +335,7 @@
         <dependency>
             <groupId>io.reactivex</groupId>
             <artifactId>rxjava</artifactId>
-            <version>1.2.6</version>
+            <version>1.2.10</version>
         </dependency>
         <dependency>
             <groupId>com.squareup.okhttp</groupId>
@@ -331,9 +353,25 @@
             <version>${stjs.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.google.code.geocoder-java</groupId>
-            <artifactId>geocoder-java</artifactId>
-            <version>0.16</version>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.st-js.bridge</groupId>
+            <artifactId>html</artifactId>
+            <version>5.0.bv30-74</version>
+        </dependency>
+        <dependency>
+            <groupId>com.vg</groupId>
+            <artifactId>rxjs-bridge</artifactId>
+            <version>4.1.0-22</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

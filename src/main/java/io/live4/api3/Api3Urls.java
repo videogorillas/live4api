@@ -11,6 +11,7 @@ public class Api3Urls {
     public static final String API_3_ORG_STORAGE_GET = "/api/3/orgstorage/get";
     public static final String API_3_HWLOG = "/api/3/hwlog";
     public static final String API_3_LOGIN = "/api/3/login";
+    public static final String API_3_LOGOUT = "/api/3/logout";
     public static final String API_3_RESETPASSWORD = "/api/3/resetpassword";
     public static final String API_3_WSUPDATES = "/api/3/wsupdates";
     public static final String API_3_LOCATIONS = "/api/3/locations";
@@ -23,4 +24,6 @@ public class Api3Urls {
     public static String locationsUrl(String streamId) {
         return API_3_LOCATIONS + "/" + streamId;
     }
+    public static final String API_3_OVERLAY = "/api/3/overlay";
+    public static final String OVERLAY_OBJECT = "/object";
 }

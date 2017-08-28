@@ -15,3 +15,12 @@ target/
 *.ear
 
 hs_err_pid*
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+build/
+/bin/
+release.properties
+pom.xml.releaseBackup
+package-lock.json
