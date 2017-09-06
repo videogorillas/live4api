@@ -30,9 +30,8 @@ public class HttpUtils {
     }
 
     public static Request putAsJsonRequest(String url, String json) {
-        String buildUrl = String.format(url);
         Request.Builder builder = new Request.Builder();
-        builder.url(buildUrl).put(RequestBody.create(JSON_MIMETYPE, json));
+        builder.url(url).put(RequestBody.create(JSON_MIMETYPE, json));
         return builder.build();
     }
 
