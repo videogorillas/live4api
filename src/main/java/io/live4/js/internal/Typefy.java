@@ -67,15 +67,15 @@ public class Typefy {
         if (!Boolean(td)) {
             return json;
         }
+        if (Date.class == td || "Date" == td) {
+            return new Date((String) json);
+        }
         if (hasOwnProperty(td, "name")) {
             String name = (String) $get(td, "name");
             Array<String> args = (Array<String>) $get(td, "arguments");
             if ("Enum".equals(name) && args != null && args.$length() > 0) {
                 return getEnum(args.$get(0), (String) json);
             }
-        }
-        if (Date.class == td || "Date" == td) {
-            return new Date((String) json);
         }
 //        console.log("td", typeof(td), td, json);
         throw new RuntimeException("dont know what to do");
