@@ -1,6 +1,7 @@
 package io.live4.js;
 
 import static io.live4.api2.Api2Urls.API_2_STREAM_UPDATE_TITLE;
+import static org.stjs.javascript.JSGlobal.JSON;
 
 import org.stjs.javascript.Array;
 
@@ -9,7 +10,9 @@ import com.vg.js.bridge.Rx.Observable;
 
 import io.live4.api1.Api1StreamUrls;
 import io.live4.api3.Api3StreamUrls;
+import io.live4.api3.Api3Urls;
 import io.live4.js.internal.Requests;
+import io.live4.js.internal.Typefy;
 import io.live4.js.internal.WSLive;
 import io.live4.model.Internal;
 import io.live4.model.LiveMessage;
@@ -48,6 +51,11 @@ public class StreamApi extends BaseAsyncDao<StreamResponse> {
 
     public Observable<StreamLocation> locationUpdates(String sid) {
         return wsLive.locationUpdates(sid);
+    }
+
+    public Observable<Array<StreamLocation>> locations(String sid) {
+        String url = Api3Urls.locationsUrl(sid);
+        return requests.get(url).map(response -> Typefy.typefyArray(JSON.parse(response), StreamLocation.class));
     }
 
     public Observable<LiveMessage> liveMessages(String sid) {
