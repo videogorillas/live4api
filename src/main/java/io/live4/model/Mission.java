@@ -14,17 +14,6 @@ import org.stjs.javascript.annotation.Namespace;
 @Namespace("live4api")
 public class Mission implements Doc {
 
-    public enum State {
-        PENDING, STARTED, CANCELLED, ENDED
-    }
-
-    public static class ShareToken {
-        public String token;
-        public String missionId;
-        public String userId;
-        public String invitedId;
-    }
-
     public long _rev;
     public String id;
     public String createdByUserId;
@@ -49,7 +38,7 @@ public class Mission implements Doc {
     //used in UI only, should not be serialized to db, use ids to serialize
     public Array<Hardware> hardware;
 
-    public Mission.State state;
+    public MissionState state;
     public static final String UNASSIGNED = "Unassigned";
 
     @Override
@@ -59,7 +48,7 @@ public class Mission implements Doc {
 
     @Override
     public boolean isActive() {
-        return state == State.PENDING || state == State.STARTED;
+        return state == MissionState.PENDING || state == MissionState.STARTED;
     }
 
     @Override
@@ -151,15 +140,15 @@ public class Mission implements Doc {
     }
 
     public boolean isLive() {
-        return State.STARTED.equals(state);
+        return MissionState.STARTED.equals(state);
     }
 
     public boolean isScheduled() {
-        return State.PENDING.equals(state);
+        return MissionState.PENDING.equals(state);
     }
 
     public boolean isCompleted() {
-        return State.ENDED.equals(state);
+        return MissionState.ENDED.equals(state);
     }
 
     public void addHardware(Hardware h) {

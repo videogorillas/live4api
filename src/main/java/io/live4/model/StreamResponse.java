@@ -11,38 +11,15 @@ public class StreamResponse extends Stream {
     public UserResponse user;
     
     public Array<Tag> tags;
-    public String m3u8;
-    public String mpd;
-    @Deprecated
-    public String dash;
-    public String webm;
-    public String mp4;
-    public String thumb;
-    public String md;
     public long durationMsec;
 
-    public String nearby;
     public String embedUrl;
     public String landUrl;
-
-    public String city;
 
     public LikeResponse likes;
     public CommentResponse comments;
     public String hostUrl;
     public String flash;
-
-    public String getMp4() {
-        return mp4;
-    }
-
-    public String getThumb() {
-        return thumb;
-    }
-
-    public String getM3u8() {
-        return m3u8;
-    }
 
     public String getHostUrl() {
         return hostUrl;

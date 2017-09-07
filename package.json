@@ -1,6 +1,6 @@
 {
   "name": "live4api",
-  "version": "3.4.2",
+  "version": "3.5.0",
   "description": "LIVE4 API",
   "main": "live4api.js",
   "scripts": {
@@ -33,5 +33,8 @@
     "grunt-contrib-watch": "0.6.1",
     "grunt-fontoptim": "0.1.1",
     "grunt-webpack": "1.0.14"
+  },
+  "dependencies": {
+    "rx": "4.1.0"
   }
 }

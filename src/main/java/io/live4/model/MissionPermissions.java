@@ -50,7 +50,7 @@ public class MissionPermissions {
     }
 
     public static boolean canViewCompletedMission(User u, Mission m) {
-        return (Mission.State.ENDED == m.state) && (containsKey(m.roles, u.id) || Mission.isOrgAdmin(u, m));
+        return (MissionState.ENDED == m.state) && (containsKey(m.roles, u.id) || Mission.isOrgAdmin(u, m));
     }
 
     public static boolean canShareMission(User user, Mission mission) {
@@ -87,22 +87,27 @@ public class MissionPermissions {
     }
 
     public static boolean canJoinMission(Mission mission, String userId) {
-        return canPreviewMission(mission, userId) && containsKey(mission.roles, userId);
+        return canPreviewMission(mission) && mission.hasUser(userId);
     }
 
-    public static boolean canPreviewMission(Mission mission, String userId) {
-        return mission != null && mission.state != Mission.State.CANCELLED && mission.state != Mission.State.ENDED;
+    public static boolean canPreviewMission(Mission mission) {
+        return mission != null && mission.state != MissionState.CANCELLED;
+    }
+
+    public static boolean canViewMission(Mission mission, User user) {
+        boolean bool = canPreviewMission(mission);
+        return (bool && mission.hasUser(user.id)) ||
+                (bool && isOrgAdmin(user, mission) && !mission.hasUser(user.id));
     }
 
     public static boolean canStartMission(User u, Mission m) {
-        // KMC-388
-        // A mission can be started by the Mission Owner and / or Mission
-        // Scheduler, Org Admin
-        return isScheduler(u, m) || isOrgAdmin(u, m) || isOwner(u, m);
-    }
-
+    //        // KMC-388
+    //        // A mission can be started by the Mission Owner and / or Mission
+    //        // Scheduler, Org Admin
+            return isScheduler(u, m)|| isOrgAdmin(u, m) || isOwner(u, m);
+        }
+    
     public static boolean userRemoved(Mission oldMisison, Mission newMission, User me) {
-        return oldMisison != null && oldMisison.roles.$get(me.getId()) != null
-                && newMission.roles.$get(me.getId()) == null;
+        return oldMisison != null && oldMisison.roles.$get(me.getId()) != null && newMission.roles.$get(me.getId()) == null;
     }
 }

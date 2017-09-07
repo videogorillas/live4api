@@ -3,7 +3,6 @@ package io.live4.apiclient.internal;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
 
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
@@ -17,19 +16,19 @@ import com.squareup.okhttp.ws.WebSocketListener;
 
 import okio.Buffer;
 import rx.Observable;
+import rx.Emitter.BackpressureMode;
 import rx.functions.Action2;
-import rx.subscriptions.Subscriptions;
 
 public class RxRequests {
     public static Observable<Response> responseRx(OkHttpClient c, Request request) {
         return Observable.create(o -> {
             Call newCall = c.newCall(request);
             AtomicBoolean needCancel = new AtomicBoolean(true);
-            o.add(Subscriptions.create(() -> {
+            o.setCancellation(() -> {
                 if (needCancel.get() && !newCall.isCanceled()) {
                     newCall.cancel();
                 }
-            }));
+            });
             newCall.enqueue(new Callback() {
 
                 @Override
@@ -46,7 +45,8 @@ public class RxRequests {
                     o.onCompleted();
                 }
             });
-        });
+            
+        }, BackpressureMode.BUFFER);
     }
 
     public static Observable<Response> okResponseRx(OkHttpClient c, Request request) {
@@ -103,7 +103,7 @@ public class RxRequests {
     public static Observable<String> webSocket(OkHttpClient c, Request request, Action2<WebSocket, Response> onOpen) {
         Observable<String> wsMsgs = Observable.create(o -> {
             WebSocketCall call = WebSocketCall.create(c, request);
-            Subscriptions.create(() -> call.cancel());
+            o.setCancellation(() -> call.cancel());
 
             call.enqueue(new WebSocketListener() {
                 @Override
@@ -136,7 +136,7 @@ public class RxRequests {
                     o.onCompleted();
                 }
             });
-        });
+        }, BackpressureMode.BUFFER);
         return wsMsgs;
     }
 }
