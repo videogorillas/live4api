@@ -15,6 +15,7 @@ import org.stjs.javascript.Date;
 import org.stjs.javascript.Error;
 import org.stjs.javascript.annotation.Namespace;
 import org.stjs.javascript.annotation.Native;
+import org.stjs.javascript.websocket.WebSocket;
 
 import com.vg.js.bridge.Rx;
 import com.vg.js.bridge.Rx.Observable;
@@ -24,6 +25,7 @@ import io.live4.api3.Api3Urls;
 import io.live4.js.internal.Requests;
 import io.live4.js.internal.Typefy;
 import io.live4.js.internal.WSLive;
+import io.live4.js.internal.WSLiveSession;
 import io.live4.model.Calendar;
 import io.live4.model.Hardware;
 import io.live4.model.Internal;
@@ -49,6 +51,14 @@ public class JSApiClient {
     public OverlayApi overlays;
     private Requests requests;
     private WSLive wsLive;
+    private String wsurl;
+
+    /**
+     * @return the wsurl
+     */
+    public String getWsurl() {
+        return wsurl;
+    }
 
     protected JSApiClient(Requests requests) {
         this.requests = requests;
@@ -58,6 +68,7 @@ public class JSApiClient {
         Requests requests = new Requests(serverUrl);
         String wsurl = wsUrl(serverUrl);
         JSApiClient b = new JSApiClient(requests);
+        b.wsurl = wsurl;
         b.wsLive = new WSLive(wsurl);
         b.missions = new MissionApi(requests, b.wsLive.missionUpdates());
         b.orgs = new OrgApi(requests, b.wsLive.orgUpdates());
@@ -80,7 +91,7 @@ public class JSApiClient {
     public Observable<Error> liveErrors() {
         return wsLive.onError();
     }
-
+    
     @Deprecated
     public Observable<Hardware> hardwareRx(String orgId) {
         Observable<Hardware> hwrx = rxFor(hw, orgId).merge(calendars.updates().concatMap(c->hw.get(c.id)).filter(h->h!=null));
@@ -137,7 +148,11 @@ public class JSApiClient {
             return Typefy.typefy(JSON.parse(json), User.class);
         });
     }
-
+    
+    public void setWebSocket(WebSocket _ws){
+        wsLive = new WSLiveSession(wsurl, _ws);
+    }
+    
     public static Rx.Observable<Hardware> mapHardwareWithCalendar (JSApiClient be, Hardware hardware) {
         return Rx.Observable.of(hardware).concatMap(h -> {
             return be.calendars.get(h.id).flatMapObserver((cal, i) -> {

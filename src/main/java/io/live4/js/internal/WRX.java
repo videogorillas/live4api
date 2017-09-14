@@ -1,6 +1,8 @@
 package io.live4.js.internal;
 
 import com.vg.js.bridge.Rx;
+import com.vg.js.bridge.Rx.Observer;
+
 import org.stjs.javascript.Error;
 import org.stjs.javascript.annotation.Namespace;
 import org.stjs.javascript.annotation.Native;
@@ -63,30 +65,43 @@ public class WRX {
     public static Rx.Observable<String> webSocket(String uri, Callback2<WebSocket, DOMEvent> onOpen) {
         return Rx.Observable.$create(eventObserver -> {
             WebSocket _ws = new WebSocket(uri);
-
-            _ws.onopen = domEvent -> {
-                if (onOpen != null) {
-                    onOpen.$invoke(_ws, domEvent);
-                }
-            };
-            _ws.onmessage = msg -> {
-                eventObserver.onNext((String) msg.data);
-            };
-            _ws.onerror = eventObserver::onError;
-
-            _ws.onclose = (e) -> {
-                if(e.code == 1008){
-                    Object err = new Error(e.reason);
-                    eventObserver.onError(err);
-                }
-                eventObserver.onCompleted();
-            };
+            setupSocket(onOpen, eventObserver, _ws);
             return () -> {
                 if (_ws.readyState != WebSocket.CLOSED && _ws.readyState != WebSocket.CLOSING) {
                     _ws.close(1000, "ok");
                 }
             };
         });
+    }
 
+    private static void setupSocket(Callback2<WebSocket, DOMEvent> onOpen, Observer<String> eventObserver, WebSocket _ws) {
+        _ws.onopen = domEvent -> {
+            if (onOpen != null) {
+                onOpen.$invoke(_ws, domEvent);
+            }
+        };
+        _ws.onmessage = msg -> {
+            eventObserver.onNext((String) msg.data);
+        };
+        _ws.onerror = eventObserver::onError;
+
+        _ws.onclose = (e) -> {
+            if(e.code == 1008){
+                Object err = new Error(e.reason);
+                eventObserver.onError(err);
+            }
+            eventObserver.onCompleted();
+        };
+    }
+    
+    public static Rx.Observable<String> fromWebSocket(WebSocket _ws, Callback2<WebSocket, DOMEvent> onOpen) {
+        return Rx.Observable.$create(eventObserver -> {
+            setupSocket(onOpen, eventObserver, _ws);
+            return () -> {
+                if (_ws.readyState != WebSocket.CLOSED && _ws.readyState != WebSocket.CLOSING) {
+                    _ws.close(1000, "ok");
+                }
+            };
+        });
     }
 }
