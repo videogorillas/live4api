@@ -3367,8 +3367,8 @@ HardwareApi = stjs.extend(HardwareApi, BaseAsyncDao, [], function(constructor, p
         });
     };
 }, {cls: {name: "Class", arguments: ["T"]}, _wsrx: {name: "Rx.Observable", arguments: ["T"]}, requests: "live4api.Requests"}, {});
-var WSLiveSession = function(url, _ws) {
-    WSLive.call(this, url);
+var WSLiveSession = function(_ws) {
+    WSLive.call(this);
     this._liveMessages = live4api.WRX.fromWebSocket(_ws, stjs.bind(this, function(ws, e) {
         this.subs.forEach(function(sub) {
             ws.send(sub);
@@ -3525,27 +3525,27 @@ live4api.JSApiClient = stjs.extend(live4api.JSApiClient, null, [], function(cons
     prototype.overlays = null;
     prototype.requests = null;
     prototype.wsLive = null;
-    prototype.wsurl = null;
-    /**
-     *  @return the wsurl
-     */
-    prototype.getWsurl = function() {
-        return this.wsurl;
-    };
     constructor.createApiClient = function(serverUrl) {
         var requests = new live4api.Requests(serverUrl);
         var wsurl = live4api.JSApiClient.wsUrl(serverUrl);
         var b = new live4api.JSApiClient(requests);
-        b.wsurl = wsurl;
         b.wsLive = new WSLive(wsurl);
-        b.missions = new MissionApi(requests, b.wsLive.missionUpdates());
-        b.orgs = new OrgApi(requests, b.wsLive.orgUpdates());
-        b.users = new UserApi(requests, b.wsLive.userUpdates());
-        b.hw = new HardwareApi(requests, b.wsLive.hwUpdates());
-        b.calendars = new CalendarApi(requests, b.wsLive.calendarUpdates());
-        b.streams = new StreamApi(requests, b.wsLive);
-        b.hwStatus = new HWStatusApi(requests, b.wsLive.hwStatusUpdates());
-        b.overlays = new OverlayApi(requests);
+        b.setupApi();
+        return b;
+    };
+    prototype.setupApi = function() {
+        this.missions = new MissionApi(this.requests, this.wsLive.missionUpdates());
+        this.orgs = new OrgApi(this.requests, this.wsLive.orgUpdates());
+        this.users = new UserApi(this.requests, this.wsLive.userUpdates());
+        this.hw = new HardwareApi(this.requests, this.wsLive.hwUpdates());
+        this.calendars = new CalendarApi(this.requests, this.wsLive.calendarUpdates());
+        this.streams = new StreamApi(this.requests, this.wsLive);
+        this.hwStatus = new HWStatusApi(this.requests, this.wsLive.hwStatusUpdates());
+        this.overlays = new OverlayApi(this.requests);
+    };
+    constructor.createApiClientBare = function(serverUrl) {
+        var requests = new live4api.Requests(serverUrl);
+        var b = new live4api.JSApiClient(requests);
         return b;
     };
     constructor.wsUrl = function(serverUrl) {
@@ -3612,7 +3612,7 @@ live4api.JSApiClient = stjs.extend(live4api.JSApiClient, null, [], function(cons
         });
     };
     prototype.setWebSocket = function(_ws) {
-        this.wsLive = new WSLiveSession(this.wsurl, _ws);
+        this.wsLive = new WSLiveSession(_ws);
     };
     constructor.mapHardwareWithCalendar = function(be, hardware) {
         return Rx.Observable.of(hardware).concatMap(function(h) {
