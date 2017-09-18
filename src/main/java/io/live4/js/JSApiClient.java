@@ -65,7 +65,7 @@ public class JSApiClient {
         return b;
     }
 
-    public void setupApi() {
+    private void setupApi() {
         missions = new MissionApi(requests, wsLive.missionUpdates());
         orgs = new OrgApi(requests, wsLive.orgUpdates());
         users = new UserApi(requests, wsLive.userUpdates());
@@ -152,6 +152,7 @@ public class JSApiClient {
     
     public void setWebSocket(WebSocket _ws){
         wsLive = new WSLiveSession(_ws);
+        setupApi();
     }
     
     public static Rx.Observable<Hardware> mapHardwareWithCalendar (JSApiClient be, Hardware hardware) {
