@@ -13,8 +13,8 @@ import io.live4.model.LiveMessage;
 
 public class WSLiveSession extends WSLive {
 
-    public WSLiveSession(String url, WebSocket _ws) {
-        super(url);
+    public WSLiveSession(WebSocket _ws) {
+        super();
         this._liveMessages = WRX
                 .fromWebSocket(_ws, (ws, e) -> {
                     subs.$forEach(sub -> {

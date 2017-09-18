@@ -51,14 +51,6 @@ public class JSApiClient {
     public OverlayApi overlays;
     private Requests requests;
     private WSLive wsLive;
-    private String wsurl;
-
-    /**
-     * @return the wsurl
-     */
-    public String getWsurl() {
-        return wsurl;
-    }
 
     protected JSApiClient(Requests requests) {
         this.requests = requests;
@@ -68,20 +60,29 @@ public class JSApiClient {
         Requests requests = new Requests(serverUrl);
         String wsurl = wsUrl(serverUrl);
         JSApiClient b = new JSApiClient(requests);
-        b.wsurl = wsurl;
         b.wsLive = new WSLive(wsurl);
-        b.missions = new MissionApi(requests, b.wsLive.missionUpdates());
-        b.orgs = new OrgApi(requests, b.wsLive.orgUpdates());
-        b.users = new UserApi(requests, b.wsLive.userUpdates());
-        b.hw = new HardwareApi(requests, b.wsLive.hwUpdates());
-        b.calendars = new CalendarApi(requests, b.wsLive.calendarUpdates());
-        b.streams = new StreamApi(requests, b.wsLive);
-        b.hwStatus = new HWStatusApi(requests, b.wsLive.hwStatusUpdates());
-        b.overlays = new OverlayApi(requests);
+        b.setupApi();
+        return b;
+    }
+
+    public void setupApi() {
+        missions = new MissionApi(requests, wsLive.missionUpdates());
+        orgs = new OrgApi(requests, wsLive.orgUpdates());
+        users = new UserApi(requests, wsLive.userUpdates());
+        hw = new HardwareApi(requests, wsLive.hwUpdates());
+        calendars = new CalendarApi(requests, wsLive.calendarUpdates());
+        streams = new StreamApi(requests, wsLive);
+        hwStatus = new HWStatusApi(requests, wsLive.hwStatusUpdates());
+        overlays = new OverlayApi(requests);
+    }
+    
+    public static JSApiClient createApiClientBare(String serverUrl) {
+        Requests requests = new Requests(serverUrl);
+        JSApiClient b = new JSApiClient(requests);
         return b;
     }
     
-    private static String wsUrl(String serverUrl) {
+    public static String wsUrl(String serverUrl) {
         if (Internal.isBlank(serverUrl)) {
             serverUrl = window.location.protocol + "//" + window.location.host;
         }
@@ -150,7 +151,7 @@ public class JSApiClient {
     }
     
     public void setWebSocket(WebSocket _ws){
-        wsLive = new WSLiveSession(wsurl, _ws);
+        wsLive = new WSLiveSession(_ws);
     }
     
     public static Rx.Observable<Hardware> mapHardwareWithCalendar (JSApiClient be, Hardware hardware) {

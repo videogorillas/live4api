@@ -8,6 +8,7 @@ import static org.stjs.javascript.JSGlobal.JSON;
 
 import org.stjs.javascript.Array;
 import org.stjs.javascript.Error;
+import org.stjs.javascript.annotation.Native;
 import org.stjs.javascript.websocket.WebSocket;
 
 import com.vg.js.bridge.Rx;
@@ -52,6 +53,13 @@ public class WSLive {
                 })
                 .share();
 
+    }
+    
+    @Native
+    public WSLive() {
+        subs = $array();
+        _ws = new ReplaySubject<>(1);
+        errorSubject = new Rx.Subject<>();
     }
 
     public Observable<Error> onError(){
