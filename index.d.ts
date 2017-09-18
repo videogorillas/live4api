@@ -687,12 +687,13 @@ export class JSApiClient  {
     overlays: OverlayApi;
 
     login(loginData: LoginRequest): Observable<User>;
-    getWsurl(): string;
+    static wsUrl(serverUrl: string): string;
+    logout(): Observable<string>;
     static createApiClient(serverUrl: string): JSApiClient;
+    static createApiClientBare(serverUrl: string): JSApiClient;
     liveErrors(): Observable<Error>;
     createOrgFull(org: Organization, admin: User, userProfile: UserProfile): Observable<Organization>;
     resetPassword(loginData: LoginRequest): Observable<User>;
-    logout(): Observable<string>;
     setWebSocket(_ws: WebSocket);
     static mapHardwareWithCalendar(be: JSApiClient, hardware: Hardware): Observable<Hardware>;
 }

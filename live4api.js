@@ -3613,6 +3613,7 @@ live4api.JSApiClient = stjs.extend(live4api.JSApiClient, null, [], function(cons
     };
     prototype.setWebSocket = function(_ws) {
         this.wsLive = new WSLiveSession(_ws);
+        this.setupApi();
     };
     constructor.mapHardwareWithCalendar = function(be, hardware) {
         return Rx.Observable.of(hardware).concatMap(function(h) {
