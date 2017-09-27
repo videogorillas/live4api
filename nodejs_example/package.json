@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "live4api": "3.5.0-beta20",
+    "live4api": "3.5.2",
     "rx": "4.1.0",
     "w3c-xmlhttprequest": "2.1.2"
   }
