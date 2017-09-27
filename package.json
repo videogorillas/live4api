@@ -1,6 +1,6 @@
 {
   "name": "live4api",
-  "version": "3.5.1",
+  "version": "3.5.2",
   "description": "LIVE4 API",
   "main": "live4api.js",
   "scripts": {

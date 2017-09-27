@@ -183,12 +183,14 @@ public class Requests {
                     } else {
                         if (!isBrowser()) {
                             String cookie = http.getResponseHeader("Set-Cookie");
+                            if (isNotBlank(cookie)) {
                             String newSessionId = $castArray(cookie.split(";"))
                                     .filter((s, i, a) -> defaultString(s, "").toLowerCase().startsWith("jsessionid="))
                                     .map((s, i, a) -> $castArray(s.split("=")).$get(1))
                                     .$get(0);
 
                             _sessionId.$put("sessionId", newSessionId);
+                            }
                         }
                         observer.onNext(http.responseText);
                         observer.onCompleted();
