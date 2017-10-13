@@ -195,6 +195,7 @@ public class User implements Doc {
         UserProfile profile = this.getProfile(orgId);
         if (profile == null) {
             this.addProfile(orgId, new UserProfile());
+            this.setUserActive(orgId, true);
         }
     }
 
