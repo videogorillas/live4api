@@ -3526,6 +3526,11 @@ live4api.JSApiClient = stjs.extend(live4api.JSApiClient, null, [], function(cons
         }
         return serverUrl.replaceFirst("http", "ws").replaceAll("/$", "") + live4api.Api3Urls.API_3_WSUPDATES + "/";
     };
+    constructor.createApiClientBare = function(serverUrl) {
+        var requests = new live4api.Requests(serverUrl);
+        var b = new live4api.JSApiClient(requests);
+        return b;
+    };
     prototype.liveErrors = function() {
         return this.wsLive.onError();
     };

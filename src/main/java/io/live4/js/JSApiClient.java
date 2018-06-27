@@ -70,12 +70,18 @@ public class JSApiClient {
         return b;
     }
     
-    private static String wsUrl(String serverUrl) {
+    public static String wsUrl(String serverUrl) {
         if (Internal.isBlank(serverUrl)) {
             serverUrl = window.location.protocol + "//" + window.location.host;
         }
         return serverUrl.replaceFirst("http", "ws").replaceAll("/$", "") + API_3_WSUPDATES + "/";
     }
+
+    public static JSApiClient createApiClientBare(String serverUrl) {
+        Requests requests = new Requests(serverUrl);
+        JSApiClient b = new JSApiClient(requests);
+        return b;
+    };
 
     public Observable<Error> liveErrors() {
         return wsLive.onError();
