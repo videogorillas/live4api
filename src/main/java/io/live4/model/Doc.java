@@ -8,5 +8,6 @@ public interface Doc {
     
     void setId(String id);
 
+    @Deprecated
     boolean isActive();
 }

@@ -50,4 +50,9 @@ public class MissionApi extends BaseAsyncDao<Mission> {
     public Observable<String> splitStreamsOnMissionEnd(String mid) {
         return requests.get(Api3MissionUrls.API_3_MISSION + "/split/" + mid);
     }
+
+    public Observable<String> getAudioChatToken() {
+        return requests.get(Api3MissionUrls.audioChatTokenUrl()).map(
+                json -> Internal.typefyJson(json, MissionShareToken.class).token);
+    }
 }
