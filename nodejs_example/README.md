@@ -7,7 +7,8 @@ npm install
 node index.js
 ```
 
-get stream mpd urls with hardware port numbers
+# Stream mpd urls with hardware port numbers
+
 ```javascript
 XMLHttpRequest = require('w3c-xmlhttprequest').XMLHttpRequest;
 let Rx = require("rx");
@@ -49,7 +50,7 @@ outputs:
 
 ```
 
-update user
+# update user
 
 ```javascript
 let api = JSApiClient.createApiClient("http://eha-vg.mx1ops.com:8642");
@@ -64,5 +65,30 @@ loginOk.concatMap(user => {
 }).subscribe(x => {
     console.log(x);
 });
+
+```
+
+# Get Locations
+
+```javascript
+let api = JSApiClient.createApiClient("https://qa.live4.io");
+let loginOk = api.login(new LoginRequest("anna.pogribnyak@gmail.com", "pewpew")).shareReplay(1);
+
+let allStreams = loginOk.concatMap(user => api.streams.list(user.id).concatMap(a => Observable.from(a)).filter(s => s != null));
+
+let latestStream = allStreams.take(1);
+
+let locations = latestStream.concatMap(s => api.streams.locations(s.sid()));
+
+locations.subscribe(x => console.log(x));
+
+//get mission36
+let mission36 = loginOk.concatMap(user => api.missions.get("mission36"));
+
+//get location of first stream in mission36
+let locations2 = mission36.concatMap(m => api.streams.locations(m.streamIds[0]));
+
+//print
+locations2.subscribe(x => console.log(x));
 
 ```
