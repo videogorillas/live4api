@@ -32,6 +32,11 @@ public class MissionApi extends BaseAsyncDao<Mission> {
         return requests.get(url).map(str -> true);
     }
 
+    public Observable<String> getAudioChatToken() {
+        return requests.get(Api3MissionUrls.audioChatTokenUrl()).map(
+                json -> Internal.typefyJson(json, MissionShareToken.class).token);
+    }
+
     @Override
     protected String getItemUrl(String id) {
         return Api3MissionUrls.getUrl(id);

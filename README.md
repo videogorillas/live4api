@@ -207,6 +207,7 @@ NOTE: Live4 public API is based on [ReactiveX library](https://github.com/Reacti
 
 2. `mvn clean package`
 3. `grunt`
+3.1 `git commit`
 4. `mvn release:prepare`
 4.1. Agree with questions
 5. `git push`

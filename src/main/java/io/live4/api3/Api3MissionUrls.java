@@ -84,4 +84,8 @@ public class Api3MissionUrls {
     }
 
     public static final String SHARE_TO_EMAIL_PARAM = "toEmail";
+
+    public static String audioChatTokenUrl() {
+        return AUDIO_CHAT_TOKEN + "?device=ios";
+    }
 }

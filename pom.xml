@@ -14,7 +14,7 @@
         <url>https://github.com/videogorillas/live4api</url>
         <connection>scm:git:https://github.com/videogorillas/live4api.git</connection>
         <developerConnection>scm:git:https://github.com/videogorillas/live4api.git</developerConnection>
-        <tag>live4api3-3.5.0-beta6</tag>
+        <tag>live4api3-3.6.0</tag>
     </scm>
     <repositories>
         <repository>

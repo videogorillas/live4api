@@ -51,6 +51,14 @@ public class TypeScriptTest {
     }
 
     @Test
+    public void testDeprecated() throws Exception {
+        Class cls = User.class;
+        Method method = Stream.of(cls.getMethods()).filter(m -> m.getName().contains("isActive")).findFirst().orElse(null);
+        Type genericReturnType = method.getGenericReturnType();
+        System.out.println(genericReturnType);
+    }
+
+    @Test
     @SuppressWarnings({ "unused", "rawtypes" })
     public void testGenerics() throws Exception {
         Class cls = CalendarApi.class;

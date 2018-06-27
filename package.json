@@ -1,9 +1,10 @@
 {
   "name": "live4api",
-  "version": "3.5.0-beta9",
+  "version": "3.6.0",
   "description": "LIVE4 API",
   "main": "live4api.js",
   "scripts": {
+    "grunt": "grunt",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
