@@ -1511,22 +1511,35 @@ live4api.WRX = stjs.extend(live4api.WRX, null, [], function(constructor, prototy
     constructor.webSocket = function(uri, onOpen) {
         return Rx.Observable.create(function(eventObserver) {
             var _ws = new WebSocket(uri);
-            _ws.onopen = function(domEvent) {
-                if (onOpen != null) {
-                    onOpen(_ws, domEvent);
+            live4api.WRX.setupSocket(onOpen, eventObserver, _ws);
+            return function() {
+                if (_ws.readyState != WebSocket.CLOSED && _ws.readyState != WebSocket.CLOSING) {
+                    _ws.close(1000, "ok");
                 }
             };
-            _ws.onmessage = function(msg) {
-                eventObserver.onNext(msg.data);
-            };
-            _ws.onerror = stjs.bind(eventObserver, "onError");
-            _ws.onclose = function(e) {
-                if (e.code == 1008) {
-                    var err = new Error(e.reason);
-                    eventObserver.onError(err);
-                }
-                eventObserver.onCompleted();
-            };
+        });
+    };
+    constructor.setupSocket = function(onOpen, eventObserver, _ws) {
+        _ws.onopen = function(domEvent) {
+            if (onOpen != null) {
+                onOpen(_ws, domEvent);
+            }
+        };
+        _ws.onmessage = function(msg) {
+            eventObserver.onNext(msg.data);
+        };
+        _ws.onerror = stjs.bind(eventObserver, "onError");
+        _ws.onclose = function(e) {
+            if (e.code == 1008) {
+                var err = new Error(e.reason);
+                eventObserver.onError(err);
+            }
+            eventObserver.onCompleted();
+        };
+    };
+    constructor.fromWebSocket = function(_ws, onOpen) {
+        return Rx.Observable.create(function(eventObserver) {
+            live4api.WRX.setupSocket(onOpen, eventObserver, _ws);
             return function() {
                 if (_ws.readyState != WebSocket.CLOSED && _ws.readyState != WebSocket.CLOSING) {
                     _ws.close(1000, "ok");
@@ -3194,6 +3207,24 @@ HardwareApi = stjs.extend(HardwareApi, BaseAsyncDao, [], function(constructor, p
         });
     };
 }, {cls: {name: "Class", arguments: ["T"]}, _wsrx: {name: "Rx.Observable", arguments: ["T"]}, requests: "live4api.Requests"}, {});
+var WSLiveSession = function(_ws) {
+    WSLive.call(this);
+    this._liveMessages = live4api.WRX.fromWebSocket(_ws, stjs.bind(this, function(ws, e) {
+        this.subs.forEach(function(sub) {
+            ws.send(sub);
+        });
+        this._ws.onNext(ws);
+    })).doOnError(stjs.bind(this, function(e) {
+        this.errorSubject.onNext(e);
+    })).repeatWhen(function(e) {
+        return e.delay(1000);
+    }).retryWhen(function(e) {
+        return e.delay(1000);
+    }).map(function(json) {
+        return Internal.typefyJson(json, live4api.LiveMessage);
+    }).share();
+};
+WSLiveSession = stjs.extend(WSLiveSession, WSLive, [], null, {_ws: {name: "Rx.ReplaySubject", arguments: ["WebSocket"]}, _liveMessages: {name: "Rx.Observable", arguments: ["live4api.LiveMessage"]}, errorSubject: {name: "Rx.Subject", arguments: ["Error"]}, subs: {name: "Array", arguments: [null]}}, {});
 var CalendarApi = function(requests, updates) {
     BaseAsyncDao.call(this, live4api.Calendar, updates, requests);
 };
@@ -3510,14 +3541,22 @@ live4api.JSApiClient = stjs.extend(live4api.JSApiClient, null, [], function(cons
         var wsurl = live4api.JSApiClient.wsUrl(serverUrl);
         var b = new live4api.JSApiClient(requests);
         b.wsLive = new WSLive(wsurl);
-        b.missions = new MissionApi(requests, b.wsLive.missionUpdates());
-        b.orgs = new OrgApi(requests, b.wsLive.orgUpdates());
-        b.users = new UserApi(requests, b.wsLive.userUpdates());
-        b.hw = new HardwareApi(requests, b.wsLive.hwUpdates());
-        b.calendars = new CalendarApi(requests, b.wsLive.calendarUpdates());
-        b.streams = new StreamApi(requests, b.wsLive);
-        b.hwStatus = new HWStatusApi(requests, b.wsLive.hwStatusUpdates());
-        b.overlays = new OverlayApi(requests);
+        b.setupApi();
+        return b;
+    };
+    prototype.setupApi = function() {
+        this.missions = new MissionApi(this.requests, this.wsLive.missionUpdates());
+        this.orgs = new OrgApi(this.requests, this.wsLive.orgUpdates());
+        this.users = new UserApi(this.requests, this.wsLive.userUpdates());
+        this.hw = new HardwareApi(this.requests, this.wsLive.hwUpdates());
+        this.calendars = new CalendarApi(this.requests, this.wsLive.calendarUpdates());
+        this.streams = new StreamApi(this.requests, this.wsLive);
+        this.hwStatus = new HWStatusApi(this.requests, this.wsLive.hwStatusUpdates());
+        this.overlays = new OverlayApi(this.requests);
+    };
+    constructor.createApiClientBare = function(serverUrl) {
+        var requests = new live4api.Requests(serverUrl);
+        var b = new live4api.JSApiClient(requests);
         return b;
     };
     constructor.wsUrl = function(serverUrl) {
@@ -3525,11 +3564,6 @@ live4api.JSApiClient = stjs.extend(live4api.JSApiClient, null, [], function(cons
             serverUrl = window.location.protocol + "//" + window.location.host;
         }
         return serverUrl.replaceFirst("http", "ws").replaceAll("/$", "") + live4api.Api3Urls.API_3_WSUPDATES + "/";
-    };
-    constructor.createApiClientBare = function(serverUrl) {
-        var requests = new live4api.Requests(serverUrl);
-        var b = new live4api.JSApiClient(requests);
-        return b;
     };
     prototype.liveErrors = function() {
         return this.wsLive.onError();
@@ -3587,6 +3621,10 @@ live4api.JSApiClient = stjs.extend(live4api.JSApiClient, null, [], function(cons
         return this.requests.postAsJson(live4api.Api3Urls.API_3_LOGIN, loginData).map(function(json) {
             return live4api.Typefy.typefy(JSON.parse(json), live4api.User);
         });
+    };
+    prototype.setWebSocket = function(_ws) {
+        this.wsLive = new WSLiveSession(_ws);
+        this.setupApi();
     };
     constructor.mapHardwareWithCalendar = function(be, hardware) {
         return Rx.Observable.of(hardware).concatMap(function(h) {

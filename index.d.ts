@@ -34,10 +34,10 @@ export class StreamLocation  {
     static accurateLocations: (arg: StreamLocation) => boolean;
 
     hashCode(): number;
-    lalo(): string;
+    static speedLocation(timestamp: string, speed: number): StreamLocation;
     static latLng(timestamp: string, latitude: number, longitude: number): StreamLocation;
     getSpeed(): number;
-    static speedLocation(timestamp: string, speed: number): StreamLocation;
+    lalo(): string;
     getTime(): number;
     getTimestamp(): string;
 }
@@ -109,7 +109,7 @@ export class LoginRequest  {
 export interface Doc  {
 
     getId(): string;
-    setId(id: string);
+    setId(arg0: string);
 }
 export class Stream implements Doc {
     _rev: number;
@@ -144,10 +144,11 @@ export class Stream implements Doc {
 
     getId(): string;
     isLive(): boolean;
+    isClosed(): boolean;
     sid(): StreamId;
+    setId(id: string);
     isActive(): boolean;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
-    setId(id: string);
     getStatus(): LiveStatus;
     isScheduled(): boolean;
     isUploading(): boolean;
@@ -160,7 +161,6 @@ export class Stream implements Doc {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
-    isClosed(): boolean;
 }
 export class Mission implements Doc {
     _rev: number;
@@ -183,8 +183,8 @@ export class Mission implements Doc {
 
     getId(): string;
     isLive(): boolean;
-    isActive(): boolean;
     setId(id: string);
+    isActive(): boolean;
     isScheduled(): boolean;
     addStream(streamId: string);
     hasStreamId(streamId: string): boolean;
@@ -277,9 +277,6 @@ export class Hardware implements Doc {
     _orgName: string;
 
     getId(): string;
-    isActive(): boolean;
-    setId(id: string);
-    isScheduled(): boolean;
     static isValidPortNumber(port: number): boolean;
     isMCBox(): boolean;
     isDrone(): boolean;
@@ -293,6 +290,9 @@ export class Hardware implements Doc {
     static statusLabel(s: HwAvailability): string;
     getAvailabilityFor(ti: TimeInterval): HwAvailability;
     setPort(port: number): Hardware;
+    setId(id: string);
+    isActive(): boolean;
+    isScheduled(): boolean;
 }
 export enum HwState { CLOSED, OPEN, DATA_RECEIVED, DATA_PARSED, BAD_DATA }
 export class Organization implements Doc {
@@ -324,8 +324,8 @@ export class Organization implements Doc {
     removeHardware(hardwareId: string);
     listHardwareIds(): string[];
     hasOnlyOneAdmin(): boolean;
-    isActive(): boolean;
     setId(id: string);
+    isActive(): boolean;
     getStatus(): string;
     removeUser(userId: string);
     addUser(userId: string);
@@ -360,8 +360,7 @@ export class User implements Doc {
     getName(): string;
     getId(): string;
     getType(): LoginType;
-    setId(id: string);
-    isOrgAdmin(orgId: string): boolean;
+    belongsToOrg(orgId: string): boolean;
     isUserActiveInAnyOrg(): boolean;
     isUserActiveInOrg(orgId: string): boolean;
     getProfile(orgId: string): UserProfile;
@@ -392,8 +391,9 @@ export class User implements Doc {
     setOrgPhone(orgId: string, phone: string);
     getOrgNotes(orgId: string): string;
     setOrgNotes(orgId: string, notes: string);
-    belongsToOrg(orgId: string): boolean;
     created(): number;
+    setId(id: string);
+    isOrgAdmin(orgId: string): boolean;
 }
 export class DataSegment  {
     constructor(playerTime: number, l: StreamLocation);
@@ -455,16 +455,17 @@ export class StreamResponse  {
     city: string;
 
     userpic(): string;
-    getHostUrl(): string;
     getFlash(): string;
+    getHostUrl(): string;
     username(): string;
     isoDate(): string;
     getId(): string;
     isLive(): boolean;
+    isClosed(): boolean;
     sid(): StreamId;
+    setId(id: string);
     isActive(): boolean;
     static createStream(sid: StreamId, privacy: Privacy): Stream;
-    setId(id: string);
     getStatus(): LiveStatus;
     isScheduled(): boolean;
     isUploading(): boolean;
@@ -477,7 +478,6 @@ export class StreamResponse  {
     getMp4(): string;
     getThumb(): string;
     getM3u8(): string;
-    isClosed(): boolean;
 }
 export class UserResponse  {
     constructor(id: string, name: string, userpic: string, type: LoginType, intoURL: string, homeTown: string, activities: UserActivityResponse[]);
@@ -523,15 +523,15 @@ export class TSFile  {
 
     equals(obj: Object): boolean;
     hashCode(): number;
-    getCtime(): number;
-    getMseq(): number;
     getVideoDuration(): number;
     getVideoDurationMsec(): number;
     getVideoDurationSec(): number;
+    getMseq(): number;
     getFilename(): string;
     getFilesize(): number;
     getStartTimeMsec(): number;
     getStartTime(): number;
+    getCtime(): number;
     getTimescale(): number;
     setVideoDuration(videoDuration: number);
 }
@@ -554,9 +554,9 @@ export class HWStatus implements Doc {
     mtime: number;
 
     getId(): string;
-    isActive(): boolean;
-    setId(id: string);
     static newStatus(hwid: string, status: HwState): HWStatus;
+    setId(id: string);
+    isActive(): boolean;
 }
 export class MissionPermissions  {
 
@@ -598,9 +598,9 @@ export class Calendar implements Doc {
     intervals: {[id: string]: TimeInterval};
 
     getId(): string;
-    isActive(): boolean;
-    setId(id: string);
     isBusyAt(interval: TimeInterval): boolean;
+    setId(id: string);
+    isActive(): boolean;
 }
 export class NewOrgAdminProfile  {
     constructor(org: Organization, admin: User, profile: UserProfile);
@@ -688,10 +688,10 @@ export class OverlayApi  {
 }
 export class MissionApi  {
 
-    getShareToken(missionId: string): Observable<string>;
-    shareMission(mission: Mission, toEmail: string): Observable<boolean>;
-    unshareMission(mission: Mission, toEmail: string): Observable<boolean>;
-    splitStreamsOnMissionEnd(mid: string): Observable<string>;
+    getShareToken(arg0: string): Observable<string>;
+    shareMission(arg0: Mission, arg1: string): Observable<boolean>;
+    unshareMission(arg0: Mission, arg1: string): Observable<boolean>;
+    splitStreamsOnMissionEnd(arg0: string): Observable<string>;
     getAudioChatToken(): Observable<string>;
     remove(id: string): Observable<Mission>;
     get(id: string): Observable<Mission>;
@@ -711,12 +711,13 @@ export class JSApiClient  {
     overlays: OverlayApi;
 
     static createApiClient(arg0: string): JSApiClient;
-    static wsUrl(arg0: string): string;
     static createApiClientBare(arg0: string): JSApiClient;
+    static wsUrl(arg0: string): string;
     liveErrors(): Observable<Error>;
     createOrgFull(arg0: Organization, arg1: User, arg2: UserProfile): Observable<Organization>;
     resetPassword(arg0: LoginRequest): Observable<User>;
     logout(): Observable<string>;
+    setWebSocket(arg0: WebSocket);
     static mapHardwareWithCalendar(arg0: JSApiClient, arg1: Hardware): Observable<Hardware>;
     login(arg0: LoginRequest): Observable<User>;
 }
@@ -733,9 +734,9 @@ export class StreamApi  {
 
     list(userId: string): Observable<StreamResponse[]>;
     locationUpdates(sid: string): Observable<StreamLocation>;
-    locations(sid: string): Observable<StreamLocation[]>;
     liveMessages(sid: string): Observable<LiveMessage>;
     updateTitle(sid: string, newTitle: string): Observable<StreamResponse>;
+    locations(sid: string): Observable<StreamLocation[]>;
     remove(id: string): Observable<StreamResponse>;
     get(id: string): Observable<StreamResponse>;
     create(item: StreamResponse): Observable<StreamResponse>;
@@ -744,10 +745,10 @@ export class StreamApi  {
 }
 export class HardwareApi  {
 
+    logList(hwId: string): Observable<HWLogEntry[]>;
     findByPort(port: number): Observable<Hardware>;
     releaseHardwares(removedHws: string[], mId: string): Observable<string>;
     reassignHardware(orgId: string, hwId: string): Observable<string>;
-    logList(hwId: string): Observable<HWLogEntry[]>;
     remove(id: string): Observable<Hardware>;
     get(id: string): Observable<Hardware>;
     create(item: Hardware): Observable<Hardware>;

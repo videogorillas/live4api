@@ -8,6 +8,7 @@ import static org.stjs.javascript.JSGlobal.JSON;
 
 import org.stjs.javascript.Array;
 import org.stjs.javascript.Error;
+import org.stjs.javascript.annotation.Native;
 import org.stjs.javascript.websocket.WebSocket;
 
 import com.vg.js.bridge.Rx;
@@ -25,10 +26,10 @@ import io.live4.model.StreamLocation;
 import io.live4.model.User;
 
 public class WSLive {
-    private ReplaySubject<WebSocket> _ws;
-    private Observable<LiveMessage> _liveMessages;
-    private Rx.Subject<Error> errorSubject;
-    private Array<String> subs;
+    protected ReplaySubject<WebSocket> _ws;
+    protected Observable<LiveMessage> _liveMessages;
+    protected Rx.Subject<Error> errorSubject;
+    protected Array<String> subs;
 
     public WSLive(String url) {
         subs = $array();
@@ -52,6 +53,13 @@ public class WSLive {
                 })
                 .share();
 
+    }
+    
+    @Native
+    public WSLive() {
+        subs = $array();
+        _ws = new ReplaySubject<>(1);
+        errorSubject = new Rx.Subject<>();
     }
 
     public Observable<Error> onError(){
