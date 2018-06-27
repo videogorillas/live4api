@@ -361,7 +361,7 @@
         <dependency>
             <groupId>org.st-js.bridge</groupId>
             <artifactId>html</artifactId>
-            <version>5.0.bv30-74</version>
+            <version>5.0.bv41-111</version>
         </dependency>
         <dependency>
             <groupId>com.vg</groupId>
